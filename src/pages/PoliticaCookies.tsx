@@ -228,7 +228,7 @@ const PoliticaCookies = () => {
               7. Alterações a esta Política
             </h2>
             <p className="text-muted-foreground leading-relaxed mt-3">
-              A VRCF reserva-se o direito de alterar a presente Política de Cookies a qualquer momento. 
+              A Kilomat reserva-se o direito de alterar a presente Política de Cookies a qualquer momento. 
               Quaisquer alterações serão publicadas nesta página com a data de atualização.
             </p>
           </section>

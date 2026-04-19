@@ -56,7 +56,7 @@ const QuoteRequestAdminEmail = ({
         </Section>
         <Hr style={hr} />
         <Text style={footer}>
-          Email gerado automaticamente pelo catálogo online VRCF.
+          Email gerado automaticamente pelo catálogo online Kilomat.
         </Text>
       </Container>
     </Body>
