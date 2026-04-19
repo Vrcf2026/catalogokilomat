@@ -13,7 +13,7 @@ export default {
       },
     },
     fontFamily: {
-        heading: ['Space Grotesk', 'sans-serif'],
+        heading: ['Barlow Condensed', 'sans-serif'],
         body: ['Inter', 'sans-serif'],
       },
     extend: {
