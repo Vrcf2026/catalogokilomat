@@ -1,0 +1,2 @@
+UPDATE brands SET logo_url = 'https://mgdhclajlcmepdfrkktw.supabase.co/storage/v1/object/public/product-images/brands%2Fdahua-logo.png' WHERE name = 'Dahua';
+UPDATE brands SET logo_url = 'https://mgdhclajlcmepdfrkktw.supabase.co/storage/v1/object/public/product-images/brands%2Fajax-logo.png' WHERE name = 'Ajax';
