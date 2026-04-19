@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getCatalogBookLayout } from "@/lib/catalogBookLayout";
-import vrcfLogo from "@/assets/vrcf-logo.png";
+import kilomatLogo from "@/assets/kilomat-wordmark.png";
 
 const TOTAL_PAGES = 16;
 const PAGE_URLS = Array.from({ length: TOTAL_PAGES }, (_, i) =>
@@ -104,7 +104,7 @@ export function KilomatCatalogViewer({ onBack }: KilomatCatalogViewerProps) {
           <ChevronLeft className="h-4 w-4" /> Voltar
         </button>
         <div className="flex items-center gap-2">
-          <img src={vrcfLogo} alt="Kilomat" className="h-10 w-10 object-contain" />
+          <img src={kilomatLogo} alt="Kilomat" className="h-10 w-10 object-contain" />
           <span className="font-heading font-bold text-white/90 text-sm">Kilomat</span>
         </div>
         <Button variant="ghost" size="sm" className="text-white/60 hover:text-white hover:bg-white/10 gap-1.5" onClick={toggleFullscreen}>

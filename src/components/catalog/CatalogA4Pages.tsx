@@ -1,7 +1,7 @@
 import { forwardRef, type ReactNode } from "react";
 import { Globe, ImageOff, Mail, MapPin, Phone, Search, ZoomIn } from "lucide-react";
-import vrcfLogo from "@/assets/vrcf-logo.png";
-import vrcfShield from "@/assets/vrcf-shield.png";
+import kilomatLogo from "@/assets/kilomat-wordmark.png";
+import kilomatShield from "@/assets/kilomat-logo.png";
 
 export interface CatalogProduct {
   id: string;
@@ -149,7 +149,7 @@ export const CatalogCoverPage = forwardRef<HTMLDivElement, {
 
       <div className="h-full flex flex-col items-center justify-center relative z-10 px-8">
         <div className="absolute top-6 left-0 right-0 flex flex-col items-center">
-          <img src={vrcfLogo} alt="Kilomat" className="h-28 w-28 object-contain drop-shadow-lg" />
+          <img src={kilomatLogo} alt="Kilomat" className="h-28 w-28 object-contain drop-shadow-lg" />
           <p className="text-white/60 text-[8px] tracking-[0.4em] uppercase mt-1 font-medium">Materiais de Construção</p>
         </div>
 
@@ -207,7 +207,7 @@ export const CatalogContactsPage = forwardRef<HTMLDivElement, {
       <div className="absolute top-0 left-0 right-0 h-1.5" style={{ background: theme.accent }} />
 
       <div className="h-full flex flex-col items-center justify-center relative z-10 px-8">
-        <img src={vrcfShield} alt="Kilomat" className="h-40 w-40 object-contain drop-shadow-lg mb-6" />
+        <img src={kilomatShield} alt="Kilomat" className="h-40 w-40 object-contain drop-shadow-lg mb-6" />
 
         <h2 className="font-heading text-2xl font-bold text-white mb-1">Kilomat</h2>
         <p className="text-white/50 text-xs tracking-[0.3em] uppercase mb-8">Materiais de Construção</p>
@@ -326,7 +326,7 @@ export const CatalogProductPage = forwardRef<HTMLDivElement, {
             {brandLogo ? (
               <img src={brandLogo} alt={category} style={{ height: logoH }} className="object-contain" />
             ) : (
-              <img src={vrcfLogo} alt="Kilomat" style={{ height: logoH, width: logoH }} className="object-contain" />
+              <img src={kilomatLogo} alt="Kilomat" style={{ height: logoH, width: logoH }} className="object-contain" />
             )}
             <span className="font-heading font-bold" style={{ fontSize: fontHeader, color: "#1a1a1a" }}>{category}</span>
           </div>

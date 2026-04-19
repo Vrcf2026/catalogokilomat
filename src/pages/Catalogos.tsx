@@ -6,7 +6,7 @@ import { BookOpen, Loader2 } from "lucide-react";
 import { CatalogViewer } from "@/components/CatalogViewer";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import vrcfLogo from "@/assets/vrcf-logo.png";
+import kilomatLogo from "@/assets/kilomat-wordmark.png";
 
 const CATEGORY_THEMES: Record<string, { icon: string; bgImage: string }> = {
   Laptops: { icon: "💻", bgImage: "/images/bg-laptops.jpg" },
@@ -196,7 +196,7 @@ const Catalogos = () => {
       <header className="flex-shrink-0 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="flex items-center justify-between px-4 py-2">
           <div className="flex items-center gap-2">
-            <img src={vrcfLogo} alt="Kilomat" className="h-20 w-auto object-contain drop-shadow-md" />
+            <img src={kilomatLogo} alt="Kilomat" className="h-20 w-auto object-contain drop-shadow-md" />
             <div>
               <h1 className="font-heading text-xl font-bold text-foreground leading-tight">Kilomat</h1>
               <p className="text-[10px] font-medium text-muted-foreground tracking-wider uppercase">Materiais de Construção</p>

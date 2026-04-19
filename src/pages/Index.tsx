@@ -6,8 +6,8 @@ import { useState, useMemo } from "react";
 import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { ProductFilters } from "@/components/ProductFilters";
-import vrcfLogo from "@/assets/vrcf-logo.png";
-import vrcfShield from "@/assets/vrcf-shield.png";
+import kilomatLogo from "@/assets/kilomat-wordmark.png";
+import kilomatShield from "@/assets/kilomat-logo.png";
 import { Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { CartDrawer } from "@/components/CartDrawer";
@@ -179,7 +179,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto flex items-center justify-between px-3 py-2 sm:px-4 sm:py-4">
-          <img src={vrcfLogo} alt="Kilomat Logo" className="h-10 sm:h-20 w-auto drop-shadow-md" />
+          <img src={kilomatLogo} alt="Kilomat Logo" className="h-10 sm:h-20 w-auto drop-shadow-md" />
           <div className="flex items-center gap-2 sm:gap-3">
             <DarkModeToggle />
             <Button variant="outline" size="sm" className="relative gap-1 sm:gap-1.5 text-xs sm:text-sm h-8 sm:h-9 px-2.5 sm:px-3" onClick={() => setIsOpen(true)}>
@@ -342,7 +342,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <img src={vrcfShield} alt="Kilomat" className="h-12 w-auto" />
+              <img src={kilomatShield} alt="Kilomat" className="h-12 w-auto" />
               <div>
                 <p className="font-heading font-bold text-sm">Kilomat — Materiais de Construção</p>
                 <p className="text-xs text-accent-foreground/70">Materiais de construção, ferramentas, canalização e tintas</p>
