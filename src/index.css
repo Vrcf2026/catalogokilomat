@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -15,28 +15,28 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 25% 12%;
 
-    --primary: 27 90% 50%;
+    --primary: 357 86% 52%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 15% 93%;
-    --secondary-foreground: 220 25% 18%;
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 240 5% 13%;
 
-    --muted: 210 15% 93%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 240 4% 40%;
 
-    --accent: 220 60% 25%;
+    --accent: 240 5% 13%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 210 15% 89%;
-    --input: 210 15% 89%;
-    --ring: 27 90% 50%;
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 357 86% 52%;
 
-    --radius: 0.75rem;
+    --radius: 0.375rem;
 
-    --font-heading: 'Space Grotesk', sans-serif;
+    --font-heading: 'Barlow Condensed', sans-serif;
     --font-body: 'Inter', sans-serif;
 
     --sidebar-background: 0 0% 98%;
@@ -46,37 +46,37 @@
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 27 90% 50%;
+    --sidebar-ring: 357 86% 52%;
   }
 
   .dark {
-    --background: 220 25% 7%;
-    --foreground: 0 0% 95%;
-    --card: 220 25% 10%;
-    --card-foreground: 0 0% 95%;
-    --popover: 220 25% 10%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 27 90% 55%;
+    --background: 240 6% 8%;
+    --foreground: 0 0% 96%;
+    --card: 240 5% 12%;
+    --card-foreground: 0 0% 96%;
+    --popover: 240 5% 12%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 357 86% 56%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 15% 16%;
-    --secondary-foreground: 0 0% 90%;
-    --muted: 220 15% 16%;
-    --muted-foreground: 220 10% 55%;
-    --accent: 220 60% 35%;
+    --secondary: 240 4% 18%;
+    --secondary-foreground: 0 0% 92%;
+    --muted: 240 4% 18%;
+    --muted-foreground: 240 4% 60%;
+    --accent: 357 86% 56%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 220 15% 18%;
-    --input: 220 15% 18%;
-    --ring: 27 90% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 27 90% 55%;
+    --destructive: 0 62.8% 40%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 4% 20%;
+    --input: 240 4% 20%;
+    --ring: 357 86% 56%;
+    --sidebar-background: 240 6% 10%;
+    --sidebar-foreground: 0 0% 92%;
+    --sidebar-primary: 357 86% 56%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 27 90% 55%;
+    --sidebar-accent: 240 4% 16%;
+    --sidebar-accent-foreground: 0 0% 92%;
+    --sidebar-border: 240 4% 18%;
+    --sidebar-ring: 357 86% 56%;
   }
 }
 
