@@ -166,7 +166,7 @@ export function CatalogPdfRenderer({
           await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
         }
 
-        const fileName = `Catalogo_${category.replace(/\s+/g, "_")}_VRCF.pdf`;
+        const fileName = `Catalogo_${category.replace(/\s+/g, "_")}_Kilomat.pdf`;
         const blob = pdf.output("blob");
         toast.success(`PDF "${category}" pronto para descarregar.`);
         completionResult = { fileName, blob };

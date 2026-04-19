@@ -23,7 +23,7 @@ const SuggestionAdminEmail = ({ name = '', email = '', message = '' }: Props) =>
         <Text style={messageBox}>{message}</Text>
         <Hr style={hr} />
         <Text style={footer}>
-          Email gerado automaticamente pelo catálogo online VRCF.
+          Email gerado automaticamente pelo catálogo online Kilomat.
         </Text>
       </Container>
     </Body>
@@ -35,7 +35,7 @@ export const template = {
   subject: (d: Record<string, any>) =>
     `Nova Sugestão - ${(d?.name || 'Visitante').toString().slice(0, 80)}`,
   displayName: 'Sugestão (admin)',
-  to: 'geral@vrcf.pt',
+  to: 'kilomat@gmail.com',
   previewData: {
     name: 'Maria Silva',
     email: 'maria@example.com',

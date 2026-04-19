@@ -5,4 +5,4 @@ Disallow: /login
 Disallow: /catalogos/destaques
 Disallow: /catalogos/kilomat
 
-Sitemap: https://showroom.vrcf.info/sitemap.xml
+Sitemap: https://kilomat.pt/sitemap.xml

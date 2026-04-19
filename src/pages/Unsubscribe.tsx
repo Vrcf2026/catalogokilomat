@@ -74,7 +74,7 @@ export default function Unsubscribe() {
 
           {state === "valid" && (
             <>
-              <p>Confirmas que queres deixar de receber emails da VRCF?</p>
+              <p>Confirmas que queres deixar de receber emails da Kilomat?</p>
               <Button onClick={confirmUnsubscribe} className="w-full">
                 Confirmar cancelamento
               </Button>

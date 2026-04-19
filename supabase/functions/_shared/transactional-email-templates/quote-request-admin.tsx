@@ -56,7 +56,7 @@ const QuoteRequestAdminEmail = ({
         </Section>
         <Hr style={hr} />
         <Text style={footer}>
-          Email gerado automaticamente pelo catálogo online VRCF.
+          Email gerado automaticamente pelo catálogo online Kilomat.
         </Text>
       </Container>
     </Body>
@@ -68,7 +68,7 @@ export const template = {
   subject: (d: Record<string, any>) =>
     `Novo Pedido de Orçamento - ${(d?.customerName || 'Cliente').toString().slice(0, 80)}`,
   displayName: 'Pedido de orçamento (admin)',
-  to: 'geral@vrcf.pt',
+  to: 'kilomat@gmail.com',
   previewData: {
     customerName: 'João Silva',
     customerEmail: 'joao@example.com',

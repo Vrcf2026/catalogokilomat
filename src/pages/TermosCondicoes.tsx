@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import vrcfLogo from "@/assets/vrcf-logo.png";
+import kilomatLogo from "@/assets/kilomat-wordmark.png";
 
 const TermosCondicoes = () => {
   return (
@@ -9,7 +9,7 @@ const TermosCondicoes = () => {
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <div className="flex items-center gap-3">
-            <img src={vrcfLogo} alt="VRCF Logo" className="h-16 w-auto drop-shadow-md" />
+            <img src={kilomatLogo} alt="Kilomat Logo" className="h-16 w-auto drop-shadow-md" />
           </div>
           <Link to="/">
             <Button variant="outline" size="sm" className="gap-1.5">
@@ -37,13 +37,13 @@ const TermosCondicoes = () => {
             </h2>
             <p className="text-muted-foreground leading-relaxed mt-3">
               O presente catálogo online, disponível em{" "}
-              <a href="https://showroom.vrcf.info" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                showroom.vrcf.info
+              <a href="https://kilomat.pt" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                kilomat.pt
               </a>{" "}
               (doravante "Catálogo"), é propriedade e é gerido por{" "}
-              <strong className="text-foreground">VALTER ROBERTO CRUZ FRANCISCO UNI. LDA</strong>, 
-              com o NIF <strong className="text-foreground">515237205</strong>{" "}
-              (doravante "VRCF", "nós" ou "empresa"), empresa devidamente constituída e registada ao abrigo da lei portuguesa. 
+              <strong className="text-foreground">Kilomat - Materiais para Construção, Lda.</strong>, 
+              com o NIF <strong className="text-foreground">508086140</strong>{" "}
+              (doravante "Kilomat", "nós" ou "empresa"), empresa devidamente constituída e registada ao abrigo da lei portuguesa. 
               Para efeitos de contacto e exercício de direitos, pode contactar-nos através dos meios disponibilizados no Catálogo.
             </p>
           </section>
@@ -53,7 +53,7 @@ const TermosCondicoes = () => {
               2. Âmbito e Objeto
             </h2>
             <p className="text-muted-foreground leading-relaxed mt-3">
-              O presente documento estabelece os Termos e Condições que regulam a utilização do Catálogo online da VRCF, 
+              O presente documento estabelece os Termos e Condições que regulam a utilização do Catálogo online da Kilomat, 
               bem como as condições aplicáveis ao processo de pedido de orçamento. O Catálogo tem carácter meramente informativo 
               e constitui um instrumento de consulta de produtos e soluções nas áreas de Informática e Segurança Eletrónica. 
               O Catálogo não constitui uma oferta de venda direta, nem um contrato de compra e venda.
@@ -74,13 +74,13 @@ const TermosCondicoes = () => {
             <h3 className="font-heading text-lg font-semibold text-foreground mt-4">3.2 Como solicitar um orçamento</h3>
             <p className="text-muted-foreground leading-relaxed mt-2">
               Para adquirir qualquer produto ou solução apresentado no Catálogo, o cliente deve submeter um pedido de orçamento 
-              através dos canais de contacto disponibilizados. Após receção do pedido, a VRCF analisará a solicitação e enviará 
+              através dos canais de contacto disponibilizados. Após receção do pedido, a Kilomat analisará a solicitação e enviará 
               uma proposta comercial personalizada.
             </p>
 
             <h3 className="font-heading text-lg font-semibold text-foreground mt-4">3.3 Validade dos orçamentos</h3>
             <ul className="list-disc pl-6 text-muted-foreground space-y-1 mt-2">
-              <li>Os orçamentos emitidos pela VRCF têm validade indicada expressamente em cada proposta comercial.</li>
+              <li>Os orçamentos emitidos pela Kilomat têm validade indicada expressamente em cada proposta comercial.</li>
               <li>Na ausência de indicação específica, o prazo de validade do orçamento é de 30 (trinta) dias corridos a contar da data de emissão.</li>
               <li>Findo o prazo de validade, o orçamento caduca automaticamente, podendo os preços estar sujeitos a alteração.</li>
               <li>A aceitação do orçamento deve ser feita por escrito (email ou outro meio documentado) dentro do prazo de validade.</li>
@@ -102,12 +102,12 @@ const TermosCondicoes = () => {
               <li>Disponibilidade de stock.</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-3">
-              O preço final e vinculativo será sempre o constante do orçamento emitido pela VRCF e aceite pelo cliente. 
-              A VRCF não se responsabiliza por eventuais erros tipográficos ou desatualizações de preços no Catálogo.
+              O preço final e vinculativo será sempre o constante do orçamento emitido pela Kilomat e aceite pelo cliente. 
+              A Kilomat não se responsabiliza por eventuais erros tipográficos ou desatualizações de preços no Catálogo.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-2">
               Todos os preços apresentados no Catálogo incluem IVA à taxa legal em vigor, sendo meramente indicativos. 
-              O preço definitivo será o indicado no orçamento formal emitido pela VRCF.
+              O preço definitivo será o indicado no orçamento formal emitido pela Kilomat.
             </p>
           </section>
 
@@ -121,7 +121,7 @@ const TermosCondicoes = () => {
               do Código do Direito de Autor e dos Direitos Conexos (aprovado pelo Decreto-Lei n.º 63/85, de 14 de março, 
               e sucessivas alterações) e demais legislação aplicável.
             </p>
-            <p className="text-muted-foreground leading-relaxed mt-3">É expressamente proibido, sem autorização prévia e escrita da VRCF:</p>
+            <p className="text-muted-foreground leading-relaxed mt-3">É expressamente proibido, sem autorização prévia e escrita da Kilomat:</p>
             <ul className="list-disc pl-6 text-muted-foreground space-y-1 mt-2">
               <li>Reproduzir, copiar, distribuir ou modificar qualquer conteúdo do Catálogo;</li>
               <li>Utilizar o Catálogo ou o seu conteúdo para fins comerciais próprios;</li>
@@ -141,7 +141,7 @@ const TermosCondicoes = () => {
 
             <h3 className="font-heading text-lg font-semibold text-foreground mt-4">6.1 Responsável pelo Tratamento</h3>
             <p className="text-muted-foreground leading-relaxed mt-2">
-              A VRCF é a Responsável pelo Tratamento dos dados pessoais recolhidos no âmbito da utilização do Catálogo 
+              A Kilomat é a Responsável pelo Tratamento dos dados pessoais recolhidos no âmbito da utilização do Catálogo 
               e do processo de pedido de orçamento, nos termos do Regulamento (UE) 2016/679 (RGPD) e da Lei n.º 58/2019, de 8 de agosto.
             </p>
 
@@ -180,7 +180,7 @@ const TermosCondicoes = () => {
               <li><strong className="text-foreground">Retirar o consentimento</strong> — a qualquer momento, sem afetar a licitude do tratamento anterior.</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-3">
-              Para exercer os seus direitos, o titular pode contactar a VRCF através dos meios indicados no Catálogo. 
+              Para exercer os seus direitos, o titular pode contactar a Kilomat através dos meios indicados no Catálogo. 
               Tem ainda o direito de apresentar reclamação à Comissão Nacional de Proteção de Dados (CNPD), em{" "}
               <a href="https://www.cnpd.pt" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                 www.cnpd.pt
@@ -189,7 +189,7 @@ const TermosCondicoes = () => {
 
             <h3 className="font-heading text-lg font-semibold text-foreground mt-4">6.6 Segurança</h3>
             <p className="text-muted-foreground leading-relaxed mt-2">
-              A VRCF adota as medidas técnicas e organizativas adequadas para proteger os dados pessoais contra acesso não autorizado, 
+              A Kilomat adota as medidas técnicas e organizativas adequadas para proteger os dados pessoais contra acesso não autorizado, 
               perda, destruição ou divulgação indevida.
             </p>
           </section>
@@ -199,8 +199,8 @@ const TermosCondicoes = () => {
               7. Limitação de Responsabilidade
             </h2>
             <p className="text-muted-foreground leading-relaxed mt-3">
-              A VRCF envidará todos os esforços para manter o Catálogo atualizado e disponível, mas não garante a ausência 
-              de erros, omissões ou interrupções. A VRCF não se responsabiliza por:
+              A Kilomat envidará todos os esforços para manter o Catálogo atualizado e disponível, mas não garante a ausência 
+              de erros, omissões ou interrupções. A Kilomat não se responsabiliza por:
             </p>
             <ul className="list-disc pl-6 text-muted-foreground space-y-1 mt-2">
               <li>Danos diretos ou indiretos decorrentes da utilização ou impossibilidade de utilização do Catálogo;</li>
@@ -215,7 +215,7 @@ const TermosCondicoes = () => {
             </h2>
             <p className="text-muted-foreground leading-relaxed mt-3">
               Os presentes Termos e Condições são regidos pela lei portuguesa. Para a resolução de quaisquer litígios emergentes 
-              da interpretação ou aplicação destes Termos, as partes elegem o foro da comarca da sede da VRCF, com expressa 
+              da interpretação ou aplicação destes Termos, as partes elegem o foro da comarca da sede da Kilomat, com expressa 
               renúncia a qualquer outro.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-3">
@@ -234,16 +234,16 @@ const TermosCondicoes = () => {
               9. Alterações aos Termos e Condições
             </h2>
             <p className="text-muted-foreground leading-relaxed mt-3">
-              A VRCF reserva-se o direito de alterar os presentes Termos e Condições a qualquer momento. As alterações entrarão 
+              A Kilomat reserva-se o direito de alterar os presentes Termos e Condições a qualquer momento. As alterações entrarão 
               em vigor após a sua publicação no Catálogo. Recomendamos que consulte regularmente esta página.
             </p>
           </section>
 
           <div className="border-t border-border pt-6 mt-10 text-center space-y-2">
-            <p className="text-sm font-semibold text-foreground">VRCF — Catálogo Online de Informática & Segurança</p>
+            <p className="text-sm font-semibold text-foreground">Kilomat — Catálogo Online de Materiais de Construção</p>
             <p className="text-xs text-muted-foreground">
-              <a href="https://showroom.vrcf.info" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                showroom.vrcf.info
+              <a href="https://kilomat.pt" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                kilomat.pt
               </a>{" "}
               | Atualizado em 27/03/2026
             </p>
@@ -260,7 +260,7 @@ const TermosCondicoes = () => {
       <footer className="border-t border-border bg-accent text-accent-foreground py-6 mt-12">
         <div className="container mx-auto px-4 text-center">
           <p className="text-xs text-accent-foreground/70">
-            © {new Date().getFullYear()} VALTER ROBERTO CRUZ FRANCISCO UNI. LDA — NIF: 515237205. Todos os direitos reservados.
+            © {new Date().getFullYear()} Kilomat - Materiais para Construção, Lda. — NIF: 508086140. Todos os direitos reservados.
           </p>
         </div>
       </footer>

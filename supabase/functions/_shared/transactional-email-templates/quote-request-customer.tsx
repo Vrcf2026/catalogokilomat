@@ -27,7 +27,7 @@ const QuoteRequestCustomerEmail = ({
 }: Props) => (
   <Html lang="pt" dir="ltr">
     <Head />
-    <Preview>Cópia do seu pedido de orçamento - VRCF</Preview>
+    <Preview>Cópia do seu pedido de orçamento - Kilomat</Preview>
     <Body style={main}>
       <Container style={container}>
         <Heading style={h1}>📋 Cópia do Seu Pedido de Orçamento</Heading>
@@ -56,9 +56,9 @@ const QuoteRequestCustomerEmail = ({
           </>
         ) : null}
         <Hr style={hr} />
-        <Text style={footer}>VRCF - VALTER ROBERTO CRUZ FRANCISCO UNI. LDA</Text>
-        <Text style={footer}>📞 +351 911 564 243 · ✉️ geral@vrcf.pt</Text>
-        <Text style={footer}>📍 Rua Luis Calado Nunes 15 LJB, 2870-350 Montijo</Text>
+        <Text style={footer}>Kilomat - Materiais para Construção, Lda.</Text>
+        <Text style={footer}>📞 +351 938 283 386 · ✉️ kilomat@gmail.com</Text>
+        <Text style={footer}>📍 Estr. do Pau Queimado, Zona Industrial Pau Queimado, 2870-100 Montijo</Text>
       </Container>
     </Body>
   </Html>
@@ -66,7 +66,7 @@ const QuoteRequestCustomerEmail = ({
 
 export const template = {
   component: QuoteRequestCustomerEmail,
-  subject: 'Cópia do seu pedido de orçamento - VRCF',
+  subject: 'Cópia do seu pedido de orçamento - Kilomat',
   displayName: 'Pedido de orçamento (cliente)',
   previewData: {
     customerName: 'João Silva',

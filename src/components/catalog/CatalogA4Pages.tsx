@@ -1,7 +1,7 @@
 import { forwardRef, type ReactNode } from "react";
 import { Globe, ImageOff, Mail, MapPin, Phone, Search, ZoomIn } from "lucide-react";
-import vrcfLogo from "@/assets/vrcf-logo.png";
-import vrcfShield from "@/assets/vrcf-shield.png";
+import kilomatLogo from "@/assets/kilomat-wordmark.png";
+import kilomatShield from "@/assets/kilomat-logo.png";
 
 export interface CatalogProduct {
   id: string;
@@ -149,8 +149,8 @@ export const CatalogCoverPage = forwardRef<HTMLDivElement, {
 
       <div className="h-full flex flex-col items-center justify-center relative z-10 px-8">
         <div className="absolute top-6 left-0 right-0 flex flex-col items-center">
-          <img src={vrcfLogo} alt="VRCF" className="h-28 w-28 object-contain drop-shadow-lg" />
-          <p className="text-white/60 text-[8px] tracking-[0.4em] uppercase mt-1 font-medium">Informática & Segurança</p>
+          <img src={kilomatLogo} alt="Kilomat" className="h-28 w-28 object-contain drop-shadow-lg" />
+          <p className="text-white/60 text-[8px] tracking-[0.4em] uppercase mt-1 font-medium">Materiais de Construção</p>
         </div>
 
         {isBrand && brandLogo ? (
@@ -207,21 +207,21 @@ export const CatalogContactsPage = forwardRef<HTMLDivElement, {
       <div className="absolute top-0 left-0 right-0 h-1.5" style={{ background: theme.accent }} />
 
       <div className="h-full flex flex-col items-center justify-center relative z-10 px-8">
-        <img src={vrcfShield} alt="VRCF" className="h-40 w-40 object-contain drop-shadow-lg mb-6" />
+        <img src={kilomatShield} alt="Kilomat" className="h-40 w-40 object-contain drop-shadow-lg mb-6" />
 
-        <h2 className="font-heading text-2xl font-bold text-white mb-1">VRCF</h2>
-        <p className="text-white/50 text-xs tracking-[0.3em] uppercase mb-8">Informática & Segurança</p>
+        <h2 className="font-heading text-2xl font-bold text-white mb-1">Kilomat</h2>
+        <p className="text-white/50 text-xs tracking-[0.3em] uppercase mb-8">Materiais de Construção</p>
 
         <div className="w-16 h-px mb-8" style={{ backgroundColor: `${theme.accent}80` }} />
 
         <div className="space-y-4 text-center">
           <div className="flex items-center gap-3 justify-center">
             <Phone className="h-4 w-4" style={{ color: theme.accent }} />
-            <span className="text-white/80 text-sm">+351 911 564 243</span>
+            <span className="text-white/80 text-sm">+351 938 283 386</span>
           </div>
           <div className="flex items-center gap-3 justify-center">
             <Mail className="h-4 w-4" style={{ color: theme.accent }} />
-            <span className="text-white/80 text-sm">geral@vrcf.pt</span>
+            <span className="text-white/80 text-sm">kilomat@gmail.com</span>
           </div>
           <div className="flex items-center gap-3 justify-center">
             <MapPin className="h-4 w-4" style={{ color: theme.accent }} />
@@ -229,7 +229,7 @@ export const CatalogContactsPage = forwardRef<HTMLDivElement, {
           </div>
           <div className="flex items-center gap-3 justify-center">
             <Globe className="h-4 w-4" style={{ color: theme.accent }} />
-            <a href="https://www.vrcf.pt" target="_blank" rel="noopener noreferrer" className="text-white/80 text-sm hover:text-white underline">www.vrcf.pt</a>
+            <a href="https://www.kilomat.pt" target="_blank" rel="noopener noreferrer" className="text-white/80 text-sm hover:text-white underline">www.kilomat.pt</a>
           </div>
         </div>
 
@@ -246,11 +246,11 @@ export const CatalogContactsPage = forwardRef<HTMLDivElement, {
         </button>
 
         <div className="absolute bottom-6 left-0 right-0 px-8 flex flex-col items-center gap-1 text-center">
-          <p className="text-white/60 text-[10px] font-semibold tracking-wider">vrcf.pt</p>
+          <p className="text-white/60 text-[10px] font-semibold tracking-wider">kilomat.pt</p>
           <p className="text-white/40 text-[9px] leading-snug max-w-md">Todos os preços apresentados incluem IVA à taxa legal em vigor.</p>
           <p className="text-white/40 text-[9px] leading-snug max-w-md">Os preços são meramente indicativos e podem sofrer alterações sem aviso prévio.</p>
           <p className="text-white/40 text-[9px] leading-snug max-w-md">As imagens apresentadas são meramente ilustrativas.</p>
-          <p className="text-white/20 text-[9px] tracking-wider mt-1">© {new Date().getFullYear()} VRCF — Todos os direitos reservados</p>
+          <p className="text-white/20 text-[9px] tracking-wider mt-1">© {new Date().getFullYear()} Kilomat — Todos os direitos reservados</p>
         </div>
       </div>
 
@@ -326,11 +326,11 @@ export const CatalogProductPage = forwardRef<HTMLDivElement, {
             {brandLogo ? (
               <img src={brandLogo} alt={category} style={{ height: logoH }} className="object-contain" />
             ) : (
-              <img src={vrcfLogo} alt="VRCF" style={{ height: logoH, width: logoH }} className="object-contain" />
+              <img src={kilomatLogo} alt="Kilomat" style={{ height: logoH, width: logoH }} className="object-contain" />
             )}
             <span className="font-heading font-bold" style={{ fontSize: fontHeader, color: "#1a1a1a" }}>{category}</span>
           </div>
-          <span className="font-medium" style={{ fontSize: 11, color: theme.accent }}>VRCF</span>
+          <span className="font-medium" style={{ fontSize: 11, color: theme.accent }}>Kilomat</span>
         </div>
 
         <div className="flex-1 flex flex-col overflow-hidden" style={{ gap: gapSize }}>

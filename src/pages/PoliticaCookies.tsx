@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import vrcfLogo from "@/assets/vrcf-logo.png";
+import kilomatLogo from "@/assets/kilomat-wordmark.png";
 
 const PoliticaCookies = () => {
   return (
@@ -9,7 +9,7 @@ const PoliticaCookies = () => {
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <div className="flex items-center gap-3">
-            <img src={vrcfLogo} alt="VRCF Logo" className="h-16 w-auto drop-shadow-md" />
+            <img src={kilomatLogo} alt="Kilomat Logo" className="h-16 w-auto drop-shadow-md" />
           </div>
           <Link to="/">
             <Button variant="outline" size="sm" className="gap-1.5">
@@ -48,11 +48,11 @@ const PoliticaCookies = () => {
             </h2>
             <p className="text-muted-foreground leading-relaxed mt-3">
               O responsável pelo tratamento dos dados recolhidos através de cookies é a{" "}
-              <strong className="text-foreground">VALTER ROBERTO CRUZ FRANCISCO UNI. LDA</strong>, 
-              com o NIF <strong className="text-foreground">515237205</strong> (doravante "VRCF"), 
+              <strong className="text-foreground">Kilomat - Materiais para Construção, Lda.</strong>, 
+              com o NIF <strong className="text-foreground">508086140</strong> (doravante "Kilomat"), 
               acessível em{" "}
-              <a href="https://showroom.vrcf.info" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                showroom.vrcf.info
+              <a href="https://kilomat.pt" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                kilomat.pt
               </a>.
             </p>
           </section>
@@ -86,7 +86,7 @@ const PoliticaCookies = () => {
                 </thead>
                 <tbody className="text-muted-foreground">
                   <tr className="border-t border-border">
-                    <td className="p-3 font-mono text-xs">vrcf_cookie_consent</td>
+                    <td className="p-3 font-mono text-xs">kilomat_cookie_consent</td>
                     <td className="p-3">Armazena a sua escolha de consentimento de cookies</td>
                     <td className="p-3">365 dias</td>
                   </tr>
@@ -208,11 +208,11 @@ const PoliticaCookies = () => {
             <ul className="list-disc pl-6 text-muted-foreground space-y-1 mt-2">
               <li>
                 Email:{" "}
-                <a href="mailto:geral@vrcf.pt" className="text-primary hover:underline">geral@vrcf.pt</a>
+                <a href="mailto:kilomat@gmail.com" className="text-primary hover:underline">kilomat@gmail.com</a>
               </li>
               <li>
                 Telefone:{" "}
-                <a href="tel:+351911564243" className="text-primary hover:underline">+351 911 564 243</a>
+                <a href="tel:+351938283386" className="text-primary hover:underline">+351 938 283 386</a>
               </li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-3">
@@ -228,15 +228,15 @@ const PoliticaCookies = () => {
               7. Alterações a esta Política
             </h2>
             <p className="text-muted-foreground leading-relaxed mt-3">
-              A VRCF reserva-se o direito de alterar a presente Política de Cookies a qualquer momento. 
+              A Kilomat reserva-se o direito de alterar a presente Política de Cookies a qualquer momento. 
               Quaisquer alterações serão publicadas nesta página com a data de atualização.
             </p>
           </section>
 
           <div className="border-t border-border pt-6 mt-10 text-center space-y-2">
-            <p className="text-sm font-semibold text-foreground">VRCF — Catálogo Online de Informática & Segurança</p>
+            <p className="text-sm font-semibold text-foreground">Kilomat — Catálogo Online de Materiais de Construção</p>
             <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} VALTER ROBERTO CRUZ FRANCISCO UNI. LDA — NIF: 515237205
+              © {new Date().getFullYear()} Kilomat - Materiais para Construção, Lda. — NIF: 508086140
             </p>
           </div>
         </div>
