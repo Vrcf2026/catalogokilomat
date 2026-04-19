@@ -192,7 +192,7 @@ export function CatalogViewer({
           <ChevronLeft className="h-4 w-4" /> Voltar
         </button>
         <div className="flex items-center gap-2">
-          <img src={vrcfLogo} alt="VRCF" className="h-10 w-10 object-contain" />
+          <img src={vrcfLogo} alt="Kilomat" className="h-10 w-10 object-contain" />
           <span className="font-heading font-bold text-white/90 text-sm">{category}</span>
         </div>
         <Button variant="ghost" size="sm" className="text-white/60 hover:text-white hover:bg-white/10 gap-1.5" onClick={toggleFullscreen}>

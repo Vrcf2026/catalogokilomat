@@ -9,7 +9,7 @@ const TermosCondicoes = () => {
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <div className="flex items-center gap-3">
-            <img src={vrcfLogo} alt="VRCF Logo" className="h-16 w-auto drop-shadow-md" />
+            <img src={vrcfLogo} alt="Kilomat Logo" className="h-16 w-auto drop-shadow-md" />
           </div>
           <Link to="/">
             <Button variant="outline" size="sm" className="gap-1.5">
@@ -37,13 +37,13 @@ const TermosCondicoes = () => {
             </h2>
             <p className="text-muted-foreground leading-relaxed mt-3">
               O presente catálogo online, disponível em{" "}
-              <a href="https://showroom.vrcf.info" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                showroom.vrcf.info
+              <a href="https://kilomat.pt" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                kilomat.pt
               </a>{" "}
               (doravante "Catálogo"), é propriedade e é gerido por{" "}
-              <strong className="text-foreground">VALTER ROBERTO CRUZ FRANCISCO UNI. LDA</strong>, 
-              com o NIF <strong className="text-foreground">515237205</strong>{" "}
-              (doravante "VRCF", "nós" ou "empresa"), empresa devidamente constituída e registada ao abrigo da lei portuguesa. 
+              <strong className="text-foreground">Kilomat - Materiais para Construção, Lda.</strong>, 
+              com o NIF <strong className="text-foreground">508086140</strong>{" "}
+              (doravante "Kilomat", "nós" ou "empresa"), empresa devidamente constituída e registada ao abrigo da lei portuguesa. 
               Para efeitos de contacto e exercício de direitos, pode contactar-nos através dos meios disponibilizados no Catálogo.
             </p>
           </section>
@@ -240,10 +240,10 @@ const TermosCondicoes = () => {
           </section>
 
           <div className="border-t border-border pt-6 mt-10 text-center space-y-2">
-            <p className="text-sm font-semibold text-foreground">VRCF — Catálogo Online de Informática & Segurança</p>
+            <p className="text-sm font-semibold text-foreground">Kilomat — Catálogo Online de Materiais de Construção</p>
             <p className="text-xs text-muted-foreground">
-              <a href="https://showroom.vrcf.info" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                showroom.vrcf.info
+              <a href="https://kilomat.pt" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                kilomat.pt
               </a>{" "}
               | Atualizado em 27/03/2026
             </p>
@@ -260,7 +260,7 @@ const TermosCondicoes = () => {
       <footer className="border-t border-border bg-accent text-accent-foreground py-6 mt-12">
         <div className="container mx-auto px-4 text-center">
           <p className="text-xs text-accent-foreground/70">
-            © {new Date().getFullYear()} VALTER ROBERTO CRUZ FRANCISCO UNI. LDA — NIF: 515237205. Todos os direitos reservados.
+            © {new Date().getFullYear()} Kilomat - Materiais para Construção, Lda. — NIF: 508086140. Todos os direitos reservados.
           </p>
         </div>
       </footer>

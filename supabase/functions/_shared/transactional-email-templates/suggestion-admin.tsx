@@ -35,7 +35,7 @@ export const template = {
   subject: (d: Record<string, any>) =>
     `Nova Sugestão - ${(d?.name || 'Visitante').toString().slice(0, 80)}`,
   displayName: 'Sugestão (admin)',
-  to: 'geral@vrcf.pt',
+  to: 'kilomat@gmail.com',
   previewData: {
     name: 'Maria Silva',
     email: 'maria@example.com',

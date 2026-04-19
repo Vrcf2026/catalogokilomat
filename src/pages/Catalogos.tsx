@@ -196,15 +196,15 @@ const Catalogos = () => {
       <header className="flex-shrink-0 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="flex items-center justify-between px-4 py-2">
           <div className="flex items-center gap-2">
-            <img src={vrcfLogo} alt="VRCF" className="h-20 w-auto object-contain drop-shadow-md" />
+            <img src={vrcfLogo} alt="Kilomat" className="h-20 w-auto object-contain drop-shadow-md" />
             <div>
-              <h1 className="font-heading text-xl font-bold text-foreground leading-tight">VRCF</h1>
-              <p className="text-[10px] font-medium text-muted-foreground tracking-wider uppercase">Informática & Segurança</p>
+              <h1 className="font-heading text-xl font-bold text-foreground leading-tight">Kilomat</h1>
+              <p className="text-[10px] font-medium text-muted-foreground tracking-wider uppercase">Materiais de Construção</p>
             </div>
           </div>
           <div className="text-center">
             <h2 className="font-heading text-sm font-bold text-foreground">
-              {isKiosk ? "Showroom VRCF" : "Os Nossos Catálogos"}
+              {isKiosk ? "Showroom Kilomat" : "Os Nossos Catálogos"}
             </h2>
           </div>
           {isKiosk ? (

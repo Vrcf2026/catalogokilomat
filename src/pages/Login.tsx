@@ -42,7 +42,7 @@ const Login = () => {
         <CardHeader className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2">
             <ShieldCheck className="h-7 w-7 text-primary" />
-            <CardTitle className="font-heading text-xl">VRCF</CardTitle>
+            <CardTitle className="font-heading text-xl">Kilomat</CardTitle>
           </div>
           <p className="text-sm text-muted-foreground">Acesso administrativo</p>
         </CardHeader>

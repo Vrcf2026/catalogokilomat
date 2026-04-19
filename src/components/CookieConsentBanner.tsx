@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Cookie, X } from "lucide-react";
 
-const COOKIE_CONSENT_KEY = "vrcf_cookie_consent";
+const COOKIE_CONSENT_KEY = "kilomat_cookie_consent";
 
 export function CookieConsentBanner() {
   const [visible, setVisible] = useState(false);
