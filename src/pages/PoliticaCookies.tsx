@@ -49,8 +49,9 @@ const PoliticaCookies = () => {
             <p className="text-muted-foreground leading-relaxed mt-3">
               O responsável pelo tratamento dos dados recolhidos através de cookies é a{" "}
               <strong className="text-foreground">Kilomat - Materiais para Construção, Lda.</strong>, 
-              com o NIF <strong className="text-foreground">508086140</strong> (doravante "Kilomat"), 
-              acessível em{" "}
+              pessoa coletiva com o NIPC <strong className="text-foreground">508086140</strong>,{" "}
+              com sede em <strong className="text-foreground">Estrada do Pau Queimado, Zona Industrial Pau Queimado, Afonsoeiro, 2870-100 Montijo</strong>{" "}
+              (doravante "Kilomat"), acessível em{" "}
               <a href="https://kilomat.pt" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                 kilomat.pt
               </a>.
