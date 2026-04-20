@@ -343,7 +343,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <img src={kilomatShield} alt="Kilomat" className="h-12 w-auto" />
+              <img src={kilomatKIcon} alt="Kilomat" className="h-12 w-auto" />
               <div>
                 <p className="font-heading font-bold text-sm">Kilomat — Materiais de Construção</p>
                 <p className="text-xs text-accent-foreground/70">Materiais de construção, ferramentas, canalização e tintas</p>
