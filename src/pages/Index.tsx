@@ -388,12 +388,6 @@ const Index = () => {
       <CartDrawer />
       <SuggestionButton />
       <ScrollToTopButton />
-      <img
-        src={kilomatKIcon}
-        alt="Kilomat"
-        aria-hidden="true"
-        className="fixed bottom-4 left-4 z-40 h-12 sm:h-16 w-auto pointer-events-none drop-shadow-lg opacity-90"
-      />
     </div>
   );
 };
