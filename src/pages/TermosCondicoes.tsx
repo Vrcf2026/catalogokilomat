@@ -42,9 +42,18 @@ const TermosCondicoes = () => {
               </a>{" "}
               (doravante "Catálogo"), é propriedade e é gerido por{" "}
               <strong className="text-foreground">Kilomat - Materiais para Construção, Lda.</strong>, 
-              com o NIF <strong className="text-foreground">508086140</strong>{" "}
-              (doravante "Kilomat", "nós" ou "empresa"), empresa devidamente constituída e registada ao abrigo da lei portuguesa. 
-              Para efeitos de contacto e exercício de direitos, pode contactar-nos através dos meios disponibilizados no Catálogo.
+              pessoa coletiva com o NIPC <strong className="text-foreground">508086140</strong>,{" "}
+              com sede em <strong className="text-foreground">Estrada do Pau Queimado, Zona Industrial Pau Queimado, Afonsoeiro, 2870-100 Montijo</strong>{" "}
+              (doravante "Kilomat", "nós" ou "empresa"), empresa devidamente constituída e registada ao abrigo da lei portuguesa.
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-3">
+              <strong className="text-foreground">Contactos:</strong>{" "}
+              <a href="mailto:kilomat@gmail.com" className="text-primary hover:underline">kilomat@gmail.com</a>{" "}
+              · <a href="tel:+351938283386" className="text-primary hover:underline">+351 938 283 386</a>{" "}
+              · <a href="tel:+351212316204" className="text-primary hover:underline">+351 212 316 204</a>
+            </p>
+            <p className="text-muted-foreground leading-relaxed mt-2 text-sm">
+              <strong className="text-foreground">Horário:</strong> Segunda a Sexta-feira das 09:00 às 13:00 e das 15:00 às 19:00; Sábado das 09:00 às 13:00; Domingo encerrado.
             </p>
           </section>
 
@@ -55,7 +64,7 @@ const TermosCondicoes = () => {
             <p className="text-muted-foreground leading-relaxed mt-3">
               O presente documento estabelece os Termos e Condições que regulam a utilização do Catálogo online da Kilomat, 
               bem como as condições aplicáveis ao processo de pedido de orçamento. O Catálogo tem carácter meramente informativo 
-              e constitui um instrumento de consulta de produtos e soluções nas áreas de Informática e Segurança Eletrónica. 
+              e constitui um instrumento de consulta de produtos e soluções nas áreas de materiais de construção, ferramentas, equipamentos, canalização, tintas e equipamentos agrícolas. 
               O Catálogo não constitui uma oferta de venda direta, nem um contrato de compra e venda.
             </p>
           </section>
