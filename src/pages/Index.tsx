@@ -8,6 +8,7 @@ import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { ProductFilters } from "@/components/ProductFilters";
 import kilomatLogo from "@/assets/kilomat-wordmark.png";
 import kilomatShield from "@/assets/kilomat-logo.png";
+import kilomatKIcon from "@/assets/kilomat-k-icon.png";
 import { Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { CartDrawer } from "@/components/CartDrawer";
@@ -387,6 +388,12 @@ const Index = () => {
       <CartDrawer />
       <SuggestionButton />
       <ScrollToTopButton />
+      <img
+        src={kilomatKIcon}
+        alt="Kilomat"
+        aria-hidden="true"
+        className="fixed bottom-4 left-4 z-40 h-12 sm:h-16 w-auto pointer-events-none drop-shadow-lg opacity-90"
+      />
     </div>
   );
 };
