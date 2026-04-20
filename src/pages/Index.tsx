@@ -8,6 +8,7 @@ import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { ProductFilters } from "@/components/ProductFilters";
 import kilomatLogo from "@/assets/kilomat-wordmark.png";
 import kilomatShield from "@/assets/kilomat-logo.png";
+import kilomatKIcon from "@/assets/kilomat-k-icon.png";
 import { Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { CartDrawer } from "@/components/CartDrawer";
