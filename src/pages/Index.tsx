@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetailDialog } from "@/components/ProductDetailDialog";
 import { useState, useMemo } from "react";
-import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
+import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin } from "lucide-react";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { ProductFilters } from "@/components/ProductFilters";
 import kilomatLogo from "@/assets/kilomat-wordmark.png";
