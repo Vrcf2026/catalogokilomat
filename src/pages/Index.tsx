@@ -224,14 +224,14 @@ const Index = () => {
             <span>kilomat@gmail.com</span>
           </a>
           <a
-            href="https://www.google.com/maps/search/?api=1&query=Estrada+do+Pau+Queimado,+Zona+Industrial+Pau+Queimado,+Afonsoeiro,+2870-100+Montijo"
+            href="https://www.openstreetmap.org/search?query=Estrada%20do%20Pau%20Queimado%2C%20Zona%20Industrial%20Pau%20Queimado%2C%20Afonsoeiro%2C%202870-100%20Montijo"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-            aria-label="Ver localização da Kilomat no Google Maps"
+            aria-label="Ver localização da Kilomat no mapa"
           >
             <MapPin className="h-4 w-4" />
-            <span>Montijo</span>
+            <span>Estrada do Pau Queimado, Montijo</span>
           </a>
         </div>
       </section>
