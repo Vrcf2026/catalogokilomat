@@ -399,6 +399,7 @@ const Index = () => {
                 <Link to="/politica-de-cookies" className="text-primary hover:underline transition-colors">
                   Política de Cookies
                 </Link>
+                <SuggestionButton />
               </p>
             </div>
           </div>
@@ -414,7 +415,6 @@ const Index = () => {
       )}
 
       <CartDrawer />
-      <SuggestionButton />
       <ScrollToTopButton />
     </div>
   );
