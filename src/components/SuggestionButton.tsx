@@ -1,13 +1,25 @@
 import { useState } from "react";
-import { MessageSquarePlus, Send, X } from "lucide-react";
+import { MessageSquarePlus, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const SuggestionButton = () => {
+interface SuggestionButtonProps {
+  triggerClassName?: string;
+}
+
+const SuggestionButton = ({ triggerClassName }: SuggestionButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -42,35 +54,31 @@ const SuggestionButton = () => {
   };
 
   return (
-    <>
-      {/* Floating button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-full bg-primary px-4 py-3 text-primary-foreground shadow-lg hover:bg-primary/90 transition-all hover:scale-105"
-        aria-label="Enviar sugestão"
-      >
-        <MessageSquarePlus className="h-5 w-5" />
-        <span className="hidden sm:inline text-sm font-medium">Sugestão</span>
-      </button>
-
-      {/* Overlay + Form */}
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
-          <div className="relative w-full max-w-md mx-4 mb-4 sm:mb-0 bg-background border border-border rounded-2xl shadow-2xl p-6 animate-in slide-in-from-bottom-4 duration-300">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-heading text-lg font-semibold text-foreground flex items-center gap-2">
-                <MessageSquarePlus className="h-5 w-5 text-primary" />
-                Envie a sua sugestão
-              </h3>
-              <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-foreground transition-colors">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <p className="text-sm text-muted-foreground mb-4">
-              A sua opinião é importante para nós. Partilhe as suas ideias ou sugestões.
-            </p>
-            <form onSubmit={handleSubmit} className="space-y-3">
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          className={
+            triggerClassName ??
+            "inline-flex items-center gap-1 text-primary hover:underline transition-colors"
+          }
+          aria-label="Enviar sugestão"
+        >
+          <MessageSquarePlus className="h-3.5 w-3.5" />
+          Sugestão
+        </button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="font-heading flex items-center gap-2">
+            <MessageSquarePlus className="h-5 w-5 text-primary" />
+            Envie a sua sugestão
+          </DialogTitle>
+          <DialogDescription>
+            A sua opinião é importante para nós. Partilhe as suas ideias ou sugestões.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-3">
               <div>
                 <Label htmlFor="suggestion-name" className="text-xs">Nome</Label>
                 <Input
@@ -110,11 +118,9 @@ const SuggestionButton = () => {
                 <Send className="h-4 w-4" />
                 {isSubmitting ? "A enviar..." : "Enviar Sugestão"}
               </Button>
-            </form>
-          </div>
-        </div>
-      )}
-    </>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
