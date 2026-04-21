@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetailDialog } from "@/components/ProductDetailDialog";
 import { useState, useMemo } from "react";
-import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react";
+import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin } from "lucide-react";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { ProductFilters } from "@/components/ProductFilters";
 import kilomatLogo from "@/assets/kilomat-wordmark.png";
@@ -206,6 +206,34 @@ const Index = () => {
         <p className="mt-3 text-lg text-muted-foreground max-w-xl mx-auto">
           Materiais de construção, ferramentas, canalização e tintas
         </p>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
+          <a
+            href="tel:+351938283386"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+            aria-label="Telefonar para Kilomat"
+          >
+            <Phone className="h-4 w-4" />
+            <span>+351 938 283 386</span>
+          </a>
+          <a
+            href="mailto:kilomat@gmail.com"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+            aria-label="Enviar email para Kilomat"
+          >
+            <Mail className="h-4 w-4" />
+            <span>kilomat@gmail.com</span>
+          </a>
+          <a
+            href="https://www.google.com/maps/search/?api=1&query=Estrada+do+Pau+Queimado,+Zona+Industrial+Pau+Queimado,+Afonsoeiro,+2870-100+Montijo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
+            aria-label="Ver localização da Kilomat no Google Maps"
+          >
+            <MapPin className="h-4 w-4" />
+            <span>Montijo</span>
+          </a>
+        </div>
       </section>
 
       <ProductFilters
