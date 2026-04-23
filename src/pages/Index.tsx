@@ -17,6 +17,7 @@ import SuggestionButton from "@/components/SuggestionButton";
 import ContactButton from "@/components/ContactButton";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import ContactFloatingBubble from "@/components/ContactFloatingBubble";
+import BrandsStrip from "@/components/BrandsStrip";
 
 const PAGE_SIZE_OPTIONS = [12, 24, 48];
 
