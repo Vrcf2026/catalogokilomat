@@ -10,6 +10,7 @@ import { ImportProductsDialog } from "@/components/ImportProductsDialog";
 import { CatalogManagerDialog } from "@/components/CatalogManagerDialog";
 import { CatalogCustomizationDialog } from "@/components/CatalogCustomizationDialog";
 import { ImageHealthCheckDialog } from "@/components/ImageHealthCheckDialog";
+import { GenerateDescriptionsDialog } from "@/components/GenerateDescriptionsDialog";
 import { KioskAccessButton } from "@/components/KioskAccessButton";
 import { AdminDashboard } from "@/components/AdminDashboard";
 import { Input } from "@/components/ui/input";
@@ -220,6 +221,7 @@ const Admin = () => {
                 queryClient.invalidateQueries({ queryKey: ["product_images"] });
               }}
             />
+            <GenerateDescriptionsDialog products={products || []} />
             <AddProductDialog families={families} categories={categoryNames} brands={brands} />
             <KioskAccessButton />
             <DarkModeToggle />
