@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { Tag, Plus, Trash2, Loader2, Link2, ChevronDown } from "lucide-react";
+import { Tag, Plus, Trash2, Loader2, Link2, ChevronDown, Upload, X, ImageIcon } from "lucide-react";
 
 interface Brand {
   id: string;
@@ -104,6 +104,48 @@ export function ManageBrandsDialog({ brands }: ManageBrandsDialogProps) {
     }
   };
 
+  const handleLogoUpload = async (brandId: string, file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Ficheiro deve ser uma imagem");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Imagem deve ter menos de 2MB");
+      return;
+    }
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `brand-logos/${brandId}-${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (uploadError) throw uploadError;
+      const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(path);
+      const { error: updateError } = await supabase
+        .from("brands")
+        .update({ logo_url: urlData.publicUrl })
+        .eq("id", brandId);
+      if (updateError) throw updateError;
+      toast.success("Logótipo atualizado!");
+      queryClient.invalidateQueries({ queryKey: ["brands"] });
+      queryClient.invalidateQueries({ queryKey: ["brands-strip"] });
+    } catch (e: any) {
+      toast.error(e.message || "Erro ao carregar logótipo");
+    }
+  };
+
+  const handleLogoRemove = async (brandId: string) => {
+    try {
+      const { error } = await supabase.from("brands").update({ logo_url: null }).eq("id", brandId);
+      if (error) throw error;
+      toast.success("Logótipo removido");
+      queryClient.invalidateQueries({ queryKey: ["brands"] });
+      queryClient.invalidateQueries({ queryKey: ["brands-strip"] });
+    } catch (e: any) {
+      toast.error(e.message || "Erro ao remover");
+    }
+  };
+
   const toggleFamily = async (brandId: string, familyId: string, checked: boolean) => {
     try {
       if (checked) {
@@ -157,7 +199,35 @@ export function ManageBrandsDialog({ brands }: ManageBrandsDialogProps) {
             const linked = familiesByBrand[b.id] || new Set<string>();
             return (
               <div key={b.id} className="flex items-center justify-between gap-2 rounded-lg bg-secondary/50 px-3 py-2">
+                <div className="h-9 w-9 shrink-0 rounded bg-background border border-border flex items-center justify-center overflow-hidden">
+                  {b.logo_url ? (
+                    <img src={b.logo_url} alt={b.name} className="h-full w-full object-contain" />
+                  ) : (
+                    <ImageIcon className="h-4 w-4 text-muted-foreground/50" />
+                  )}
+                </div>
                 <span className="text-sm font-medium text-foreground flex-1 truncate">{b.name}</span>
+
+                <label className="cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) handleLogoUpload(b.id, f);
+                      e.target.value = "";
+                    }}
+                  />
+                  <Button asChild variant="ghost" size="icon" className="h-7 w-7" title="Carregar logótipo">
+                    <span><Upload className="h-3 w-3" /></span>
+                  </Button>
+                </label>
+                {b.logo_url && (
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleLogoRemove(b.id)} title="Remover logótipo">
+                    <X className="h-3 w-3" />
+                  </Button>
+                )}
 
                 <Popover>
                   <PopoverTrigger asChild>
