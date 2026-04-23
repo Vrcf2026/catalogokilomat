@@ -1,12 +1,15 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { FileSpreadsheet, Loader2, CheckCircle2, XCircle, Clock, Upload } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import * as XLSX from "xlsx";
+import { FixedSizeList as VirtualList } from "react-window";
 
 interface ImportRow {
   nome: string;
@@ -17,9 +20,12 @@ interface ImportRow {
   preco?: number;
 }
 
+type RowStatus = "pending" | "creating" | "description" | "images" | "done" | "error";
+
 interface ImportStatus {
   row: ImportRow;
-  status: "pending" | "creating" | "description" | "images" | "done" | "error";
+  status: RowStatus;
+  productId?: string;
   error?: string;
 }
 
@@ -42,13 +48,24 @@ const stripHtml = (html: string): string => {
   return text;
 };
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+// Tunable batch sizes
+const PRODUCT_INSERT_BATCH = 500;       // Supabase handles batch inserts well
+const ENRICH_CHUNK_SIZE = 25;            // parallel image/desc fetches per chunk
+const ENRICH_CHUNK_PAUSE_MS = 1500;      // pause between chunks (rate-limit friendly)
+const UI_UPDATE_THROTTLE = 50;           // re-render every N rows during enrichment
+
 export function ImportProductsDialog({ families: initialFamilies, categories, brands: initialBrands = [] }: ImportProductsDialogProps) {
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState<ImportStatus[]>([]);
   const [importing, setImporting] = useState(false);
   const [done, setDone] = useState(false);
+  const [phase, setPhase] = useState<string>("");
   const [localFamilies, setLocalFamilies] = useState(initialFamilies);
   const [localBrands, setLocalBrands] = useState(initialBrands);
+  const [searchImages, setSearchImages] = useState(true);
+  const [generateDescriptions, setGenerateDescriptions] = useState(false); // OFF by default for big imports
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
@@ -134,54 +151,64 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const findOrCreateFamily = async (familyName?: string, categoryName?: string): Promise<string | null> => {
-    if (!familyName) return null;
-    const normalizedFamily = familyName.trim().toLowerCase();
-    const normalizedCategory = (categoryName || "").trim().toLowerCase();
-    const existing = localFamilies.find(
-      (f) => f.name.trim().toLowerCase() === normalizedFamily &&
-        (!normalizedCategory || f.category.trim().toLowerCase() === normalizedCategory)
-    );
-    if (existing) return existing.id;
-    const cat = categoryName?.trim() || "Outros";
-    try {
-      const { data, error } = await supabase.from("product_families").insert({ name: familyName.trim(), category: cat }).select().single();
-      if (error) { console.error("Error creating family:", error); return null; }
-      const newFamily = { id: data.id, name: data.name, category: data.category };
-      setLocalFamilies((prev) => [...prev, newFamily]);
-      return data.id;
-    } catch (e) { console.error("Error creating family:", e); return null; }
-  };
+  // ---------- Pre-creation: ensure all categories/families/brands exist ----------
+  const ensureTaxonomies = async (rowsData: ImportRow[]) => {
+    const catSet = new Set<string>();
+    const brandSet = new Set<string>();
+    const famKey = (name: string, cat: string) => `${name.toLowerCase()}::${cat.toLowerCase()}`;
+    const famMap = new Map<string, { name: string; category: string }>();
 
-  const findOrCreateBrand = async (brandName?: string): Promise<string | null> => {
-    if (!brandName) return null;
-    const normalized = brandName.trim().toLowerCase();
-    const existing = localBrands.find((b) => b.name.trim().toLowerCase() === normalized);
-    if (existing) return existing.id;
-    try {
-      const { data, error } = await supabase.from("brands").insert({ name: brandName.trim() }).select().single();
-      if (error) { console.error("Error creating brand:", error); return null; }
-      const newBrand = { id: data.id, name: data.name };
-      setLocalBrands((prev) => [...prev, newBrand]);
-      return data.id;
-    } catch (e) { console.error("Error creating brand:", e); return null; }
-  };
-
-  const findOrCreateCategory = async (categoryName?: string): Promise<void> => {
-    if (!categoryName) return;
-    const normalized = categoryName.trim().toLowerCase();
-    try {
-      const { data: existing } = await supabase.from("categories").select("id").ilike("name", normalized).maybeSingle();
-      if (!existing) {
-        await supabase.from("categories").insert({ name: categoryName.trim() });
+    for (const r of rowsData) {
+      if (r.categoria) catSet.add(r.categoria.trim());
+      if (r.marca) brandSet.add(r.marca.trim());
+      if (r.familia) {
+        const cat = (r.categoria || "Outros").trim();
+        famMap.set(famKey(r.familia.trim(), cat), { name: r.familia.trim(), category: cat });
       }
-    } catch (e) { console.error("Error creating category:", e); }
+    }
+
+    // Categories
+    const { data: existingCats } = await supabase.from("categories").select("name");
+    const existingCatNames = new Set((existingCats || []).map((c) => c.name.toLowerCase()));
+    const newCats = [...catSet].filter((c) => !existingCatNames.has(c.toLowerCase()));
+    if (newCats.length > 0) {
+      await supabase.from("categories").insert(newCats.map((name) => ({ name })));
+    }
+
+    // Brands
+    const { data: existingBrandsData } = await supabase.from("brands").select("id, name");
+    const brandByName = new Map<string, string>();
+    (existingBrandsData || []).forEach((b) => brandByName.set(b.name.toLowerCase(), b.id));
+    const newBrands = [...brandSet].filter((b) => !brandByName.has(b.toLowerCase()));
+    if (newBrands.length > 0) {
+      const { data: insertedBrands } = await supabase
+        .from("brands")
+        .insert(newBrands.map((name) => ({ name })))
+        .select("id, name");
+      (insertedBrands || []).forEach((b) => brandByName.set(b.name.toLowerCase(), b.id));
+    }
+
+    // Families
+    const { data: existingFams } = await supabase.from("product_families").select("id, name, category");
+    const famByKey = new Map<string, string>();
+    (existingFams || []).forEach((f) => famByKey.set(famKey(f.name, f.category), f.id));
+    const newFams = [...famMap.values()].filter((f) => !famByKey.has(famKey(f.name, f.category)));
+    if (newFams.length > 0) {
+      const { data: insertedFams } = await supabase
+        .from("product_families")
+        .insert(newFams.map((f) => ({ name: f.name, category: f.category })))
+        .select("id, name, category");
+      (insertedFams || []).forEach((f) => famByKey.set(famKey(f.name, f.category), f.id));
+    }
+
+    return { brandByName, famByKey };
   };
 
+  // ---------- Image search for a single product ----------
   const searchAndSaveImages = async (productName: string, productId: string) => {
     try {
       const { data, error } = await supabase.functions.invoke("search-product-images", {
-        body: { query: productName, count: 24 },
+        body: { query: productName, count: 12 },
       });
       if (error) throw error;
       const images: string[] = Array.isArray(data?.images) ? data.images : [];
@@ -190,77 +217,146 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
         return lower.startsWith("http") && !lower.includes("supabase.co") && !lower.includes("lovable.app") && !lower.includes("lovableproject.com") && !lower.includes("/product-images/");
       });
       const selected = pickRandomImages(safeExternal, 3);
-      if (selected.length === 0) return;
-      for (let i = 0; i < selected.length; i++) {
-        await supabase.from("product_images").insert({ product_id: productId, image_url: selected[i], position: i });
-      }
+      if (selected.length === 0) return false;
+      const insertRows = selected.map((url, i) => ({ product_id: productId, image_url: url, position: i }));
+      await supabase.from("product_images").insert(insertRows);
       await supabase.from("products").update({ image_url: selected[0] }).eq("id", productId);
-    } catch (e) { console.error("Image search failed for:", productName, e); }
+      return true;
+    } catch (e) {
+      console.error("Image search failed for:", productName, e);
+      return false;
+    }
   };
 
+  const generateDescriptionFor = async (productName: string, category: string | null, productId: string) => {
+    try {
+      const { data: descData } = await supabase.functions.invoke("generate-description", {
+        body: { productName, category },
+      });
+      if (descData?.description) {
+        await supabase.from("products").update({ description: descData.description }).eq("id", productId);
+      }
+    } catch (e) {
+      console.error("Description generation failed for:", productName, e);
+    }
+  };
+
+  // ---------- Main import ----------
   const handleImport = async () => {
     setImporting(true);
+    setPhase("A preparar categorias, famílias e marcas...");
 
-    for (let i = 0; i < rows.length; i++) {
-      const { row } = rows[i];
-      setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, status: "creating" } : r)));
+    try {
+      const allRows = rows.map((r) => r.row);
+      const { brandByName, famByKey } = await ensureTaxonomies(allRows);
 
-      try {
-        const familyId = await findOrCreateFamily(row.familia, row.categoria);
-        const brandId = await findOrCreateBrand(row.marca);
-        await findOrCreateCategory(row.categoria);
+      // Build product insert payload
+      const famKeyOf = (name: string, cat: string) => `${name.toLowerCase()}::${cat.toLowerCase()}`;
+      const productsPayload = allRows.map((r) => ({
+        name: r.nome,
+        description: r.descricao || null,
+        category: r.categoria || null,
+        price: r.preco ?? null,
+        family_id: r.familia
+          ? famByKey.get(famKeyOf(r.familia, r.categoria || "Outros")) || null
+          : null,
+        brand_id: r.marca ? brandByName.get(r.marca.toLowerCase()) || null : null,
+      }));
 
-        const { data: product, error } = await supabase
-          .from("products")
-          .insert({
-            name: row.nome,
-            description: row.descricao || null,
-            category: row.categoria || null,
-            price: row.preco ?? null,
-            family_id: familyId,
-            brand_id: brandId,
-          })
-          .select()
-          .single();
+      // Mark all as creating
+      setRows((prev) => prev.map((r) => ({ ...r, status: "creating" as RowStatus })));
+      setPhase(`A criar ${allRows.length} produto(s) em lotes de ${PRODUCT_INSERT_BATCH}...`);
+
+      const insertedIds: string[] = [];
+      for (let i = 0; i < productsPayload.length; i += PRODUCT_INSERT_BATCH) {
+        const slice = productsPayload.slice(i, i + PRODUCT_INSERT_BATCH);
+        const { data, error } = await supabase.from("products").insert(slice).select("id");
         if (error) throw error;
-
-        // Generate description via AI only if not provided
-        if (!row.descricao) {
-          setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, status: "description" } : r)));
-          try {
-            const { data: descData } = await supabase.functions.invoke("generate-description", {
-              body: { productName: row.nome, category: row.categoria || null },
-            });
-            if (descData?.description) {
-              await supabase.from("products").update({ description: descData.description }).eq("id", product.id);
-            }
-          } catch (e) { console.error("Description generation failed for:", row.nome, e); }
-        }
-
-        setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, status: "images" } : r)));
-        await searchAndSaveImages(row.nome, product.id);
-        setRows((prev) => prev.map((r, idx) => (idx === i ? { ...r, status: "done" } : r)));
-      } catch (e: any) {
-        console.error("Import error for:", row.nome, e);
-        setRows((prev) => prev.map((r, idx) => idx === i ? { ...r, status: "error", error: e.message || "Erro desconhecido" } : r));
+        (data || []).forEach((d) => insertedIds.push(d.id));
+        setPhase(`Criados ${Math.min(i + PRODUCT_INSERT_BATCH, productsPayload.length)} / ${productsPayload.length}`);
       }
-    }
 
-    setImporting(false);
-    setDone(true);
-    queryClient.invalidateQueries({ queryKey: ["products"] });
-    queryClient.invalidateQueries({ queryKey: ["product_images"] });
-    queryClient.invalidateQueries({ queryKey: ["families"] });
-    queryClient.invalidateQueries({ queryKey: ["brands"] });
-    queryClient.invalidateQueries({ queryKey: ["categories"] });
-    toast.success("Importação concluída!");
+      // Update rows with productId; mark "done" for ones that won't be enriched
+      const willEnrich = searchImages || generateDescriptions;
+      setRows((prev) =>
+        prev.map((r, idx) => ({
+          ...r,
+          productId: insertedIds[idx],
+          status: willEnrich ? ("pending" as RowStatus) : ("done" as RowStatus),
+        }))
+      );
+
+      if (willEnrich) {
+        setPhase(`A enriquecer produtos (lotes de ${ENRICH_CHUNK_SIZE})...`);
+        let updateBuffer: { idx: number; status: RowStatus }[] = [];
+        const flushBuffer = () => {
+          if (updateBuffer.length === 0) return;
+          const updates = updateBuffer;
+          updateBuffer = [];
+          setRows((prev) => {
+            const next = [...prev];
+            for (const u of updates) {
+              if (next[u.idx]) next[u.idx] = { ...next[u.idx], status: u.status };
+            }
+            return next;
+          });
+        };
+
+        for (let i = 0; i < insertedIds.length; i += ENRICH_CHUNK_SIZE) {
+          const chunk = insertedIds.slice(i, i + ENRICH_CHUNK_SIZE).map((id, k) => ({
+            id,
+            idx: i + k,
+            row: allRows[i + k],
+          }));
+
+          await Promise.all(
+            chunk.map(async ({ id, idx, row }) => {
+              updateBuffer.push({ idx, status: generateDescriptions && !row.descricao ? "description" : "images" });
+              if (generateDescriptions && !row.descricao) {
+                await generateDescriptionFor(row.nome, row.categoria || null, id);
+              }
+              if (searchImages) {
+                updateBuffer.push({ idx, status: "images" });
+                await searchAndSaveImages(row.nome, id);
+              }
+              updateBuffer.push({ idx, status: "done" });
+            })
+          );
+
+          if (updateBuffer.length >= UI_UPDATE_THROTTLE) flushBuffer();
+          setPhase(`Enriquecidos ${Math.min(i + ENRICH_CHUNK_SIZE, insertedIds.length)} / ${insertedIds.length}`);
+
+          // Pause between chunks to respect rate limits
+          if (i + ENRICH_CHUNK_SIZE < insertedIds.length) {
+            await sleep(ENRICH_CHUNK_PAUSE_MS);
+          }
+        }
+        flushBuffer();
+      }
+
+      setPhase("");
+      setImporting(false);
+      setDone(true);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product_images"] });
+      queryClient.invalidateQueries({ queryKey: ["families"] });
+      queryClient.invalidateQueries({ queryKey: ["brands"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast.success("Importação concluída!");
+    } catch (e: any) {
+      console.error("Bulk import failed:", e);
+      toast.error(`Erro na importação: ${e.message || "desconhecido"}`);
+      setRows((prev) => prev.map((r) => (r.status === "creating" ? { ...r, status: "error", error: e.message } : r)));
+      setImporting(false);
+      setDone(true);
+    }
   };
 
-  const completedCount = rows.filter((r) => r.status === "done").length;
-  const errorCount = rows.filter((r) => r.status === "error").length;
+  const completedCount = useMemo(() => rows.filter((r) => r.status === "done").length, [rows]);
+  const errorCount = useMemo(() => rows.filter((r) => r.status === "error").length, [rows]);
   const progress = rows.length > 0 ? ((completedCount + errorCount) / rows.length) * 100 : 0;
 
-  const statusIcon = (status: ImportStatus["status"]) => {
+  const statusIcon = (status: RowStatus) => {
     switch (status) {
       case "pending": return <Clock className="h-4 w-4 text-muted-foreground" />;
       case "creating": return <Loader2 className="h-4 w-4 animate-spin text-primary" />;
@@ -271,7 +367,7 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
     }
   };
 
-  const statusLabel = (status: ImportStatus["status"]) => {
+  const statusLabel = (status: RowStatus) => {
     switch (status) {
       case "pending": return "Em espera";
       case "creating": return "A criar...";
@@ -285,8 +381,29 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
   const handleClose = (isOpen: boolean) => {
     if (!importing) {
       setOpen(isOpen);
-      if (!isOpen) { setRows([]); setDone(false); }
+      if (!isOpen) { setRows([]); setDone(false); setPhase(""); }
     }
+  };
+
+  // Virtualized row renderer
+  const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
+    const item = rows[index];
+    return (
+      <div style={style} className="flex items-center gap-3 px-3 py-2 text-sm border-b border-border">
+        {statusIcon(item.status)}
+        <div className="flex-1 min-w-0">
+          <p className="font-medium truncate">{item.row.nome}</p>
+          <p className="text-xs text-muted-foreground truncate">
+            {[item.row.categoria, item.row.familia, item.row.marca, item.row.preco != null ? `${item.row.preco}€` : null]
+              .filter(Boolean)
+              .join(" · ") || "Sem detalhes adicionais"}
+          </p>
+        </div>
+        <span className="text-xs text-muted-foreground whitespace-nowrap">
+          {statusLabel(item.status)}
+        </span>
+      </div>
+    );
   };
 
   return (
@@ -310,14 +427,14 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
               </p>
               <div className="bg-secondary rounded-lg p-3 text-sm space-y-1">
                 <p><strong>Nome</strong> — nome do produto (obrigatório)</p>
-                <p><strong>Descrição</strong> — descrição do produto (se vazio, gera por IA)</p>
-                <p><strong>Categoria</strong> — categoria (criada automaticamente se não existir)</p>
-                <p><strong>Família</strong> — família do produto (criada automaticamente)</p>
-                <p><strong>Marca</strong> — marca do produto (criada automaticamente)</p>
+                <p><strong>Descrição</strong> — descrição do produto</p>
+                <p><strong>Categoria</strong> — categoria (criada automaticamente)</p>
+                <p><strong>Família</strong> — família (criada automaticamente)</p>
+                <p><strong>Marca</strong> — marca (criada automaticamente)</p>
                 <p><strong>Preço</strong> — preço em euros</p>
               </div>
               <p className="text-xs text-muted-foreground">
-                Descrições em HTML são automaticamente limpas. Categorias, famílias e marcas são criadas se não existirem.
+                Suporta milhares de produtos. Para grandes importações, desligue IA/imagens e enriqueça depois.
               </p>
 
               <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" onChange={handleFileSelect} className="hidden" />
@@ -330,33 +447,48 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
 
           {rows.length > 0 && (
             <>
-              {importing && (
+              {!importing && !done && (
+                <div className="space-y-2 rounded-lg border p-3">
+                  <p className="text-sm font-medium">Opções de importação</p>
+                  <div className="flex items-center gap-2">
+                    <Checkbox id="opt-images" checked={searchImages} onCheckedChange={(v) => setSearchImages(!!v)} />
+                    <Label htmlFor="opt-images" className="text-sm font-normal cursor-pointer">
+                      Pesquisar imagens automaticamente (mais lento)
+                    </Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox id="opt-desc" checked={generateDescriptions} onCheckedChange={(v) => setGenerateDescriptions(!!v)} />
+                    <Label htmlFor="opt-desc" className="text-sm font-normal cursor-pointer">
+                      Gerar descrições por IA (apenas vazias)
+                    </Label>
+                  </div>
+                  {rows.length > 1000 && (searchImages || generateDescriptions) && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400 pt-1">
+                      ⚠️ {rows.length} produtos com enriquecimento ativo pode demorar várias horas. Recomendado: criar primeiro sem enriquecimento.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {(importing || done) && (
                 <div className="space-y-1">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Progresso</span>
-                    <span className="font-medium">{completedCount + errorCount}/{rows.length}</span>
+                    <span className="text-muted-foreground truncate">{phase || "Progresso"}</span>
+                    <span className="font-medium whitespace-nowrap ml-2">{completedCount + errorCount}/{rows.length}</span>
                   </div>
                   <Progress value={progress} className="h-2" />
                 </div>
               )}
 
-              <div className="flex-1 overflow-y-auto border rounded-lg divide-y divide-border">
-                {rows.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-3 px-3 py-2 text-sm">
-                    {statusIcon(item.status)}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{item.row.nome}</p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {[item.row.categoria, item.row.familia, item.row.marca, item.row.preco != null ? `${item.row.preco}€` : null]
-                          .filter(Boolean)
-                          .join(" · ") || "Sem detalhes adicionais"}
-                      </p>
-                    </div>
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">
-                      {statusLabel(item.status)}
-                    </span>
-                  </div>
-                ))}
+              <div className="flex-1 border rounded-lg overflow-hidden" style={{ minHeight: 200 }}>
+                <VirtualList
+                  height={300}
+                  width="100%"
+                  itemCount={rows.length}
+                  itemSize={56}
+                >
+                  {Row}
+                </VirtualList>
               </div>
 
               {!importing && !done && (
@@ -364,7 +496,7 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
                   <Button variant="outline" onClick={() => setRows([])} className="flex-1">Cancelar</Button>
                   <Button onClick={handleImport} className="flex-1 gap-2">
                     <FileSpreadsheet className="h-4 w-4" />
-                    Importar {rows.length} produto(s)
+                    Importar {rows.length}
                   </Button>
                 </div>
               )}
