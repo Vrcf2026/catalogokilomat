@@ -14,7 +14,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const STORAGE_KEY = "kilomat-contact-bubble-dismissed";
+const STORAGE_KEY = "kilomat-contact-bubble-dismissed-at";
+const DISMISS_DURATION_MS = 24 * 60 * 60 * 1000; // 24h
 
 const ContactFloatingBubble = () => {
   const [visible, setVisible] = useState(false);
@@ -24,7 +25,8 @@ const ContactFloatingBubble = () => {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (localStorage.getItem(STORAGE_KEY) === "1") return;
+    const dismissedAt = Number(localStorage.getItem(STORAGE_KEY) || 0);
+    if (dismissedAt && Date.now() - dismissedAt < DISMISS_DURATION_MS) return;
     const t = setTimeout(() => setVisible(true), 2000);
     return () => clearTimeout(t);
   }, []);
@@ -32,7 +34,7 @@ const ContactFloatingBubble = () => {
   const dismiss = () => {
     setVisible(false);
     try {
-      localStorage.setItem(STORAGE_KEY, "1");
+      localStorage.setItem(STORAGE_KEY, String(Date.now()));
     } catch {
       /* ignore */
     }
