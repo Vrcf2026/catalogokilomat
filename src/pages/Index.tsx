@@ -14,6 +14,7 @@ import { useCart } from "@/contexts/CartContext";
 import { CartDrawer } from "@/components/CartDrawer";
 import { Button } from "@/components/ui/button";
 import SuggestionButton from "@/components/SuggestionButton";
+import ContactButton from "@/components/ContactButton";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 
 const PAGE_SIZE_OPTIONS = [12, 24, 48];
@@ -400,6 +401,7 @@ const Index = () => {
                   Política de Cookies
                 </Link>
                 <SuggestionButton />
+                <ContactButton />
               </p>
             </div>
           </div>
