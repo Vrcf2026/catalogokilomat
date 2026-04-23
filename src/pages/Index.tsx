@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import SuggestionButton from "@/components/SuggestionButton";
 import ContactButton from "@/components/ContactButton";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
+import ContactFloatingBubble from "@/components/ContactFloatingBubble";
 
 const PAGE_SIZE_OPTIONS = [12, 24, 48];
 
@@ -418,6 +419,7 @@ const Index = () => {
 
       <CartDrawer />
       <ScrollToTopButton />
+      <ContactFloatingBubble />
     </div>
   );
 };
