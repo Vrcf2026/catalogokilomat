@@ -17,6 +17,7 @@ import SuggestionButton from "@/components/SuggestionButton";
 import ContactButton from "@/components/ContactButton";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import ContactFloatingBubble from "@/components/ContactFloatingBubble";
+import BrandsStrip from "@/components/BrandsStrip";
 
 const PAGE_SIZE_OPTIONS = [12, 24, 48];
 
@@ -202,6 +203,10 @@ const Index = () => {
       </header>
 
       <section className="container mx-auto px-4 py-12 text-center">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-4">
+          <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+          Desde 2007 · Montijo
+        </span>
         <h2 className="font-heading text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
           Tudo para a sua obra
         </h2>
@@ -251,6 +256,8 @@ const Index = () => {
           <span>Seg-Sex 9h-13h / 15h-19h · Sáb 9h-13h</span>
         </div>
       </section>
+
+      <BrandsStrip />
 
       <ProductFilters
         search={search}
