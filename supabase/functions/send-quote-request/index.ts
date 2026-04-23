@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,22 +14,13 @@ async function invokeTransactionalEmail(payload: Record<string, unknown>) {
     throw new Error("Configuração de email incompleta no servidor");
   }
 
-  const response = await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      apikey: serviceKey,
-      Authorization: `Bearer ${serviceKey}`,
-    },
-    body: JSON.stringify(payload),
+  const supabase = createClient(supabaseUrl, serviceKey);
+  const { data, error } = await supabase.functions.invoke("send-transactional-email", {
+    body: payload,
   });
 
-  const data = await response.json().catch(() => null);
-
-  if (!response.ok) {
-    const message = typeof data?.error === "string"
-      ? data.error
-      : `Falha ao enviar email (${response.status})`;
+  if (error) {
+    const message = (error as any)?.message || "Falha ao enviar email";
     throw new Error(message);
   }
 
