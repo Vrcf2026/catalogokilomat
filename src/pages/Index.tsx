@@ -210,7 +210,7 @@ const Index = () => {
         <h2 className="font-heading text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
           Tudo para a sua obra
         </h2>
-        <p className="mt-3 text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="mt-3 text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
           Mais de 18 anos a equipar profissionais e particulares — Construção, Ferramentas e Agrícola
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
