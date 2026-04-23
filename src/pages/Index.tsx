@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetailDialog } from "@/components/ProductDetailDialog";
 import { useState, useMemo } from "react";
-import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin } from "lucide-react";
+import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin, MessageCircle, Clock } from "lucide-react";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { ProductFilters } from "@/components/ProductFilters";
 import kilomatLogo from "@/assets/kilomat-wordmark.png";
@@ -203,10 +203,10 @@ const Index = () => {
 
       <section className="container mx-auto px-4 py-12 text-center">
         <h2 className="font-heading text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-          Catálogo de Produtos
+          Tudo para a sua obra
         </h2>
-        <p className="mt-3 text-lg text-muted-foreground max-w-xl mx-auto">
-          Materiais de construção, ferramentas, canalização e tintas
+        <p className="mt-3 text-lg text-muted-foreground max-w-2xl mx-auto">
+          Mais de 18 anos a equipar profissionais e particulares — Construção, Ferramentas e Agrícola
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
           <a
@@ -216,6 +216,16 @@ const Index = () => {
           >
             <Phone className="h-4 w-4" />
             <span>+351 938 283 386</span>
+          </a>
+          <a
+            href="https://wa.me/351938283386"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-[#25D366] transition-colors"
+            aria-label="Enviar mensagem WhatsApp para Kilomat"
+          >
+            <MessageCircle className="h-4 w-4" />
+            <span>WhatsApp</span>
           </a>
           <a
             href="mailto:kilomat@gmail.com"
@@ -235,6 +245,10 @@ const Index = () => {
             <MapPin className="h-4 w-4" />
             <span>Estrada do Pau Queimado, Montijo</span>
           </a>
+        </div>
+        <div className="mt-3 inline-flex items-center gap-2 text-xs text-muted-foreground/80">
+          <Clock className="h-3.5 w-3.5" />
+          <span>Seg-Sex 9h-13h / 15h-19h · Sáb 9h-13h</span>
         </div>
       </section>
 
