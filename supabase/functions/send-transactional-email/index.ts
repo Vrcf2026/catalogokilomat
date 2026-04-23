@@ -30,9 +30,13 @@ function generateToken(): string {
     .join('')
 }
 
-// Auth note: this function uses verify_jwt = true in config.toml, so Supabase's
-// gateway validates the caller's JWT (anon or service_role) before the request
-// reaches this code. No in-function auth check is needed.
+function isAuthorizedInternalCall(req: Request, serviceRoleKey: string): boolean {
+  const authHeader = req.headers.get('Authorization')
+  const bearerToken = authHeader?.replace(/^Bearer\s+/i, '').trim()
+  const apiKeyHeader = req.headers.get('apikey')?.trim()
+
+  return bearerToken === serviceRoleKey || apiKeyHeader === serviceRoleKey
+}
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
@@ -49,6 +53,17 @@ Deno.serve(async (req) => {
       JSON.stringify({ error: 'Server configuration error' }),
       {
         status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    )
+  }
+
+  if (!isAuthorizedInternalCall(req, supabaseServiceKey)) {
+    console.error('Unauthorized send-transactional-email call')
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      {
+        status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     )
