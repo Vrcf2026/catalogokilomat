@@ -239,7 +239,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
                 Termos e Condições
               </a>{" "}
               e a{" "}
-              <a href="/termos-e-condicoes#6" target="_blank" className="text-primary hover:underline">
+              <a href="/politica-de-privacidade" target="_blank" className="text-primary hover:underline">
                 Política de Privacidade
               </a>.
             </label>

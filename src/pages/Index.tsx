@@ -407,8 +407,11 @@ const Index = () => {
                 <Link to="/termos-e-condicoes" className="text-primary hover:underline transition-colors">
                   Termos e Condições
                 </Link>
+                <Link to="/politica-de-privacidade" className="text-primary hover:underline transition-colors">
+                  Privacidade
+                </Link>
                 <Link to="/politica-de-cookies" className="text-primary hover:underline transition-colors">
-                  Política de Cookies
+                  Cookies
                 </Link>
                 <SuggestionButton />
                 <ContactButton />
