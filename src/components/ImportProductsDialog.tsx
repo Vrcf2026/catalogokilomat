@@ -579,6 +579,8 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
     switch (status) {
       case "pending": return <Clock className="h-4 w-4 text-muted-foreground" />;
       case "creating": return <Loader2 className="h-4 w-4 animate-spin text-primary" />;
+      case "updating": return <Loader2 className="h-4 w-4 animate-spin text-blue-500" />;
+      case "restoring": return <Loader2 className="h-4 w-4 animate-spin text-purple-500" />;
       case "description": return <Loader2 className="h-4 w-4 animate-spin text-blue-500" />;
       case "images": return <Loader2 className="h-4 w-4 animate-spin text-amber-500" />;
       case "done": return <CheckCircle2 className="h-4 w-4 text-green-500" />;
@@ -590,6 +592,8 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
     switch (status) {
       case "pending": return "Em espera";
       case "creating": return "A criar...";
+      case "updating": return "A atualizar preço...";
+      case "restoring": return "A restaurar imagens...";
       case "description": return "A gerar descrição...";
       case "images": return "A pesquisar imagens...";
       case "done": return "Concluído";
@@ -600,7 +604,13 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
   const handleClose = (isOpen: boolean) => {
     if (!importing) {
       setOpen(isOpen);
-      if (!isOpen) { setRows([]); setDone(false); setPhase(""); }
+      if (!isOpen) {
+        setRows([]);
+        setDone(false);
+        setPhase("");
+        setPlan(null);
+        setCounts({ created: 0, updated: 0, deleted: 0, restored: 0 });
+      }
     }
   };
 
