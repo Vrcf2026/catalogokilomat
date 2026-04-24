@@ -655,6 +655,7 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
                 Carregue um ficheiro Excel (.xlsx, .xls) com as seguintes colunas:
               </p>
               <div className="bg-secondary rounded-lg p-3 text-sm space-y-1">
+                <p><strong>Código</strong> — referência interna do software de faturação (recomendado)</p>
                 <p><strong>Nome</strong> — nome do produto (obrigatório)</p>
                 <p><strong>Descrição</strong> — descrição do produto</p>
                 <p><strong>Categoria</strong> — categoria (criada automaticamente)</p>
@@ -663,7 +664,8 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
                 <p><strong>Preço</strong> — preço em euros</p>
               </div>
               <p className="text-xs text-muted-foreground">
-                Suporta milhares de produtos. Para grandes importações, desligue IA/imagens e enriqueça depois.
+                💡 <strong>Sincronização inteligente:</strong> produtos com o mesmo Código têm apenas o preço atualizado.
+                Imagens e descrições são preservadas. Produtos que sumirem do Excel são eliminados (imagens guardadas 6 meses).
               </p>
 
               <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" onChange={handleFileSelect} className="hidden" />
@@ -676,24 +678,79 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
 
           {rows.length > 0 && (
             <>
-              {!importing && !done && (
+              {!importing && !done && !plan && (
                 <div className="space-y-2 rounded-lg border p-3">
-                  <p className="text-sm font-medium">Opções de importação</p>
+                  <p className="text-sm font-medium">Opções de sincronização</p>
+                  <div className="flex items-center gap-2">
+                    <Checkbox id="opt-sync" checked={syncMode} onCheckedChange={(v) => setSyncMode(!!v)} />
+                    <Label htmlFor="opt-sync" className="text-sm font-normal cursor-pointer">
+                      Modo sincronização (eliminar produtos que sumiram do Excel)
+                    </Label>
+                  </div>
                   <div className="flex items-center gap-2">
                     <Checkbox id="opt-images" checked={searchImages} onCheckedChange={(v) => setSearchImages(!!v)} />
                     <Label htmlFor="opt-images" className="text-sm font-normal cursor-pointer">
-                      Pesquisar imagens automaticamente (mais lento)
+                      Pesquisar imagens para os <strong>novos</strong> produtos
                     </Label>
                   </div>
                   <div className="flex items-center gap-2">
                     <Checkbox id="opt-desc" checked={generateDescriptions} onCheckedChange={(v) => setGenerateDescriptions(!!v)} />
                     <Label htmlFor="opt-desc" className="text-sm font-normal cursor-pointer">
-                      Gerar descrições por IA (apenas vazias)
+                      Gerar descrições por IA para os <strong>novos</strong>
                     </Label>
                   </div>
                   {rows.length > 1000 && (searchImages || generateDescriptions) && (
                     <p className="text-xs text-amber-600 dark:text-amber-400 pt-1">
-                      ⚠️ {rows.length} produtos com enriquecimento ativo pode demorar várias horas. Recomendado: criar primeiro sem enriquecimento.
+                      ⚠️ Enriquecer {rows.length} produtos pode demorar muito tempo.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {!importing && !done && plan && (
+                <div className="space-y-3 rounded-lg border p-3 bg-secondary/30">
+                  <p className="text-sm font-semibold">📋 Plano de sincronização</p>
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="rounded border p-2">
+                      <p className="text-2xl font-bold text-green-600">{plan.toCreate.length}</p>
+                      <p className="text-[10px] uppercase text-muted-foreground">Novos</p>
+                    </div>
+                    <div className="rounded border p-2">
+                      <p className="text-2xl font-bold text-blue-600">{plan.toUpdate.length}</p>
+                      <p className="text-[10px] uppercase text-muted-foreground">Preço atualiza</p>
+                    </div>
+                    <div className="rounded border p-2">
+                      <p className="text-2xl font-bold text-destructive">{plan.toDelete.length}</p>
+                      <p className="text-[10px] uppercase text-muted-foreground">A eliminar</p>
+                    </div>
+                  </div>
+                  {plan.toDelete.length > 0 && plan.deletePercent >= 10 && !plan.confirmedDelete && (
+                    <div className="rounded border border-destructive/40 bg-destructive/5 p-3 space-y-2">
+                      <div className="flex gap-2 items-start">
+                        <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0 mt-0.5" />
+                        <div className="text-xs">
+                          <p className="font-semibold text-destructive">
+                            Vai eliminar {plan.toDelete.length} produtos ({plan.deletePercent.toFixed(1)}% do catálogo).
+                          </p>
+                          <p className="text-muted-foreground mt-1">
+                            Isto é mais de 10%. Verifique se o Excel está correto antes de continuar.
+                            As imagens ficam guardadas 6 meses caso o produto regresse.
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="w-full"
+                        onClick={() => setPlan({ ...plan, confirmedDelete: true })}
+                      >
+                        Confirmo, avançar mesmo assim
+                      </Button>
+                    </div>
+                  )}
+                  {plan.toDelete.length > 0 && plan.deletePercent < 10 && (
+                    <p className="text-[11px] text-muted-foreground">
+                      Imagens dos eliminados ficam guardadas 6 meses (restauradas automaticamente se o Código regressar).
                     </p>
                   )}
                 </div>
@@ -720,22 +777,68 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
                 </VirtualList>
               </div>
 
-              {!importing && !done && (
+              {!importing && !done && !plan && (
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setRows([])} className="flex-1">Cancelar</Button>
-                  <Button onClick={handleImport} className="flex-1 gap-2">
-                    <FileSpreadsheet className="h-4 w-4" />
-                    Importar {rows.length}
+                  <Button variant="outline" onClick={() => { setRows([]); setPlan(null); }} className="flex-1">
+                    Cancelar
+                  </Button>
+                  <Button onClick={buildSyncPlan} className="flex-1 gap-2">
+                    <RefreshCcw className="h-4 w-4" />
+                    Analisar {rows.length}
+                  </Button>
+                </div>
+              )}
+
+              {!importing && !done && plan && (
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setPlan(null)} className="flex-1">
+                    Voltar
+                  </Button>
+                  <Button
+                    onClick={handleImport}
+                    className="flex-1 gap-2"
+                    disabled={plan.toDelete.length > 0 && plan.deletePercent >= 10 && !plan.confirmedDelete}
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Sincronizar
                   </Button>
                 </div>
               )}
 
               {done && (
-                <div className="text-center space-y-2">
-                  <p className="text-sm font-medium text-green-600">
-                    ✅ {completedCount} importado(s){errorCount > 0 ? `, ${errorCount} com erro` : ""}
-                  </p>
-                  <Button variant="outline" onClick={() => handleClose(false)}>Fechar</Button>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-2 text-center">
+                    <div className="rounded border p-2 bg-green-500/10">
+                      <p className="text-xl font-bold text-green-600">{counts.created}</p>
+                      <p className="text-[10px] uppercase text-muted-foreground flex items-center justify-center gap-1">
+                        <Sparkles className="h-3 w-3" /> Criados
+                      </p>
+                    </div>
+                    <div className="rounded border p-2 bg-blue-500/10">
+                      <p className="text-xl font-bold text-blue-600">{counts.updated}</p>
+                      <p className="text-[10px] uppercase text-muted-foreground flex items-center justify-center gap-1">
+                        <RefreshCcw className="h-3 w-3" /> Preços atualizados
+                      </p>
+                    </div>
+                    <div className="rounded border p-2 bg-destructive/10">
+                      <p className="text-xl font-bold text-destructive">{counts.deleted}</p>
+                      <p className="text-[10px] uppercase text-muted-foreground flex items-center justify-center gap-1">
+                        <Trash2 className="h-3 w-3" /> Eliminados
+                      </p>
+                    </div>
+                    <div className="rounded border p-2 bg-purple-500/10">
+                      <p className="text-xl font-bold text-purple-600">{counts.restored}</p>
+                      <p className="text-[10px] uppercase text-muted-foreground flex items-center justify-center gap-1">
+                        <ImageIcon className="h-3 w-3" /> Imagens restauradas
+                      </p>
+                    </div>
+                  </div>
+                  {errorCount > 0 && (
+                    <p className="text-xs text-destructive text-center">⚠️ {errorCount} com erro</p>
+                  )}
+                  <Button variant="outline" onClick={() => handleClose(false)} className="w-full">
+                    Fechar
+                  </Button>
                 </div>
               )}
             </>
