@@ -6,12 +6,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { FileSpreadsheet, Loader2, CheckCircle2, XCircle, Clock, Upload } from "lucide-react";
+import {
+  FileSpreadsheet, Loader2, CheckCircle2, XCircle, Clock, Upload,
+  AlertTriangle, RefreshCcw, Sparkles, Trash2, Image as ImageIcon,
+} from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import * as XLSX from "xlsx";
 import { FixedSizeList as VirtualList } from "react-window";
 
 interface ImportRow {
+  sku?: string;
   nome: string;
   descricao?: string;
   categoria?: string;
@@ -20,13 +24,25 @@ interface ImportRow {
   preco?: number;
 }
 
-type RowStatus = "pending" | "creating" | "description" | "images" | "done" | "error";
+type RowStatus =
+  | "pending"
+  | "creating"      // novo produto a ser criado
+  | "updating"      // SKU já existe → só atualizar preço
+  | "restoring"     // SKU novo mas com imagens órfãs a recuperar
+  | "description"
+  | "images"
+  | "done"
+  | "error";
+
+type SyncAction = "create" | "update" | "skip";
 
 interface ImportStatus {
   row: ImportRow;
   status: RowStatus;
+  action?: SyncAction;
   productId?: string;
   error?: string;
+  restoredImages?: number;
 }
 
 interface ImportProductsDialogProps {
@@ -64,8 +80,20 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
   const [phase, setPhase] = useState<string>("");
   const [localFamilies, setLocalFamilies] = useState(initialFamilies);
   const [localBrands, setLocalBrands] = useState(initialBrands);
-  const [searchImages, setSearchImages] = useState(true);
+  const [searchImages, setSearchImages] = useState(false);
   const [generateDescriptions, setGenerateDescriptions] = useState(false); // OFF by default for big imports
+  const [syncMode, setSyncMode] = useState(true); // sincronização (apaga produtos que sumiram do Excel)
+
+  // Plano da sincronização (calculado antes de importar)
+  const [plan, setPlan] = useState<{
+    toCreate: ImportRow[];
+    toUpdate: { row: ImportRow; existingId: string }[];
+    toDelete: { id: string; name: string; sku: string }[];
+    deletePercent: number;
+    confirmedDelete: boolean;
+  } | null>(null);
+  const [counts, setCounts] = useState({ created: 0, updated: 0, deleted: 0, restored: 0 });
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
@@ -116,7 +144,11 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
               descricao = raw.includes("<") ? stripHtml(raw) : raw;
             }
 
+            const rawSku = find(["codigo", "código", "code", "sku", "referencia", "referência", "ref", "artigo"]);
+            const sku = rawSku != null ? String(rawSku).trim() : "";
+
             return {
+              sku: sku || undefined,
               nome: String(find(["nome", "name", "produto", "product", "artigo", "designacao"]) || "").trim(),
               descricao,
               categoria: String(find(["categ", "categoria", "category", "departamento", "setor"]) || "").trim() || undefined,
