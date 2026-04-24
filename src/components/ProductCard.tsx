@@ -42,6 +42,7 @@ function ProductImage({ src, alt }: { src: string; alt: string }) {
 interface ProductCardProps {
   id: string;
   name: string;
+  sku?: string | null;
   description: string | null;
   category: string | null;
   price: number | null;
@@ -54,7 +55,7 @@ interface ProductCardProps {
   isAdmin?: boolean;
 }
 
-export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onClick?: () => void }>(function ProductCard({ id, name, description, category, price, imageUrl, images, familyName, onEdit, isAdmin, onClick, featured, includeInCatalog }, ref) {
+export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onClick?: () => void }>(function ProductCard({ id, name, sku, description, category, price, imageUrl, images, familyName, onEdit, isAdmin, onClick, featured, includeInCatalog }, ref) {
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
   const queryClient = useQueryClient();
@@ -193,7 +194,7 @@ export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onCli
               size="sm"
               className="gap-1.5 flex-1"
               onClick={() => {
-                addItem({ id, name, price, imageUrl: allImages[0] || imageUrl, category }, quantity);
+                addItem({ id, name, sku: sku ?? null, price, imageUrl: allImages[0] || imageUrl, category }, quantity);
                 toast.success(`${quantity}x ${name} adicionado ao carrinho`);
                 setQuantity(1);
               }}

@@ -11,6 +11,7 @@ interface ProductDetailDialogProps {
   product: {
     id?: string;
     name: string;
+    sku?: string | null;
     description: string | null;
     category: string | null;
     price: number | null;
@@ -36,7 +37,7 @@ export function ProductDetailDialog({ open, onOpenChange, product }: ProductDeta
   const handleAddToCart = () => {
     if (!product.id) return;
     addItem(
-      { id: product.id, name: product.name, price: product.price, imageUrl: allImages[0] || product.imageUrl, category: product.category },
+      { id: product.id, name: product.name, sku: product.sku ?? null, price: product.price, imageUrl: allImages[0] || product.imageUrl, category: product.category },
       quantity
     );
     toast.success(`${quantity}x ${product.name} adicionado ao orçamento`);

@@ -282,6 +282,7 @@ const Index = () => {
                 key={product.id}
                 id={product.id}
                 name={product.name}
+                sku={product.sku}
                 description={product.description}
                 category={product.category}
                 price={product.price}
@@ -292,6 +293,7 @@ const Index = () => {
                 onClick={() => setSelectedProduct({
                   id: product.id,
                   name: product.name,
+                  sku: product.sku,
                   description: product.description,
                   category: product.category,
                   price: product.price,
