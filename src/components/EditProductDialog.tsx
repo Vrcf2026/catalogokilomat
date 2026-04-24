@@ -115,8 +115,19 @@ export function EditProductDialog({ open, onOpenChange, product, families, categ
 
     const imageUrl = slot.url;
     if (imageUrl && imageUrl.startsWith("http")) {
-      await supabase.from("product_images").insert({ product_id: productId, image_url: imageUrl, position });
-      return imageUrl;
+      try {
+        const { data, error } = await supabase.functions.invoke("download-and-store-image", {
+          body: { imageUrl, sku: sku.trim() || productId, position, productId },
+        });
+        if (error) throw error;
+        const finalUrl = data?.url || imageUrl;
+        await supabase.from("product_images").insert({ product_id: productId, image_url: finalUrl, position });
+        return finalUrl;
+      } catch (e) {
+        console.error("Download/store failed, keeping original URL:", e);
+        await supabase.from("product_images").insert({ product_id: productId, image_url: imageUrl, position });
+        return imageUrl;
+      }
     }
     return null;
   };
