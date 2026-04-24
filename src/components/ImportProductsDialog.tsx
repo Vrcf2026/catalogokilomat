@@ -273,97 +273,285 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
     }
   };
 
-  // ---------- Main import ----------
-  const handleImport = async () => {
-    setImporting(true);
-    setPhase("A preparar categorias, famílias e marcas...");
+  // ---------- Calcular plano de sincronização ----------
+  // Lê os produtos existentes na BD e classifica cada linha do Excel:
+  // - SKU já existe → UPDATE (só preço)
+  // - SKU novo / sem SKU → CREATE
+  // - SKU na BD que não vem no Excel → DELETE (move para órfãs)
+  const buildSyncPlan = async () => {
+    setPhase("A analisar Excel vs base de dados...");
+    const allRows = rows.map((r) => r.row);
 
-    try {
-      const allRows = rows.map((r) => r.row);
-      const { brandByName, famByKey } = await ensureTaxonomies(allRows);
+    const { data: existing, error } = await supabase
+      .from("products")
+      .select("id, name, sku");
+    if (error) throw error;
 
-      // Build product insert payload
-      const famKeyOf = (name: string, cat: string) => `${name.toLowerCase()}::${cat.toLowerCase()}`;
-      const productsPayload = allRows.map((r) => ({
-        name: r.nome,
-        description: r.descricao || null,
-        category: r.categoria || null,
-        price: r.preco ?? null,
-        family_id: r.familia
-          ? famByKey.get(famKeyOf(r.familia, r.categoria || "Outros")) || null
-          : null,
-        brand_id: r.marca ? brandByName.get(r.marca.toLowerCase()) || null : null,
-      }));
+    const existingBySku = new Map<string, { id: string; name: string }>();
+    (existing || []).forEach((p) => {
+      if (p.sku) existingBySku.set(p.sku.trim().toLowerCase(), { id: p.id, name: p.name });
+    });
 
-      // Mark all as creating
-      setRows((prev) => prev.map((r) => ({ ...r, status: "creating" as RowStatus })));
-      setPhase(`A criar ${allRows.length} produto(s) em lotes de ${PRODUCT_INSERT_BATCH}...`);
+    const seenSkus = new Set<string>();
+    const toCreate: ImportRow[] = [];
+    const toUpdate: { row: ImportRow; existingId: string }[] = [];
 
-      const insertedIds: string[] = [];
-      for (let i = 0; i < productsPayload.length; i += PRODUCT_INSERT_BATCH) {
-        const slice = productsPayload.slice(i, i + PRODUCT_INSERT_BATCH);
-        const { data, error } = await supabase.from("products").insert(slice).select("id");
-        if (error) throw error;
-        (data || []).forEach((d) => insertedIds.push(d.id));
-        setPhase(`Criados ${Math.min(i + PRODUCT_INSERT_BATCH, productsPayload.length)} / ${productsPayload.length}`);
+    for (const r of allRows) {
+      const skuKey = r.sku ? r.sku.trim().toLowerCase() : "";
+      if (skuKey && existingBySku.has(skuKey)) {
+        seenSkus.add(skuKey);
+        toUpdate.push({ row: r, existingId: existingBySku.get(skuKey)!.id });
+      } else {
+        if (skuKey) seenSkus.add(skuKey);
+        toCreate.push(r);
+      }
+    }
+
+    const toDelete = syncMode
+      ? (existing || [])
+          .filter((p) => p.sku && !seenSkus.has(p.sku.trim().toLowerCase()))
+          .map((p) => ({ id: p.id, name: p.name, sku: p.sku as string }))
+      : [];
+
+    const totalExistingWithSku = (existing || []).filter((p) => !!p.sku).length;
+    const deletePercent = totalExistingWithSku > 0 ? (toDelete.length / totalExistingWithSku) * 100 : 0;
+
+    setPlan({ toCreate, toUpdate, toDelete, deletePercent, confirmedDelete: deletePercent < 10 });
+    setPhase("");
+  };
+
+  // ---------- Mover produtos eliminados para tabela de imagens órfãs ----------
+  const orphanProducts = async (toDelete: { id: string; sku: string }[]) => {
+    if (toDelete.length === 0) return 0;
+    let orphanedCount = 0;
+
+    for (let i = 0; i < toDelete.length; i += 100) {
+      const chunk = toDelete.slice(i, i + 100);
+      const ids = chunk.map((p) => p.id);
+      const skuById = new Map(chunk.map((p) => [p.id, p.sku]));
+
+      // Carregar produtos completos + imagens
+      const { data: fullProducts } = await supabase
+        .from("products")
+        .select("id, name, description, category, price, family_id, brand_id, featured, include_in_catalog")
+        .in("id", ids);
+
+      const { data: allImages } = await supabase
+        .from("product_images")
+        .select("product_id, image_url, position")
+        .in("product_id", ids);
+
+      const orphanRows: any[] = [];
+      (fullProducts || []).forEach((p) => {
+        const sku = skuById.get(p.id)!;
+        const imgs = (allImages || []).filter((img) => img.product_id === p.id);
+        if (imgs.length === 0) return; // sem imagens, não vale guardar nada
+        imgs.forEach((img) => {
+          orphanRows.push({
+            sku,
+            image_url: img.image_url,
+            position: img.position,
+            product_name: p.name,
+            product_description: p.description,
+            product_category: p.category,
+            product_family_id: p.family_id,
+            product_brand_id: p.brand_id,
+            product_price: p.price,
+            product_featured: p.featured,
+            product_include_in_catalog: p.include_in_catalog,
+          });
+        });
+      });
+
+      if (orphanRows.length > 0) {
+        await supabase.from("orphaned_product_images").insert(orphanRows);
+        orphanedCount += orphanRows.length;
       }
 
-      // Update rows with productId; mark "done" for ones that won't be enriched
-      const willEnrich = searchImages || generateDescriptions;
-      setRows((prev) =>
-        prev.map((r, idx) => ({
-          ...r,
-          productId: insertedIds[idx],
-          status: willEnrich ? ("pending" as RowStatus) : ("done" as RowStatus),
-        }))
-      );
+      // Apagar produtos (cascade vai apagar product_images)
+      await supabase.from("products").delete().in("id", ids);
+      setPhase(`Eliminados ${Math.min(i + 100, toDelete.length)} / ${toDelete.length}`);
+    }
+    return orphanedCount;
+  };
 
-      if (willEnrich) {
-        setPhase(`A enriquecer produtos (lotes de ${ENRICH_CHUNK_SIZE})...`);
-        let updateBuffer: { idx: number; status: RowStatus }[] = [];
-        const flushBuffer = () => {
-          if (updateBuffer.length === 0) return;
-          const updates = updateBuffer;
-          updateBuffer = [];
-          setRows((prev) => {
-            const next = [...prev];
-            for (const u of updates) {
-              if (next[u.idx]) next[u.idx] = { ...next[u.idx], status: u.status };
-            }
-            return next;
-          });
-        };
+  // ---------- Restaurar imagens órfãs para SKUs novos ----------
+  const restoreOrphanedImages = async (productId: string, sku: string): Promise<number> => {
+    const skuKey = sku.trim();
+    const { data: orphans } = await supabase
+      .from("orphaned_product_images")
+      .select("image_url, position")
+      .eq("sku", skuKey)
+      .order("position");
 
-        for (let i = 0; i < insertedIds.length; i += ENRICH_CHUNK_SIZE) {
-          const chunk = insertedIds.slice(i, i + ENRICH_CHUNK_SIZE).map((id, k) => ({
-            id,
-            idx: i + k,
-            row: allRows[i + k],
-          }));
+    if (!orphans || orphans.length === 0) return 0;
 
+    await supabase
+      .from("product_images")
+      .insert(orphans.map((o) => ({ product_id: productId, image_url: o.image_url, position: o.position })));
+
+    await supabase.from("products").update({ image_url: orphans[0].image_url }).eq("id", productId);
+
+    // Limpar órfãs deste SKU
+    await supabase.from("orphaned_product_images").delete().eq("sku", skuKey);
+    return orphans.length;
+  };
+
+  // ---------- Executar a sincronização ----------
+  const handleImport = async () => {
+    if (!plan) return;
+    setImporting(true);
+    setCounts({ created: 0, updated: 0, deleted: 0, restored: 0 });
+
+    try {
+      // 1. Garantir taxonomias só para os "to create"
+      setPhase("A preparar categorias, famílias e marcas...");
+      const { brandByName, famByKey } = await ensureTaxonomies(plan.toCreate);
+      const famKeyOf = (name: string, cat: string) => `${name.toLowerCase()}::${cat.toLowerCase()}`;
+
+      // 2. UPDATE: atualizar APENAS o preço dos existentes
+      if (plan.toUpdate.length > 0) {
+        setPhase(`A atualizar preços de ${plan.toUpdate.length} produto(s) existente(s)...`);
+        setRows((prev) =>
+          prev.map((r) => {
+            const found = plan.toUpdate.find((u) => u.row === r.row);
+            return found ? { ...r, status: "updating" as RowStatus, action: "update", productId: found.existingId } : r;
+          })
+        );
+
+        // Update em paralelo (chunks de 50)
+        for (let i = 0; i < plan.toUpdate.length; i += 50) {
+          const chunk = plan.toUpdate.slice(i, i + 50);
           await Promise.all(
-            chunk.map(async ({ id, idx, row }) => {
-              updateBuffer.push({ idx, status: generateDescriptions && !row.descricao ? "description" : "images" });
-              if (generateDescriptions && !row.descricao) {
-                await generateDescriptionFor(row.nome, row.categoria || null, id);
-              }
-              if (searchImages) {
-                updateBuffer.push({ idx, status: "images" });
-                await searchAndSaveImages(row.nome, id);
-              }
-              updateBuffer.push({ idx, status: "done" });
+            chunk.map(({ row, existingId }) =>
+              supabase.from("products").update({ price: row.preco ?? null }).eq("id", existingId)
+            )
+          );
+          setPhase(`Atualizados ${Math.min(i + 50, plan.toUpdate.length)} / ${plan.toUpdate.length}`);
+        }
+
+        setRows((prev) =>
+          prev.map((r) => (r.action === "update" ? { ...r, status: "done" as RowStatus } : r))
+        );
+        setCounts((c) => ({ ...c, updated: plan.toUpdate.length }));
+      }
+
+      // 3. CREATE: criar novos produtos em batches
+      const createdIdBySku = new Map<string, string>();
+      const createdIds: string[] = [];
+      const createdRowsOrder: ImportRow[] = [];
+
+      if (plan.toCreate.length > 0) {
+        setPhase(`A criar ${plan.toCreate.length} produto(s) novo(s)...`);
+        setRows((prev) =>
+          prev.map((r) => {
+            const isNew = plan.toCreate.includes(r.row);
+            return isNew ? { ...r, status: "creating" as RowStatus, action: "create" } : r;
+          })
+        );
+
+        const payload = plan.toCreate.map((r) => ({
+          name: r.nome,
+          sku: r.sku || null,
+          description: r.descricao || null,
+          category: r.categoria || null,
+          price: r.preco ?? null,
+          family_id: r.familia ? famByKey.get(famKeyOf(r.familia, r.categoria || "Outros")) || null : null,
+          brand_id: r.marca ? brandByName.get(r.marca.toLowerCase()) || null : null,
+        }));
+
+        for (let i = 0; i < payload.length; i += PRODUCT_INSERT_BATCH) {
+          const slice = payload.slice(i, i + PRODUCT_INSERT_BATCH);
+          const sliceRows = plan.toCreate.slice(i, i + PRODUCT_INSERT_BATCH);
+          const { data, error } = await supabase.from("products").insert(slice).select("id, sku");
+          if (error) throw error;
+          (data || []).forEach((d, k) => {
+            createdIds.push(d.id);
+            createdRowsOrder.push(sliceRows[k]);
+            if (d.sku) createdIdBySku.set(d.sku, d.id);
+          });
+          setPhase(`Criados ${Math.min(i + PRODUCT_INSERT_BATCH, payload.length)} / ${payload.length}`);
+        }
+        setCounts((c) => ({ ...c, created: createdIds.length }));
+
+        // 4. RESTORE: tentar restaurar imagens órfãs para SKUs criados
+        let restoredTotal = 0;
+        for (let i = 0; i < createdIds.length; i += 50) {
+          const chunk = createdIds.slice(i, i + 50).map((id, k) => ({ id, row: createdRowsOrder[i + k] }));
+          await Promise.all(
+            chunk.map(async ({ id, row }) => {
+              if (!row.sku) return;
+              const restored = await restoreOrphanedImages(id, row.sku);
+              if (restored > 0) restoredTotal += 1;
             })
           );
-
-          if (updateBuffer.length >= UI_UPDATE_THROTTLE) flushBuffer();
-          setPhase(`Enriquecidos ${Math.min(i + ENRICH_CHUNK_SIZE, insertedIds.length)} / ${insertedIds.length}`);
-
-          // Pause between chunks to respect rate limits
-          if (i + ENRICH_CHUNK_SIZE < insertedIds.length) {
-            await sleep(ENRICH_CHUNK_PAUSE_MS);
-          }
         }
-        flushBuffer();
+        setCounts((c) => ({ ...c, restored: restoredTotal }));
+
+        // Mark created as done (enriquecimento abaixo se ativo)
+        const willEnrich = searchImages || generateDescriptions;
+        setRows((prev) =>
+          prev.map((r, idx) => {
+            if (r.action !== "create") return r;
+            const createIdx = createdRowsOrder.indexOf(r.row);
+            const productId = createIdx >= 0 ? createdIds[createIdx] : undefined;
+            return { ...r, productId, status: willEnrich ? ("pending" as RowStatus) : ("done" as RowStatus) };
+          })
+        );
+
+        // 5. ENRICH (opcional)
+        if (willEnrich) {
+          setPhase(`A enriquecer ${createdIds.length} novo(s) produto(s)...`);
+          let updateBuffer: { idx: number; status: RowStatus }[] = [];
+          const flushBuffer = () => {
+            if (updateBuffer.length === 0) return;
+            const updates = updateBuffer;
+            updateBuffer = [];
+            setRows((prev) => {
+              const next = [...prev];
+              for (const u of updates) {
+                if (next[u.idx]) next[u.idx] = { ...next[u.idx], status: u.status };
+              }
+              return next;
+            });
+          };
+
+          // Mapear createdRowsOrder para os índices originais em rows
+          const enrichTargets = createdIds.map((id, k) => {
+            const row = createdRowsOrder[k];
+            const idx = rows.findIndex((r) => r.row === row);
+            return { id, row, idx };
+          });
+
+          for (let i = 0; i < enrichTargets.length; i += ENRICH_CHUNK_SIZE) {
+            const chunk = enrichTargets.slice(i, i + ENRICH_CHUNK_SIZE);
+            await Promise.all(
+              chunk.map(async ({ id, idx, row }) => {
+                if (idx < 0) return;
+                if (generateDescriptions && !row.descricao) {
+                  updateBuffer.push({ idx, status: "description" });
+                  await generateDescriptionFor(row.nome, row.categoria || null, id);
+                }
+                if (searchImages) {
+                  updateBuffer.push({ idx, status: "images" });
+                  await searchAndSaveImages(row.nome, id);
+                }
+                updateBuffer.push({ idx, status: "done" });
+              })
+            );
+            if (updateBuffer.length >= UI_UPDATE_THROTTLE) flushBuffer();
+            setPhase(`Enriquecidos ${Math.min(i + ENRICH_CHUNK_SIZE, enrichTargets.length)} / ${enrichTargets.length}`);
+            if (i + ENRICH_CHUNK_SIZE < enrichTargets.length) await sleep(ENRICH_CHUNK_PAUSE_MS);
+          }
+          flushBuffer();
+        }
+      }
+
+      // 6. DELETE: mover produtos eliminados para órfãs
+      if (plan.toDelete.length > 0) {
+        setPhase(`A arquivar ${plan.toDelete.length} produto(s) eliminado(s) (imagens guardadas 6 meses)...`);
+        await orphanProducts(plan.toDelete);
+        setCounts((c) => ({ ...c, deleted: plan.toDelete.length }));
       }
 
       setPhase("");
@@ -374,11 +562,10 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
       queryClient.invalidateQueries({ queryKey: ["families"] });
       queryClient.invalidateQueries({ queryKey: ["brands"] });
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      toast.success("Importação concluída!");
+      toast.success("Sincronização concluída!");
     } catch (e: any) {
-      console.error("Bulk import failed:", e);
-      toast.error(`Erro na importação: ${e.message || "desconhecido"}`);
-      setRows((prev) => prev.map((r) => (r.status === "creating" ? { ...r, status: "error", error: e.message } : r)));
+      console.error("Sync failed:", e);
+      toast.error(`Erro na sincronização: ${e.message || "desconhecido"}`);
       setImporting(false);
       setDone(true);
     }
