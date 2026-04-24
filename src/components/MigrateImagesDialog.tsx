@@ -191,7 +191,7 @@ export function MigrateImagesDialog() {
 
               <div className="grid grid-cols-3 gap-2 text-center text-xs">
                 <div className="rounded-md bg-muted p-2">
-                  <div className="text-lg font-semibold text-green-600">{success}</div>
+                  <div className="text-lg font-semibold text-primary">{success}</div>
                   <div className="text-muted-foreground">Sucesso</div>
                 </div>
                 <div className="rounded-md bg-muted p-2">
@@ -211,7 +211,7 @@ export function MigrateImagesDialog() {
               )}
 
               {pauseInfo && (
-                <p className="text-xs text-amber-600 text-center">{pauseInfo}</p>
+                <p className="text-xs text-muted-foreground text-center">{pauseInfo}</p>
               )}
 
               {running && (
