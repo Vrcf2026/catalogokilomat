@@ -14,6 +14,7 @@ import CatalogoDestaques from "./pages/CatalogoDestaques.tsx";
 import CatalogoKilomat from "./pages/CatalogoKilomat.tsx";
 import TermosCondicoes from "./pages/TermosCondicoes.tsx";
 import PoliticaCookies from "./pages/PoliticaCookies.tsx";
+import PoliticaPrivacidade from "./pages/PoliticaPrivacidade.tsx";
 import Unsubscribe from "./pages/Unsubscribe.tsx";
 import { CookieConsentBanner } from "./components/CookieConsentBanner.tsx";
 import { Loader2 } from "lucide-react";
@@ -49,6 +50,7 @@ const App = () => (
               <Route path="/catalogos/kilomat" element={<CatalogoKilomat />} />
               <Route path="/termos-e-condicoes" element={<TermosCondicoes />} />
               <Route path="/politica-de-cookies" element={<PoliticaCookies />} />
+              <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="/login" element={<Login />} />
               <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
