@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ImageSearch, Loader2, CheckCircle2, XCircle, ImageOff } from "lucide-react";
+import { ImageIcon, Loader2, CheckCircle2, XCircle, ImageOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -128,7 +128,7 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
     <Dialog open={open} onOpenChange={(v) => { if (!running) setOpen(v); }}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
-          <ImageSearch className="h-4 w-4" />
+          <ImageIcon className="h-4 w-4" />
           Buscar Imagens (Web)
         </Button>
       </DialogTrigger>
