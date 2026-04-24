@@ -43,6 +43,7 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
   const [imagesPerProduct, setImagesPerProduct] = useState(3);
   const [rows, setRows] = useState<Row[]>([]);
   const [progress, setProgress] = useState(0);
+  const [pauseInfo, setPauseInfo] = useState<string>("");
   const queryClient = useQueryClient();
 
   const productImagesByProduct = useMemo(() => {
@@ -70,6 +71,14 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
 
     let done = 0;
     let stopped = false;
+    let consecutiveErrors = 0;
+
+    // Throttle config — protege contra bloqueio dos motores de busca
+    const BASE_DELAY_MIN = 800;   // ms entre pedidos (mín)
+    const BASE_DELAY_MAX = 1800;  // ms entre pedidos (máx) — aleatório evita padrão
+    const LONG_PAUSE_EVERY = 50;  // a cada N produtos
+    const LONG_PAUSE_MS = 15000;  // 15s
+    const ERROR_BACKOFF_MS = 30000; // 30s após 3 erros seguidos
 
     for (let i = 0; i < candidates.length; i++) {
       if (stop) { stopped = true; break; }
@@ -99,17 +108,39 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
 
           setRows((prev) => prev.map((r, idx) => idx === i ? { ...r, status: "done", found: images.length } : r));
         }
+        consecutiveErrors = 0;
       } catch (e: any) {
         setRows((prev) => prev.map((r, idx) => idx === i ? { ...r, status: "error", error: e.message } : r));
+        consecutiveErrors++;
       }
 
       done++;
       setProgress(Math.round((done / candidates.length) * 100));
-      // Small delay to avoid hammering the search providers
-      await new Promise((r) => setTimeout(r, 250));
+
+      // Backoff longo se houver muitos erros seguidos (provável rate-limit)
+      if (consecutiveErrors >= 3) {
+        setPauseInfo(`⚠️ Muitos erros seguidos. Pausa de ${ERROR_BACKOFF_MS / 1000}s para evitar bloqueio...`);
+        await new Promise((r) => setTimeout(r, ERROR_BACKOFF_MS));
+        consecutiveErrors = 0;
+        setPauseInfo("");
+        continue;
+      }
+
+      // Pausa longa periódica (a cada N produtos) para "respirar"
+      if (done % LONG_PAUSE_EVERY === 0 && done < candidates.length) {
+        setPauseInfo(`⏸ Pausa de ${LONG_PAUSE_MS / 1000}s (lote de ${LONG_PAUSE_EVERY} concluído)...`);
+        await new Promise((r) => setTimeout(r, LONG_PAUSE_MS));
+        setPauseInfo("");
+        continue;
+      }
+
+      // Delay aleatório entre pedidos (evita padrão detectável)
+      const jitter = BASE_DELAY_MIN + Math.random() * (BASE_DELAY_MAX - BASE_DELAY_MIN);
+      await new Promise((r) => setTimeout(r, jitter));
     }
 
     setRunning(false);
+    setPauseInfo("");
     queryClient.invalidateQueries({ queryKey: ["products"] });
     queryClient.invalidateQueries({ queryKey: ["product_images"] });
 
@@ -164,7 +195,10 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
             </div>
             <p className="text-xs text-muted-foreground">
               Total a processar: <strong>{candidates.length}</strong> produto(s).
-              Estimativa: ~{Math.ceil(candidates.length * 1.5 / 60)} min.
+              Estimativa: ~{Math.ceil((candidates.length * 1.3 + Math.floor(candidates.length / 50) * 15) / 60)} min.
+            </p>
+            <p className="text-[11px] text-muted-foreground italic">
+              Throttling automático: 0.8–1.8s entre pedidos, pausa de 15s a cada 50 produtos, e backoff de 30s se detectar bloqueio.
             </p>
           </div>
 
@@ -172,6 +206,9 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
             <div className="space-y-1">
               <Progress value={progress} />
               <p className="text-xs text-muted-foreground text-center">{progress}%</p>
+              {pauseInfo && (
+                <p className="text-xs text-amber-600 dark:text-amber-400 text-center font-medium">{pauseInfo}</p>
+              )}
             </div>
           )}
 
