@@ -195,7 +195,10 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
             </div>
             <p className="text-xs text-muted-foreground">
               Total a processar: <strong>{candidates.length}</strong> produto(s).
-              Estimativa: ~{Math.ceil(candidates.length * 1.5 / 60)} min.
+              Estimativa: ~{Math.ceil((candidates.length * 1.3 + Math.floor(candidates.length / 50) * 15) / 60)} min.
+            </p>
+            <p className="text-[11px] text-muted-foreground italic">
+              Throttling automático: 0.8–1.8s entre pedidos, pausa de 15s a cada 50 produtos, e backoff de 30s se detectar bloqueio.
             </p>
           </div>
 
@@ -203,6 +206,9 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
             <div className="space-y-1">
               <Progress value={progress} />
               <p className="text-xs text-muted-foreground text-center">{progress}%</p>
+              {pauseInfo && (
+                <p className="text-xs text-amber-600 dark:text-amber-400 text-center font-medium">{pauseInfo}</p>
+              )}
             </div>
           )}
 
