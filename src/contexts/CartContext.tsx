@@ -6,6 +6,7 @@ export interface CartItem {
   price: number | null;
   imageUrl: string | null;
   category: string | null;
+  sku?: string | null;
   quantity: number;
 }
 

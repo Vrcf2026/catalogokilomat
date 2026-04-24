@@ -20,6 +20,7 @@ interface AddProductDialogProps {
 export function AddProductDialog({ families, categories, brands }: AddProductDialogProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
+  const [sku, setSku] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [familyId, setFamilyId] = useState("none");
@@ -94,6 +95,7 @@ export function AddProductDialog({ families, categories, brands }: AddProductDia
         .from("products")
         .insert({
           name: productName,
+          sku: sku.trim() || null,
           description: description.trim() || null,
           category: category || null,
           price: price ? parseFloat(price) : null,
@@ -133,6 +135,7 @@ export function AddProductDialog({ families, categories, brands }: AddProductDia
 
   const resetForm = () => {
     setName("");
+    setSku("");
     setDescription("");
     setCategory("");
     setPrice("");
@@ -160,6 +163,14 @@ export function AddProductDialog({ families, categories, brands }: AddProductDia
               <Input id="name" placeholder="Ex: iPhone 15 Pro Max" value={name} onChange={(e) => setName(e.target.value)} />
               <Sparkles className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="sku">Código (referência interna)</Label>
+            <Input id="sku" placeholder="Ex: ABC-1234" value={sku} onChange={(e) => setSku(e.target.value)} />
+            <p className="text-[11px] text-muted-foreground">
+              Código do software de faturação. Não aparece no catálogo, mas sai nos orçamentos.
+            </p>
           </div>
 
           <div className="space-y-2">

@@ -206,6 +206,57 @@ export type Database = {
         }
         Relationships: []
       }
+      orphaned_product_images: {
+        Row: {
+          expires_at: string
+          id: string
+          image_url: string
+          orphaned_at: string
+          position: number
+          product_brand_id: string | null
+          product_category: string | null
+          product_description: string | null
+          product_family_id: string | null
+          product_featured: boolean | null
+          product_include_in_catalog: boolean | null
+          product_name: string | null
+          product_price: number | null
+          sku: string
+        }
+        Insert: {
+          expires_at?: string
+          id?: string
+          image_url: string
+          orphaned_at?: string
+          position?: number
+          product_brand_id?: string | null
+          product_category?: string | null
+          product_description?: string | null
+          product_family_id?: string | null
+          product_featured?: boolean | null
+          product_include_in_catalog?: boolean | null
+          product_name?: string | null
+          product_price?: number | null
+          sku: string
+        }
+        Update: {
+          expires_at?: string
+          id?: string
+          image_url?: string
+          orphaned_at?: string
+          position?: number
+          product_brand_id?: string | null
+          product_category?: string | null
+          product_description?: string | null
+          product_family_id?: string | null
+          product_featured?: boolean | null
+          product_include_in_catalog?: boolean | null
+          product_name?: string | null
+          product_price?: number | null
+          sku?: string
+        }
+        Relationships: []
+      }
       product_analytics: {
         Row: {
           created_at: string
@@ -296,6 +347,7 @@ export type Database = {
           include_in_catalog: boolean
           name: string
           price: number | null
+          sku: string | null
           updated_at: string
         }
         Insert: {
@@ -310,6 +362,7 @@ export type Database = {
           include_in_catalog?: boolean
           name: string
           price?: number | null
+          sku?: string | null
           updated_at?: string
         }
         Update: {
@@ -324,6 +377,7 @@ export type Database = {
           include_in_catalog?: boolean
           name?: string
           price?: number | null
+          sku?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -420,6 +474,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_orphaned_images: { Args: never; Returns: number }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean

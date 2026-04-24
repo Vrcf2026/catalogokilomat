@@ -78,6 +78,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
         ...items.map((i) => ({
           id: i.id,
           name: i.name,
+          sku: i.sku ?? null,
           price: i.price,
           category: i.category,
           quantity: i.quantity,
@@ -85,6 +86,7 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
         ...validCustomItems.map((ci) => ({
           id: ci.id,
           name: ci.description.trim(),
+          sku: null,
           price: null,
           category: "Pedido personalizado",
           quantity: ci.quantity,

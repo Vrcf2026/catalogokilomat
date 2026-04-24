@@ -6,6 +6,7 @@ import type { TemplateEntry } from './registry.ts'
 
 interface QuoteItem {
   name: string
+  sku?: string
   category?: string
   quantity: number
   price?: number | null
@@ -43,6 +44,9 @@ const QuoteRequestCustomerEmail = ({
                 <strong>{item.name}</strong>
                 {item.category ? ` — ${item.category}` : ''}
               </Text>
+              {item.sku ? (
+                <Text style={itemSku}>Código: {item.sku}</Text>
+              ) : null}
               <Text style={itemMeta}>
                 Quantidade: {item.quantity} · Preço unit.: {formatPrice(item.price)}
               </Text>
@@ -72,7 +76,7 @@ export const template = {
     customerName: 'João Silva',
     notes: 'Preciso para projeto novo.',
     items: [
-      { name: 'Câmara IP', category: 'Segurança', quantity: 2, price: 89.9 },
+      { name: 'Câmara IP', sku: 'CAM-IP-001', category: 'Segurança', quantity: 2, price: 89.9 },
     ],
   },
 } satisfies TemplateEntry
@@ -85,6 +89,7 @@ const h3 = { fontSize: '15px', color: '#1a1a2e', margin: '16px 0 8px' }
 const text = { fontSize: '14px', color: '#333', lineHeight: '1.5', margin: '0 0 8px' }
 const itemRow = { background: '#f7f7f9', padding: '10px 14px', borderRadius: '6px', margin: '0 0 8px' }
 const itemText = { fontSize: '14px', color: '#1a1a2e', margin: '0' }
+const itemSku = { fontSize: '12px', color: '#ff6b00', fontWeight: 'bold' as const, margin: '4px 0 0', fontFamily: 'monospace' }
 const itemMeta = { fontSize: '12px', color: '#666', margin: '4px 0 0' }
 const hr = { borderColor: '#eee', margin: '24px 0' }
 const footer = { fontSize: '12px', color: '#666', margin: '0 0 4px' }
