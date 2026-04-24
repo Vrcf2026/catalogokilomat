@@ -45,6 +45,7 @@ serve(async (req) => {
     const requestId = crypto.randomUUID();
     const safeItems = (items as any[]).map((i) => ({
       name: String(i.name ?? ""),
+      sku: i.sku ? String(i.sku) : undefined,
       category: i.category ? String(i.category) : undefined,
       quantity: Number(i.quantity) || 0,
       price: i.price != null ? Number(i.price) : null,

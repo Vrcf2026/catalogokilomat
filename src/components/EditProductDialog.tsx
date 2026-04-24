@@ -17,6 +17,7 @@ interface EditProductDialogProps {
   product: {
     id: string;
     name: string;
+    sku?: string | null;
     description: string | null;
     category: string | null;
     price: number | null;
@@ -31,6 +32,7 @@ interface EditProductDialogProps {
 
 export function EditProductDialog({ open, onOpenChange, product, families, categories, brands }: EditProductDialogProps) {
   const [name, setName] = useState(product.name);
+  const [sku, setSku] = useState(product.sku || "");
   const [description, setDescription] = useState(product.description || "");
   const [category, setCategory] = useState(product.category || "");
   const [familyId, setFamilyId] = useState(product.family_id || "none");
@@ -130,6 +132,7 @@ export function EditProductDialog({ open, onOpenChange, product, families, categ
         .from("products")
         .update({
           name: name.trim(),
+          sku: sku.trim() || null,
           description: description.trim() || null,
           category: category || null,
           price: price ? parseFloat(price) : null,
@@ -192,6 +195,19 @@ export function EditProductDialog({ open, onOpenChange, product, families, categ
           <div className="space-y-2">
             <Label htmlFor="edit-name">Nome *</Label>
             <Input id="edit-name" value={name} onChange={(e) => setName(e.target.value)} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="edit-sku">Código (referência interna)</Label>
+            <Input
+              id="edit-sku"
+              value={sku}
+              onChange={(e) => setSku(e.target.value)}
+              placeholder="Ex: ABC-1234"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Código do software de faturação. Não aparece no catálogo, mas sai nos orçamentos.
+            </p>
           </div>
 
           <div className="space-y-2">
