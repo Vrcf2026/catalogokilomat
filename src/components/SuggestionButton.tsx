@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { MessageSquarePlus, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { HONEYPOT_FIELD_NAME, honeypotStyle, isLikelyBot } from "@/lib/antiBot";
 
 interface SuggestionButtonProps {
   triggerClassName?: string;
@@ -23,9 +24,22 @@ const SuggestionButton = ({ triggerClassName }: SuggestionButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [honeypot, setHoneypot] = useState("");
+  const formOpenedAt = useRef<number>(Date.now());
+
+  useEffect(() => {
+    if (isOpen) formOpenedAt.current = Date.now();
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLikelyBot({ honeypotValue: honeypot, formOpenedAt: formOpenedAt.current })) {
+      toast.success("Sugestão enviada com sucesso! Obrigado pelo seu contributo.");
+      setForm({ name: "", email: "", message: "" });
+      setHoneypot("");
+      setIsOpen(false);
+      return;
+    }
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
       toast.error("Por favor preencha todos os campos.");
       return;
@@ -79,6 +93,17 @@ const SuggestionButton = ({ triggerClassName }: SuggestionButtonProps) => {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-3">
+          {/* Honeypot — invisible to humans, bots auto-fill it */}
+          <input
+            type="text"
+            name={HONEYPOT_FIELD_NAME}
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            style={honeypotStyle}
+          />
               <div>
                 <Label htmlFor="suggestion-name" className="text-xs">Nome</Label>
                 <Input

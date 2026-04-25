@@ -5,11 +5,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/contexts/CartContext";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Send, CheckCircle, Plus, Trash2 } from "lucide-react";
 import { trackEvent } from "@/lib/trackEvent";
+import { HONEYPOT_FIELD_NAME, honeypotStyle, isLikelyBot } from "@/lib/antiBot";
 
 interface CheckoutDialogProps {
   open: boolean;
@@ -34,6 +35,12 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [sendCopy, setSendCopy] = useState(true);
   const submitTimestamps = useRef<number[]>([]);
+  const [honeypot, setHoneypot] = useState("");
+  const formOpenedAt = useRef<number>(Date.now());
+
+  useEffect(() => {
+    if (open) formOpenedAt.current = Date.now();
+  }, [open]);
 
   const MAX_SUBMITS = 3;
   const RATE_WINDOW_MS = 60_000; // 1 minute
@@ -52,6 +59,19 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLikelyBot({ honeypotValue: honeypot, formOpenedAt: formOpenedAt.current })) {
+      // Silent fake-success — don't tell bots what triggered the block.
+      setSuccess(true);
+      clearCart();
+      setTimeout(() => {
+        setSuccess(false);
+        onOpenChange(false);
+        setName(""); setEmail(""); setPhone(""); setNotes("");
+        setCustomItems([]); setAcceptedTerms(false); setSendCopy(true);
+        setHoneypot("");
+      }, 3000);
+      return;
+    }
     if (!name.trim() || !email.trim() || !phone.trim()) {
       toast.error("Por favor preencha todos os campos obrigatórios.");
       return;
@@ -201,6 +221,17 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Honeypot — invisible to humans, bots auto-fill it */}
+          <input
+            type="text"
+            name={HONEYPOT_FIELD_NAME}
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            style={honeypotStyle}
+          />
           <div className="space-y-2">
             <Label htmlFor="name">Nome *</Label>
             <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="O seu nome" required maxLength={100} />
