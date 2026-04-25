@@ -61,7 +61,7 @@ const QuoteRequestCustomerEmail = ({
         ) : null}
         <Hr style={hr} />
         <Text style={footer}>Kilomat - Materiais para Construção, Lda.</Text>
-        <Text style={footer}>📞 +351 938 283 386 · ✉️ kilomat@gmail.com</Text>
+        <Text style={footer}>📞 +351 938 283 386 · ✉️ info@kilomat.pt</Text>
         <Text style={footer}>📍 Estr. do Pau Queimado, Zona Industrial Pau Queimado, 2870-100 Montijo</Text>
       </Container>
     </Body>

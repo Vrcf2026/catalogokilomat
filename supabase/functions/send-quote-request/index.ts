@@ -53,7 +53,7 @@ serve(async (req) => {
 
     await invokeTransactionalEmail({
       templateName: "quote-request-admin",
-      recipientEmail: "kilomat@gmail.com",
+      recipientEmail: "info@kilomat.pt",
       idempotencyKey: `quote-admin-${requestId}`,
       templateData: {
         customerName: String(customerName),

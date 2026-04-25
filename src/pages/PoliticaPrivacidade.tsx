@@ -48,7 +48,7 @@ const PoliticaPrivacidade = () => {
             </p>
             <p className="text-muted-foreground leading-relaxed mt-3">
               <strong className="text-foreground">Contacto do Encarregado da Proteção de Dados (DPO):</strong>{" "}
-              <a href="mailto:kilomat@gmail.com" className="text-primary hover:underline">kilomat@gmail.com</a>{" "}
+              <a href="mailto:info@kilomat.pt" className="text-primary hover:underline">info@kilomat.pt</a>{" "}
               · <a href="tel:+351938283386" className="text-primary hover:underline">+351 938 283 386</a>
             </p>
           </section>
@@ -270,7 +270,7 @@ const PoliticaPrivacidade = () => {
             <ul className="list-disc pl-6 text-muted-foreground space-y-1 mt-2">
               <li>
                 <strong className="text-foreground">Email:</strong>{" "}
-                <a href="mailto:kilomat@gmail.com" className="text-primary hover:underline">kilomat@gmail.com</a>{" "}
+                <a href="mailto:info@kilomat.pt" className="text-primary hover:underline">info@kilomat.pt</a>{" "}
                 (assunto: "Dados Pessoais")
               </li>
               <li>

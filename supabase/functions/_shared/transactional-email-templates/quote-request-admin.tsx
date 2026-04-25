@@ -72,7 +72,7 @@ export const template = {
   subject: (d: Record<string, any>) =>
     `Novo Pedido de Orçamento - ${(d?.customerName || 'Cliente').toString().slice(0, 80)}`,
   displayName: 'Pedido de orçamento (admin)',
-  to: 'kilomat@gmail.com',
+  to: 'info@kilomat.pt',
   previewData: {
     customerName: 'João Silva',
     customerEmail: 'joao@example.com',
