@@ -48,7 +48,7 @@ const TermosCondicoes = () => {
             </p>
             <p className="text-muted-foreground leading-relaxed mt-3">
               <strong className="text-foreground">Contactos:</strong>{" "}
-              <a href="mailto:kilomat@gmail.com" className="text-primary hover:underline">kilomat@gmail.com</a>{" "}
+              <a href="mailto:info@kilomat.pt" className="text-primary hover:underline">info@kilomat.pt</a>{" "}
               · <a href="tel:+351938283386" className="text-primary hover:underline">+351 938 283 386</a>{" "}
               · <a href="tel:+351212316204" className="text-primary hover:underline">+351 212 316 204</a>
             </p>

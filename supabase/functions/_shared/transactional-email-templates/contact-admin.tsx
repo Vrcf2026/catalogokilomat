@@ -37,7 +37,7 @@ export const template = {
   subject: (d: Record<string, any>) =>
     `Novo Contacto - ${(d?.name || 'Visitante').toString().slice(0, 80)}`,
   displayName: 'Contacto (admin)',
-  to: 'kilomat@gmail.com',
+  to: 'info@kilomat.pt',
   previewData: {
     name: 'João Pereira',
     email: 'joao@example.com',

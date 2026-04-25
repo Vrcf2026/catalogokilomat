@@ -59,7 +59,7 @@ serve(async (req) => {
 
     await invokeTransactionalEmail({
       templateName: "suggestion-admin",
-      recipientEmail: "kilomat@gmail.com",
+      recipientEmail: "info@kilomat.pt",
       idempotencyKey: `suggestion-admin-${requestId}`,
       templateData: data,
     });

@@ -221,7 +221,7 @@ export const CatalogContactsPage = forwardRef<HTMLDivElement, {
           </div>
           <div className="flex items-center gap-3 justify-center">
             <Mail className="h-4 w-4" style={{ color: theme.accent }} />
-            <span className="text-white/80 text-sm">kilomat@gmail.com</span>
+            <span className="text-white/80 text-sm">info@kilomat.pt</span>
           </div>
           <div className="flex items-center gap-3 justify-center">
             <MapPin className="h-4 w-4" style={{ color: theme.accent }} />

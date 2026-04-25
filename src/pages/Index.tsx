@@ -223,12 +223,12 @@ const Index = () => {
             <span>+351 938 283 386</span>
           </a>
           <a
-            href="mailto:kilomat@gmail.com"
+            href="mailto:info@kilomat.pt"
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
             aria-label="Enviar email para Kilomat"
           >
             <Mail className="h-4 w-4" />
-            <span>kilomat@gmail.com</span>
+            <span>info@kilomat.pt</span>
           </a>
           <a
             href="https://www.google.com/maps/search/?api=1&query=Kilomat+Lda+Montijo"

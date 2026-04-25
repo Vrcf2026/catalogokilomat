@@ -209,7 +209,7 @@ const PoliticaCookies = () => {
             <ul className="list-disc pl-6 text-muted-foreground space-y-1 mt-2">
               <li>
                 Email:{" "}
-                <a href="mailto:kilomat@gmail.com" className="text-primary hover:underline">kilomat@gmail.com</a>
+                <a href="mailto:info@kilomat.pt" className="text-primary hover:underline">info@kilomat.pt</a>
               </li>
               <li>
                 Telefone:{" "}

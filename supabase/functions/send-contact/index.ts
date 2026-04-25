@@ -36,7 +36,7 @@ serve(async (req) => {
     const { error: adminError } = await supabase.functions.invoke("send-transactional-email", {
       body: {
         templateName: "contact-admin",
-        recipientEmail: "kilomat@gmail.com",
+        recipientEmail: "info@kilomat.pt",
         idempotencyKey: `contact-admin-${requestId}`,
         templateData: data,
       },
