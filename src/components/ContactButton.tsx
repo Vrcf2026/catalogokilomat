@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Phone, Send, HardHat } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { HONEYPOT_FIELD_NAME, honeypotStyle, isLikelyBot } from "@/lib/antiBot";
 
 interface ContactButtonProps {
   triggerClassName?: string;
@@ -23,9 +24,23 @@ const ContactButton = ({ triggerClassName }: ContactButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [honeypot, setHoneypot] = useState("");
+  const formOpenedAt = useRef<number>(Date.now());
+
+  useEffect(() => {
+    if (isOpen) formOpenedAt.current = Date.now();
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLikelyBot({ honeypotValue: honeypot, formOpenedAt: formOpenedAt.current })) {
+      // Silent success — don't tip off bots about the check.
+      toast.success("Mensagem enviada! Entraremos em contacto brevemente.");
+      setForm({ name: "", email: "", phone: "", message: "" });
+      setHoneypot("");
+      setIsOpen(false);
+      return;
+    }
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
       toast.error("Por favor preencha nome, email e mensagem.");
       return;
@@ -89,6 +104,17 @@ const ContactButton = ({ triggerClassName }: ContactButtonProps) => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
+          {/* Honeypot — invisible to humans, bots auto-fill it */}
+          <input
+            type="text"
+            name={HONEYPOT_FIELD_NAME}
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            style={honeypotStyle}
+          />
           <div>
             <Label htmlFor="contact-name" className="text-xs">Nome *</Label>
             <Input
