@@ -192,15 +192,17 @@ export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onCli
             <Button
               variant="outline"
               size="sm"
-              className="gap-1.5 flex-1"
+              className="gap-1.5 flex-1 px-2"
+              title="Adicionar ao carrinho"
+              aria-label="Adicionar ao carrinho"
               onClick={() => {
                 addItem({ id, name, sku: sku ?? null, price, imageUrl: allImages[0] || imageUrl, category }, quantity);
                 toast.success(`${quantity}x ${name} adicionado ao carrinho`);
                 setQuantity(1);
               }}
             >
-              <ShoppingCart className="h-3.5 w-3.5" />
-              Adicionar
+              <ShoppingCart className="h-4 w-4" />
+              <span className="hidden xl:inline">Adicionar</span>
             </Button>
           </div>
         )}
