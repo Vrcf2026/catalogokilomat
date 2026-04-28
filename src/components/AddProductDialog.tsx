@@ -252,6 +252,8 @@ export function AddProductDialog({ families, categories, brands }: AddProductDia
             slots={imageSlots}
             onSlotsChange={setImageSlots}
             productName={name}
+            brandName={brands.find((b) => b.id === brandId)?.name || null}
+            allBrandNames={brands.map((b) => b.name)}
             disabled={loading}
           />
 

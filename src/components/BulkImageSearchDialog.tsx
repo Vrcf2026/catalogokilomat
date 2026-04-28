@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -14,6 +14,7 @@ interface Product {
   id: string;
   name: string;
   image_url: string | null;
+  brand_id?: string | null;
 }
 
 interface ProductImage {
@@ -44,7 +45,26 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
   const [rows, setRows] = useState<Row[]>([]);
   const [progress, setProgress] = useState(0);
   const [pauseInfo, setPauseInfo] = useState<string>("");
+  const [brandsMap, setBrandsMap] = useState<Map<string, string>>(new Map());
+  const [allBrandNames, setAllBrandNames] = useState<string[]>([]);
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!open) return;
+    (async () => {
+      const { data } = await supabase.from("brands").select("id, name");
+      const map = new Map<string, string>();
+      const names: string[] = [];
+      (data || []).forEach((b: any) => {
+        if (b?.id && b?.name) {
+          map.set(b.id, b.name);
+          names.push(b.name);
+        }
+      });
+      setBrandsMap(map);
+      setAllBrandNames(names);
+    })();
+  }, [open]);
 
   const productImagesByProduct = useMemo(() => {
     const map: Record<string, number> = {};
@@ -86,8 +106,10 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
       setRows((prev) => prev.map((r, idx) => idx === i ? { ...r, status: "searching" } : r));
 
       try {
+        const brandName = p.brand_id ? brandsMap.get(p.brand_id) || "" : "";
+        const excludeBrands = brandName ? [] : allBrandNames;
         const { data, error } = await supabase.functions.invoke("search-product-images", {
-          body: { query: p.name, count: imagesPerProduct * 4 },
+          body: { query: p.name, count: imagesPerProduct * 4, brand: brandName, excludeBrands },
         });
         if (error) throw error;
 
