@@ -509,6 +509,8 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
         // 5. ENRICH (opcional)
         if (willEnrich) {
           setPhase(`A enriquecer ${createdIds.length} novo(s) produto(s)...`);
+          // Snapshot all brand names (for excludeBrands when product has no brand)
+          const allBrandNames = Array.from(brandByName.keys());
           let updateBuffer: { idx: number; status: RowStatus }[] = [];
           const flushBuffer = () => {
             if (updateBuffer.length === 0) return;
@@ -541,7 +543,7 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
                 }
                 if (searchImages) {
                   updateBuffer.push({ idx, status: "images" });
-                  await searchAndSaveImages(row.nome, id);
+                  await searchAndSaveImages(row.nome, id, row.marca || null, allBrandNames);
                 }
                 updateBuffer.push({ idx, status: "done" });
               })
