@@ -301,6 +301,7 @@ const Index = () => {
                   imageUrl: product.image_url,
                   images: imagesByProduct[product.id] || [],
                   familyName: product.family_id ? familyMap[product.family_id] || null : null,
+                  brandName: product.brand_id ? brandMap[product.brand_id] || null : null,
                 })}
               />
             ))}
