@@ -237,10 +237,17 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
   };
 
   // ---------- Image search for a single product ----------
-  const searchAndSaveImages = async (productName: string, productId: string) => {
+  const searchAndSaveImages = async (
+    productName: string,
+    productId: string,
+    brandName?: string | null,
+    allBrandNames?: string[],
+  ) => {
     try {
+      const brand = (brandName || "").trim();
+      const excludeBrands = brand ? [] : (allBrandNames || []);
       const { data, error } = await supabase.functions.invoke("search-product-images", {
-        body: { query: productName, count: 12 },
+        body: { query: productName, count: 12, brand, excludeBrands },
       });
       if (error) throw error;
       const images: string[] = Array.isArray(data?.images) ? data.images : [];
