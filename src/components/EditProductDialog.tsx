@@ -302,7 +302,14 @@ export function EditProductDialog({ open, onOpenChange, product, families, categ
             </div>
           </div>
 
-          <ImageSlotPicker slots={imageSlots} onSlotsChange={setImageSlots} productName={name} disabled={loading} />
+          <ImageSlotPicker
+            slots={imageSlots}
+            onSlotsChange={setImageSlots}
+            productName={name}
+            brandName={brands.find((b) => b.id === brandId)?.name || null}
+            allBrandNames={brands.map((b) => b.name)}
+            disabled={loading}
+          />
 
           <div className="flex gap-2">
             <Button onClick={handleSave} disabled={loading || generatingDesc} className="flex-1 gap-2">
