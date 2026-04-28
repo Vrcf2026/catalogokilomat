@@ -305,6 +305,8 @@ export function CatalogViewer({
                   onProductOpen={(product) => {
                     trackEvent(product.id, "catalog_view");
                     setSelectedProduct({
+                      id: product.id,
+                      sku: (product as any).sku ?? null,
                       name: product.name,
                       description: product.description,
                       category: product.category,
@@ -312,6 +314,7 @@ export function CatalogViewer({
                       imageUrl: product.image_url,
                       images: imagesByProduct[product.id] || [],
                       familyName: page.familyName,
+                      brandName: null,
                     });
                   }}
                 />

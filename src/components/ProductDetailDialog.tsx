@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { ImageOff, ChevronLeft, ChevronRight, ShoppingCart, Minus, Plus } from "lucide-react";
+import { ImageOff, ChevronLeft, ChevronRight, ShoppingCart, Minus, Plus, Tag, Layers, Mail, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { toast } from "sonner";
@@ -18,6 +18,7 @@ interface ProductDetailDialogProps {
     imageUrl: string | null;
     images: { id: string; image_url: string; position: number }[];
     familyName: string | null;
+    brandName?: string | null;
   };
 }
 
@@ -160,6 +161,50 @@ export function ProductDetailDialog({ open, onOpenChange, product }: ProductDeta
               <p className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed">
                 {product.description}
               </p>
+            )}
+
+            {!product.description && (
+              <div className="flex flex-col gap-3 mt-1">
+                {/* Useful product metadata */}
+                <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-muted/30 p-3">
+                  {product.sku && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <Tag className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-muted-foreground">Referência:</span>
+                      <span className="font-medium text-foreground">{product.sku}</span>
+                    </div>
+                  )}
+                  {product.brandName && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <Layers className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-muted-foreground">Marca:</span>
+                      <span className="font-medium text-foreground">{product.brandName}</span>
+                    </div>
+                  )}
+                  {product.familyName && !product.brandName && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <Layers className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-muted-foreground">Família:</span>
+                      <span className="font-medium text-foreground">{product.familyName}</span>
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-sm text-muted-foreground leading-relaxed flex items-start gap-2">
+                  <Info className="h-4 w-4 text-muted-foreground/70 flex-shrink-0 mt-0.5" />
+                  <span>
+                    Para mais informações sobre este produto, contacte-nos ou solicite orçamento.
+                  </span>
+                </p>
+
+                <a
+                  href={`mailto:info@kilomat.pt?subject=${encodeURIComponent(`Pedido de informação - ${product.name}${product.sku ? ` (Ref: ${product.sku})` : ""}`)}&body=${encodeURIComponent(`Olá,\n\nGostaria de mais informações sobre o produto:\n\n${product.name}${product.sku ? `\nReferência: ${product.sku}` : ""}${product.brandName ? `\nMarca: ${product.brandName}` : ""}\n\nObrigado.`)}`}
+                  className="inline-flex items-center justify-center gap-2 text-sm font-medium text-primary hover:text-primary/80 border border-primary/30 hover:border-primary/60 rounded-md px-3 py-2 transition-colors w-fit"
+                >
+                  <Mail className="h-4 w-4" />
+                  Pedir mais informações
+                </a>
+              </div>
             )}
           </div>
         </div>

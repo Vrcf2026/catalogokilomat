@@ -96,6 +96,7 @@ const Index = () => {
   }, {});
 
   const familyMap = Object.fromEntries(families.map((f) => [f.id, f.name]));
+  const brandMap = Object.fromEntries(brands.map((b) => [b.id, b.name]));
 
   const normalize = (str: string) => str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
@@ -300,6 +301,7 @@ const Index = () => {
                   imageUrl: product.image_url,
                   images: imagesByProduct[product.id] || [],
                   familyName: product.family_id ? familyMap[product.family_id] || null : null,
+                  brandName: product.brand_id ? brandMap[product.brand_id] || null : null,
                 })}
               />
             ))}
