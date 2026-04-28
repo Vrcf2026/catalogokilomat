@@ -306,7 +306,7 @@ export function CatalogViewer({
                     trackEvent(product.id, "catalog_view");
                     setSelectedProduct({
                       id: product.id,
-                      sku: product.sku ?? null,
+                      sku: (product as any).sku ?? null,
                       name: product.name,
                       description: product.description,
                       category: product.category,
