@@ -43,6 +43,13 @@ function tokenizeQuery(query: string) {
     .filter((token) => token.length >= 3);
 }
 
+function brandTokens(brand?: string | null) {
+  if (!brand) return [] as string[];
+  return normalizeText(brand)
+    .split(" ")
+    .filter((t) => t.length >= 2);
+}
+
 function isBlockedHost(hostname: string) {
   const host = hostname.toLowerCase();
   return [...blockedDomains].some((blocked) => host === blocked || host.endsWith(`.${blocked}`));
@@ -68,12 +75,38 @@ function isValidCandidate(rawUrl: string) {
   }
 }
 
-function scoreCandidate(url: string, tokens: string[]) {
+function scoreCandidate(
+  url: string,
+  tokens: string[],
+  brand?: string | null,
+  excludeBrandTokens?: string[],
+) {
   const normalized = normalizeText(url);
   let score = 0;
 
   for (const token of tokens) {
     if (normalized.includes(token)) score += 3;
+  }
+
+  // Strong boost when the brand name appears in URL/path
+  const bTokens = brandTokens(brand);
+  if (bTokens.length > 0) {
+    let brandHits = 0;
+    for (const t of bTokens) {
+      if (normalized.includes(t)) brandHits++;
+    }
+    if (brandHits === bTokens.length) score += 8; // full brand match
+    else if (brandHits > 0) score += 4;
+    else score -= 6; // brand specified but absent → demote heavily
+  }
+
+  // Penalize results that mention OTHER known brands when filtering them out
+  if (excludeBrandTokens && excludeBrandTokens.length > 0) {
+    for (const t of excludeBrandTokens) {
+      if (t.length >= 3 && normalized.includes(t)) {
+        score -= 10;
+      }
+    }
   }
 
   if (/\.(png|jpg|jpeg|webp|avif)(\?|$)/i.test(url)) score += 2;
@@ -189,22 +222,48 @@ serve(async (req) => {
   }
 
   try {
-    const { query, count = 12 } = await req.json();
+    const { query, count = 12, brand, excludeBrands } = await req.json();
     if (!query?.trim()) throw new Error("Query is required");
 
     const requestedCount = Math.min(Math.max(Number(count) || 12, 1), 30);
     const cleanQuery = query.trim();
+    const cleanBrand = typeof brand === "string" ? brand.trim() : "";
+    const hasBrand = cleanBrand.length > 0;
+
+    // Build token list of brands to exclude (only when no brand provided).
+    // Tokens are normalized; multi-word brands become several tokens.
+    const excludeList: string[] = Array.isArray(excludeBrands)
+      ? (excludeBrands as unknown[]).filter((b): b is string => typeof b === "string")
+      : [];
+    const excludeTokens = hasBrand
+      ? []
+      : Array.from(
+          new Set(
+            excludeList
+              .flatMap((b) => normalizeText(b).split(" "))
+              .filter((t) => t.length >= 3),
+          ),
+        );
+
     const tokens = tokenizeQuery(cleanQuery);
 
-    const queryVariants = dedupe([
-      `"${cleanQuery}" product`,
-      cleanQuery,
-      `${cleanQuery} produto`,
-      `${cleanQuery} product image`,
-      `${cleanQuery} official`,
-    ]);
+    const queryVariants = hasBrand
+      ? dedupe([
+          `"${cleanBrand}" "${cleanQuery}"`,
+          `${cleanBrand} ${cleanQuery} product`,
+          `${cleanBrand} ${cleanQuery}`,
+          `${cleanBrand} ${cleanQuery} official`,
+          `"${cleanBrand}" ${cleanQuery} datasheet`,
+        ])
+      : dedupe([
+          `"${cleanQuery}" product`,
+          cleanQuery,
+          `${cleanQuery} produto`,
+          `${cleanQuery} product image`,
+          `${cleanQuery} official`,
+        ]);
 
-    console.log("Searching images for:", cleanQuery);
+    console.log("Searching images for:", cleanQuery, "brand:", cleanBrand || "(none)", "exclude:", excludeTokens.length);
 
     let candidates: string[] = [];
 
@@ -222,8 +281,19 @@ serve(async (req) => {
       }
     }
 
-    const ranked = candidates
-      .map((url) => ({ url, score: scoreCandidate(url, tokens) }))
+    // Hard filter when brand is missing: drop URLs that clearly reference any known brand.
+    let filtered = candidates;
+    if (!hasBrand && excludeTokens.length > 0) {
+      filtered = candidates.filter((url) => {
+        const n = normalizeText(url);
+        return !excludeTokens.some((t) => n.includes(t));
+      });
+      // Fallback: if filtering removed everything, keep originals so we still return something
+      if (filtered.length === 0) filtered = candidates;
+    }
+
+    const ranked = filtered
+      .map((url) => ({ url, score: scoreCandidate(url, tokens, cleanBrand, excludeTokens) }))
       .sort((a, b) => b.score - a.score)
       .map((item) => item.url);
 
