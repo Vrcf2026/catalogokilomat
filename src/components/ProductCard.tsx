@@ -192,7 +192,7 @@ export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onCli
             <Button
               variant="outline"
               size="sm"
-              className="gap-1.5 flex-1 px-2"
+              className="px-2 shrink-0"
               title="Adicionar ao carrinho"
               aria-label="Adicionar ao carrinho"
               onClick={() => {
@@ -202,7 +202,6 @@ export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onCli
               }}
             >
               <ShoppingCart className="h-4 w-4" />
-              <span className="hidden xl:inline">Adicionar</span>
             </Button>
           </div>
         )}
