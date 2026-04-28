@@ -96,6 +96,7 @@ const Index = () => {
   }, {});
 
   const familyMap = Object.fromEntries(families.map((f) => [f.id, f.name]));
+  const brandMap = Object.fromEntries(brands.map((b) => [b.id, b.name]));
 
   const normalize = (str: string) => str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
