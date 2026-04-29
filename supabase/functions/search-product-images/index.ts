@@ -80,6 +80,7 @@ function scoreCandidate(
   tokens: string[],
   brand?: string | null,
   excludeBrandTokens?: string[],
+  contextTokens?: string[],
 ) {
   const normalized = normalizeText(url);
   let score = 0;
@@ -109,13 +110,28 @@ function scoreCandidate(
     }
   }
 
+  // Context (category/family) boost — reinforces relevance to the product type
+  if (contextTokens && contextTokens.length > 0) {
+    for (const t of contextTokens) {
+      if (t.length >= 3 && normalized.includes(t)) score += 2;
+    }
+  }
+
   if (/\.(png|jpg|jpeg|webp|avif)(\?|$)/i.test(url)) score += 2;
   if (normalized.includes("product")) score += 2;
   if (normalized.includes("catalog") || normalized.includes("datasheet") || normalized.includes("spec")) score += 1;
 
-  const negativeTerms = ["logo", "icon", "avatar", "banner", "background", "news", "blog", "person", "event"];
+  // Aggressive penalties for irrelevant content (people, vehicles, lifestyle, etc.)
+  const negativeTerms = [
+    "logo", "icon", "avatar", "banner", "background", "news", "blog", "event",
+    "person", "people", "man", "woman", "men", "women", "boy", "girl", "kid", "child",
+    "worker", "portrait", "selfie", "face",
+    "car", "truck", "van", "vehicle", "carrinha", "carro", "auto",
+    "lifestyle", "wallpaper", "stockphoto", "stock-photo",
+    "meme", "funny", "celebrity",
+  ];
   for (const term of negativeTerms) {
-    if (normalized.includes(term)) score -= 2;
+    if (normalized.includes(term)) score -= 5;
   }
 
   return score;
@@ -222,13 +238,23 @@ serve(async (req) => {
   }
 
   try {
-    const { query, count = 12, brand, excludeBrands } = await req.json();
+    const { query, count = 12, brand, excludeBrands, category, family } = await req.json();
     if (!query?.trim()) throw new Error("Query is required");
 
     const requestedCount = Math.min(Math.max(Number(count) || 12, 1), 30);
     const cleanQuery = query.trim();
     const cleanBrand = typeof brand === "string" ? brand.trim() : "";
     const hasBrand = cleanBrand.length > 0;
+    const cleanCategory = typeof category === "string" ? category.trim() : "";
+    const cleanFamily = typeof family === "string" ? family.trim() : "";
+    const contextTokens = Array.from(
+      new Set(
+        [cleanCategory, cleanFamily]
+          .filter((s) => s.length > 0)
+          .flatMap((s) => normalizeText(s).split(" "))
+          .filter((t) => t.length >= 3),
+      ),
+    );
 
     // Build token list of brands to exclude (only when no brand provided).
     // Tokens are normalized; multi-word brands become several tokens.
@@ -247,23 +273,25 @@ serve(async (req) => {
 
     const tokens = tokenizeQuery(cleanQuery);
 
+    // Build query variants — when brand+category/family are present, anchor the
+    // search to a very specific product type to avoid generic noise (people, cars, etc.)
+    const ctxStr = [cleanFamily, cleanCategory].filter(Boolean).join(" ");
     const queryVariants = hasBrand
       ? dedupe([
-          `"${cleanBrand}" "${cleanQuery}"`,
-          `${cleanBrand} ${cleanQuery} product`,
-          `${cleanBrand} ${cleanQuery}`,
-          `${cleanBrand} ${cleanQuery} official`,
-          `"${cleanBrand}" ${cleanQuery} datasheet`,
+          ctxStr ? `"${cleanBrand}" "${cleanQuery}" ${ctxStr}` : `"${cleanBrand}" "${cleanQuery}"`,
+          ctxStr ? `${cleanBrand} ${cleanQuery} ${ctxStr}` : `${cleanBrand} ${cleanQuery} product`,
+          `"${cleanBrand}" ${cleanQuery} product`,
+          `${cleanBrand} ${cleanQuery} official site:${cleanBrand.replace(/\s+/g, "")}.com`,
+          `${cleanBrand} ${cleanQuery} datasheet`,
         ])
       : dedupe([
-          `"${cleanQuery}" product`,
-          cleanQuery,
+          ctxStr ? `"${cleanQuery}" ${ctxStr}` : `"${cleanQuery}" product`,
+          ctxStr ? `${cleanQuery} ${ctxStr} product` : cleanQuery,
           `${cleanQuery} produto`,
           `${cleanQuery} product image`,
-          `${cleanQuery} official`,
         ]);
 
-    console.log("Searching images for:", cleanQuery, "brand:", cleanBrand || "(none)", "exclude:", excludeTokens.length);
+    console.log("Searching images for:", cleanQuery, "brand:", cleanBrand || "(none)", "ctx:", ctxStr || "(none)", "exclude:", excludeTokens.length);
 
     let candidates: string[] = [];
 
@@ -288,12 +316,25 @@ serve(async (req) => {
         const n = normalizeText(url);
         return !excludeTokens.some((t) => n.includes(t));
       });
-      // Fallback: if filtering removed everything, keep originals so we still return something
       if (filtered.length === 0) filtered = candidates;
     }
 
+    // Hard filter: drop URLs containing strong "irrelevant subject" markers
+    const hardNoise = [
+      "/people/", "/person/", "/man/", "/woman/", "/men/", "/women/",
+      "/cars/", "/car/", "/truck/", "/vehicle/", "/auto/",
+      "/portrait", "/selfie", "/lifestyle/", "/wallpaper",
+    ];
+    const noiseFiltered = filtered.filter((url) => {
+      const lower = url.toLowerCase();
+      return !hardNoise.some((n) => lower.includes(n));
+    });
+    if (noiseFiltered.length >= Math.max(3, Math.floor(requestedCount / 2))) {
+      filtered = noiseFiltered;
+    }
+
     const ranked = filtered
-      .map((url) => ({ url, score: scoreCandidate(url, tokens, cleanBrand, excludeTokens) }))
+      .map((url) => ({ url, score: scoreCandidate(url, tokens, cleanBrand, excludeTokens, contextTokens) }))
       .sort((a, b) => b.score - a.score)
       .map((item) => item.url);
 
