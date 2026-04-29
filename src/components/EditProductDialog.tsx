@@ -308,6 +308,8 @@ export function EditProductDialog({ open, onOpenChange, product, families, categ
             productName={name}
             brandName={brands.find((b) => b.id === brandId)?.name || null}
             allBrandNames={brands.map((b) => b.name)}
+            category={category || null}
+            familyName={families.find((f) => f.id === familyId)?.name || null}
             disabled={loading}
           />
 

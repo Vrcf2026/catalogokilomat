@@ -18,10 +18,12 @@ interface ImageSlotPickerProps {
   productName: string;
   brandName?: string | null;
   allBrandNames?: string[];
+  category?: string | null;
+  familyName?: string | null;
   disabled?: boolean;
 }
 
-export function ImageSlotPicker({ slots, onSlotsChange, productName, brandName, allBrandNames, disabled }: ImageSlotPickerProps) {
+export function ImageSlotPicker({ slots, onSlotsChange, productName, brandName, allBrandNames, category, familyName, disabled }: ImageSlotPickerProps) {
   const [searching, setSearching] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [searchResults, setSearchResults] = useState<string[]>([]);
@@ -47,7 +49,14 @@ export function ImageSlotPicker({ slots, onSlotsChange, productName, brandName, 
         ? []
         : (allBrandNames || []).filter((b) => b && b.trim().length > 0);
       const { data, error } = await supabase.functions.invoke("search-product-images", {
-        body: { query: productName.trim(), count: 18, brand, excludeBrands },
+        body: {
+          query: productName.trim(),
+          count: 18,
+          brand,
+          excludeBrands,
+          category: (category || "").trim() || undefined,
+          family: (familyName || "").trim() || undefined,
+        },
       });
 
       if (error) throw error;
