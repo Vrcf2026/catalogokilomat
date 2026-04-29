@@ -197,6 +197,10 @@ export function ProductDetailDialog({ open, onOpenChange, product }: ProductDeta
                   </span>
                 </p>
 
+                <p className="text-xs text-muted-foreground/70 italic">
+                  As imagens apresentadas são meramente ilustrativas.
+                </p>
+
                 <a
                   href={`mailto:info@kilomat.pt?subject=${encodeURIComponent(`Pedido de informação - ${product.name}${product.sku ? ` (Ref: ${product.sku})` : ""}`)}&body=${encodeURIComponent(`Olá,\n\nGostaria de mais informações sobre o produto:\n\n${product.name}${product.sku ? `\nReferência: ${product.sku}` : ""}${product.brandName ? `\nMarca: ${product.brandName}` : ""}\n\nObrigado.`)}`}
                   className="inline-flex items-center justify-center gap-2 text-sm font-medium text-primary hover:text-primary/80 border border-primary/30 hover:border-primary/60 rounded-md px-3 py-2 transition-colors w-fit"
