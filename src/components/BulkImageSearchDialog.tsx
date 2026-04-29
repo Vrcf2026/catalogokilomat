@@ -15,6 +15,8 @@ interface Product {
   name: string;
   image_url: string | null;
   brand_id?: string | null;
+  category?: string | null;
+  family_id?: string | null;
 }
 
 interface ProductImage {
@@ -47,6 +49,7 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
   const [pauseInfo, setPauseInfo] = useState<string>("");
   const [brandsMap, setBrandsMap] = useState<Map<string, string>>(new Map());
   const [allBrandNames, setAllBrandNames] = useState<string[]>([]);
+  const [familiesMap, setFamiliesMap] = useState<Map<string, string>>(new Map());
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -63,6 +66,10 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
       });
       setBrandsMap(map);
       setAllBrandNames(names);
+      const { data: fams } = await supabase.from("product_families").select("id, name");
+      const fmap = new Map<string, string>();
+      (fams || []).forEach((f: any) => { if (f?.id && f?.name) fmap.set(f.id, f.name); });
+      setFamiliesMap(fmap);
     })();
   }, [open]);
 
@@ -108,8 +115,16 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
       try {
         const brandName = p.brand_id ? brandsMap.get(p.brand_id) || "" : "";
         const excludeBrands = brandName ? [] : allBrandNames;
+        const familyName = p.family_id ? familiesMap.get(p.family_id) || "" : "";
         const { data, error } = await supabase.functions.invoke("search-product-images", {
-          body: { query: p.name, count: imagesPerProduct * 4, brand: brandName, excludeBrands },
+          body: {
+            query: p.name,
+            count: imagesPerProduct * 4,
+            brand: brandName,
+            excludeBrands,
+            category: p.category || undefined,
+            family: familyName || undefined,
+          },
         });
         if (error) throw error;
 

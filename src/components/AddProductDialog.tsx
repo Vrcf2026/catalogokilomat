@@ -254,6 +254,8 @@ export function AddProductDialog({ families, categories, brands }: AddProductDia
             productName={name}
             brandName={brands.find((b) => b.id === brandId)?.name || null}
             allBrandNames={brands.map((b) => b.name)}
+            category={category || null}
+            familyName={families.find((f) => f.id === familyId)?.name || null}
             disabled={loading}
           />
 
