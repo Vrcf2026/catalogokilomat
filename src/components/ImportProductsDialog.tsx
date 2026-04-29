@@ -242,12 +242,21 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
     productId: string,
     brandName?: string | null,
     allBrandNames?: string[],
+    category?: string | null,
+    familyName?: string | null,
   ) => {
     try {
       const brand = (brandName || "").trim();
       const excludeBrands = brand ? [] : (allBrandNames || []);
       const { data, error } = await supabase.functions.invoke("search-product-images", {
-        body: { query: productName, count: 12, brand, excludeBrands },
+        body: {
+          query: productName,
+          count: 12,
+          brand,
+          excludeBrands,
+          category: (category || "").trim() || undefined,
+          family: (familyName || "").trim() || undefined,
+        },
       });
       if (error) throw error;
       const images: string[] = Array.isArray(data?.images) ? data.images : [];
@@ -543,7 +552,14 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
                 }
                 if (searchImages) {
                   updateBuffer.push({ idx, status: "images" });
-                  await searchAndSaveImages(row.nome, id, row.marca || null, allBrandNames);
+                  await searchAndSaveImages(
+                    row.nome,
+                    id,
+                    row.marca || null,
+                    allBrandNames,
+                    row.categoria || null,
+                    row.familia || null,
+                  );
                 }
                 updateBuffer.push({ idx, status: "done" });
               })
