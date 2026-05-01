@@ -11,6 +11,7 @@ import { CatalogManagerDialog } from "@/components/CatalogManagerDialog";
 import { CatalogCustomizationDialog } from "@/components/CatalogCustomizationDialog";
 import { ImageHealthCheckDialog } from "@/components/ImageHealthCheckDialog";
 import { BulkImageSearchDialog } from "@/components/BulkImageSearchDialog";
+import { ReprocessAllImagesButton } from "@/components/ReprocessAllImagesButton";
 import { MigrateImagesDialog } from "@/components/MigrateImagesDialog";
 import { GenerateDescriptionsDialog } from "@/components/GenerateDescriptionsDialog";
 import { KioskAccessButton } from "@/components/KioskAccessButton";
@@ -224,6 +225,7 @@ const Admin = () => {
               }}
             />
             <BulkImageSearchDialog products={products || []} productImages={productImages} />
+            <ReprocessAllImagesButton />
             <MigrateImagesDialog />
             <GenerateDescriptionsDialog products={products || []} />
             <AddProductDialog families={families} categories={categoryNames} brands={brands} />
