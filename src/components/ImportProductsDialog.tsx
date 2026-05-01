@@ -244,6 +244,7 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
     allBrandNames?: string[],
     category?: string | null,
     familyName?: string | null,
+    sku?: string | null,
   ) => {
     try {
       const brand = (brandName || "").trim();
