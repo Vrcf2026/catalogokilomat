@@ -561,6 +561,7 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
                     allBrandNames,
                     row.categoria || null,
                     row.familia || null,
+                    row.sku || null,
                   );
                 }
                 updateBuffer.push({ idx, status: "done" });
