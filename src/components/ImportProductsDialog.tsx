@@ -256,6 +256,7 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
           excludeBrands,
           category: (category || "").trim() || undefined,
           family: (familyName || "").trim() || undefined,
+          sku: (sku || "").trim() || undefined,
         },
       });
       if (error) throw error;

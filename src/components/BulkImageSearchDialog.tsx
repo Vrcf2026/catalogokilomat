@@ -124,6 +124,7 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
             excludeBrands,
             category: p.category || undefined,
             family: familyName || undefined,
+            sku: (p as any).sku || undefined,
           },
         });
         if (error) throw error;
