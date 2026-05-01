@@ -238,13 +238,15 @@ serve(async (req) => {
   }
 
   try {
-    const { query, count = 12, brand, excludeBrands, category, family } = await req.json();
+    const { query, count = 12, brand, excludeBrands, category, family, sku } = await req.json();
     if (!query?.trim()) throw new Error("Query is required");
 
     const requestedCount = Math.min(Math.max(Number(count) || 12, 1), 30);
     const cleanQuery = query.trim();
     const cleanBrand = typeof brand === "string" ? brand.trim() : "";
     const hasBrand = cleanBrand.length > 0;
+    const cleanSku = typeof sku === "string" ? sku.trim() : "";
+    const hasSku = cleanSku.length > 0;
     const cleanCategory = typeof category === "string" ? category.trim() : "";
     const cleanFamily = typeof family === "string" ? family.trim() : "";
     const contextTokens = Array.from(
