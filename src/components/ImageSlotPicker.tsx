@@ -20,10 +20,11 @@ interface ImageSlotPickerProps {
   allBrandNames?: string[];
   category?: string | null;
   familyName?: string | null;
+  sku?: string | null;
   disabled?: boolean;
 }
 
-export function ImageSlotPicker({ slots, onSlotsChange, productName, brandName, allBrandNames, category, familyName, disabled }: ImageSlotPickerProps) {
+export function ImageSlotPicker({ slots, onSlotsChange, productName, brandName, allBrandNames, category, familyName, sku, disabled }: ImageSlotPickerProps) {
   const [searching, setSearching] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [searchResults, setSearchResults] = useState<string[]>([]);
@@ -56,6 +57,7 @@ export function ImageSlotPicker({ slots, onSlotsChange, productName, brandName, 
           excludeBrands,
           category: (category || "").trim() || undefined,
           family: (familyName || "").trim() || undefined,
+          sku: (sku || "").trim() || undefined,
         },
       });
 

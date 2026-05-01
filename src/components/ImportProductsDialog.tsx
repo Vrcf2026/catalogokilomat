@@ -244,6 +244,7 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
     allBrandNames?: string[],
     category?: string | null,
     familyName?: string | null,
+    sku?: string | null,
   ) => {
     try {
       const brand = (brandName || "").trim();
@@ -256,6 +257,7 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
           excludeBrands,
           category: (category || "").trim() || undefined,
           family: (familyName || "").trim() || undefined,
+          sku: (sku || "").trim() || undefined,
         },
       });
       if (error) throw error;
@@ -559,6 +561,7 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
                     allBrandNames,
                     row.categoria || null,
                     row.familia || null,
+                    row.sku || null,
                   );
                 }
                 updateBuffer.push({ idx, status: "done" });

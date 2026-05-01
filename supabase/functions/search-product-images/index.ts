@@ -81,12 +81,33 @@ function scoreCandidate(
   brand?: string | null,
   excludeBrandTokens?: string[],
   contextTokens?: string[],
+  sku?: string | null,
+  brandDomain?: string | null,
 ) {
   const normalized = normalizeText(url);
   let score = 0;
 
   for (const token of tokens) {
     if (normalized.includes(token)) score += 3;
+  }
+
+  // SKU in URL → strongest signal possible
+  if (sku && sku.length >= 4) {
+    const skuNorm = normalizeText(sku);
+    if (skuNorm && normalized.includes(skuNorm)) score += 20;
+    // Also accept SKU with hyphens removed
+    const skuStripped = skuNorm.replace(/[\s-]/g, "");
+    if (skuStripped && skuStripped.length >= 4 && normalized.replace(/[\s-]/g, "").includes(skuStripped)) {
+      score += 15;
+    }
+  }
+
+  // URL is hosted on the official brand domain → strong trust boost
+  if (brandDomain) {
+    try {
+      const host = new URL(url).hostname.toLowerCase();
+      if (host === brandDomain || host.endsWith(`.${brandDomain}`)) score += 12;
+    } catch { /* ignore */ }
   }
 
   // Strong boost when the brand name appears in URL/path
@@ -238,13 +259,15 @@ serve(async (req) => {
   }
 
   try {
-    const { query, count = 12, brand, excludeBrands, category, family } = await req.json();
+    const { query, count = 12, brand, excludeBrands, category, family, sku } = await req.json();
     if (!query?.trim()) throw new Error("Query is required");
 
     const requestedCount = Math.min(Math.max(Number(count) || 12, 1), 30);
     const cleanQuery = query.trim();
     const cleanBrand = typeof brand === "string" ? brand.trim() : "";
     const hasBrand = cleanBrand.length > 0;
+    const cleanSku = typeof sku === "string" ? sku.trim() : "";
+    const hasSku = cleanSku.length > 0;
     const cleanCategory = typeof category === "string" ? category.trim() : "";
     const cleanFamily = typeof family === "string" ? family.trim() : "";
     const contextTokens = Array.from(
@@ -273,25 +296,38 @@ serve(async (req) => {
 
     const tokens = tokenizeQuery(cleanQuery);
 
-    // Build query variants — when brand+category/family are present, anchor the
-    // search to a very specific product type to avoid generic noise (people, cars, etc.)
-    const ctxStr = [cleanFamily, cleanCategory].filter(Boolean).join(" ");
+    // Derive a likely official domain for the brand (e.g. "Hikvision" → hikvision.com).
+    // Used both for site-anchored queries and as a trust-boost in scoring.
+    const brandSlug = hasBrand
+      ? normalizeText(cleanBrand).replace(/[^a-z0-9]/g, "")
+      : "";
+    const brandDomain = brandSlug.length >= 3 ? `${brandSlug}.com` : "";
+
+    // Build query variants. Focus is name + brand (descriptions are unreliable).
+    // When brand exists, we strongly prefer the official site as first source.
     const queryVariants = hasBrand
       ? dedupe([
-          ctxStr ? `"${cleanBrand}" "${cleanQuery}" ${ctxStr}` : `"${cleanBrand}" "${cleanQuery}"`,
-          ctxStr ? `${cleanBrand} ${cleanQuery} ${ctxStr}` : `${cleanBrand} ${cleanQuery} product`,
-          `"${cleanBrand}" ${cleanQuery} product`,
-          `${cleanBrand} ${cleanQuery} official site:${cleanBrand.replace(/\s+/g, "")}.com`,
+          // 1. Anchor to official brand domain (highest precision).
+          brandDomain ? `site:${brandDomain} ${cleanQuery}` : "",
+          // 2. SKU search on official domain (when SKU is meaningful, not a numeric-only ref).
+          hasSku && brandDomain && /[a-z]/i.test(cleanSku) ? `site:${brandDomain} ${cleanSku}` : "",
+          // 3. Strict brand + name combo.
+          `"${cleanBrand}" "${cleanQuery}"`,
+          // 4. Brand + name + datasheet (catalog-style results).
           `${cleanBrand} ${cleanQuery} datasheet`,
-        ])
+        ].filter((s) => s.length > 0))
       : dedupe([
-          ctxStr ? `"${cleanQuery}" ${ctxStr}` : `"${cleanQuery}" product`,
-          ctxStr ? `${cleanQuery} ${ctxStr} product` : cleanQuery,
-          `${cleanQuery} produto`,
-          `${cleanQuery} product image`,
+          `"${cleanQuery}"`,
+          `${cleanQuery} product`,
         ]);
 
-    console.log("Searching images for:", cleanQuery, "brand:", cleanBrand || "(none)", "ctx:", ctxStr || "(none)", "exclude:", excludeTokens.length);
+    console.log(
+      "Searching images for:", cleanQuery,
+      "| brand:", cleanBrand || "(none)",
+      "| domain:", brandDomain || "(none)",
+      "| sku:", cleanSku || "(none)",
+      "| exclude:", excludeTokens.length,
+    );
 
     let candidates: string[] = [];
 
@@ -319,22 +355,31 @@ serve(async (req) => {
       if (filtered.length === 0) filtered = candidates;
     }
 
-    // Hard filter: drop URLs containing strong "irrelevant subject" markers
+    // Hard filter: drop URLs containing strong "irrelevant subject" markers.
+    // Now applied as a real filter (not just penalty) — these never belong in
+    // a product catalog regardless of search engine ranking.
     const hardNoise = [
-      "/people/", "/person/", "/man/", "/woman/", "/men/", "/women/",
-      "/cars/", "/car/", "/truck/", "/vehicle/", "/auto/",
-      "/portrait", "/selfie", "/lifestyle/", "/wallpaper",
+      "people", "person", "/man/", "/woman/", "/men/", "/women/",
+      "portrait", "selfie", "lifestyle", "wallpaper",
+      "/car/", "/cars/", "/truck/", "/trucks/", "/van/", "/vans/",
+      "/vehicle/", "/auto/", "carrinha", "carro",
+      "stockphoto", "stock-photo", "shutterstock", "istockphoto",
+      "celebrity", "meme", "funny",
     ];
     const noiseFiltered = filtered.filter((url) => {
       const lower = url.toLowerCase();
       return !hardNoise.some((n) => lower.includes(n));
     });
-    if (noiseFiltered.length >= Math.max(3, Math.floor(requestedCount / 2))) {
-      filtered = noiseFiltered;
-    }
+    // Always apply, even if it leaves few results — better empty than wrong.
+    filtered = noiseFiltered;
 
     const ranked = filtered
-      .map((url) => ({ url, score: scoreCandidate(url, tokens, cleanBrand, excludeTokens, contextTokens) }))
+      .map((url) => ({
+        url,
+        score: scoreCandidate(url, tokens, cleanBrand, excludeTokens, contextTokens, cleanSku, brandDomain),
+      }))
+      // Drop anything with very negative score — likely irrelevant.
+      .filter((item) => item.score > -5)
       .sort((a, b) => b.score - a.score)
       .map((item) => item.url);
 
