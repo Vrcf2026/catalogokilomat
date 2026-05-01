@@ -81,12 +81,33 @@ function scoreCandidate(
   brand?: string | null,
   excludeBrandTokens?: string[],
   contextTokens?: string[],
+  sku?: string | null,
+  brandDomain?: string | null,
 ) {
   const normalized = normalizeText(url);
   let score = 0;
 
   for (const token of tokens) {
     if (normalized.includes(token)) score += 3;
+  }
+
+  // SKU in URL → strongest signal possible
+  if (sku && sku.length >= 4) {
+    const skuNorm = normalizeText(sku);
+    if (skuNorm && normalized.includes(skuNorm)) score += 20;
+    // Also accept SKU with hyphens removed
+    const skuStripped = skuNorm.replace(/[\s-]/g, "");
+    if (skuStripped && skuStripped.length >= 4 && normalized.replace(/[\s-]/g, "").includes(skuStripped)) {
+      score += 15;
+    }
+  }
+
+  // URL is hosted on the official brand domain → strong trust boost
+  if (brandDomain) {
+    try {
+      const host = new URL(url).hostname.toLowerCase();
+      if (host === brandDomain || host.endsWith(`.${brandDomain}`)) score += 12;
+    } catch { /* ignore */ }
   }
 
   // Strong boost when the brand name appears in URL/path
