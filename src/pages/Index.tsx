@@ -388,6 +388,11 @@ const Index = () => {
               <div>
                 <p className="font-heading font-bold text-sm">Kilomat — Materiais de Construção</p>
                 <p className="text-xs text-accent-foreground/70">Materiais de construção, ferramentas, canalização e tintas</p>
+                <p className="text-xs text-accent-foreground/70 mt-1">
+                  <a href="tel:+351938283386" className="hover:text-primary transition-colors">+351 938 283 386</a>
+                  {" · "}
+                  <a href="mailto:info@kilomat.pt" className="hover:text-primary transition-colors">info@kilomat.pt</a>
+                </p>
               </div>
             </div>
             <div className="text-center md:text-right space-y-1">
