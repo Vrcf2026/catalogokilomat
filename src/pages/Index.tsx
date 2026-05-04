@@ -35,12 +35,23 @@ const Index = () => {
   const { data: products, isLoading } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
+      // Paginate to bypass Supabase's default 1000-row limit
+      const pageSize = 1000;
+      let from = 0;
+      const all: any[] = [];
+      while (true) {
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .range(from, from + pageSize - 1);
+        if (error) throw error;
+        if (!data || data.length === 0) break;
+        all.push(...data);
+        if (data.length < pageSize) break;
+        from += pageSize;
+      }
+      return all;
     },
   });
 
