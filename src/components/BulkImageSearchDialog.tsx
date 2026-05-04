@@ -9,6 +9,7 @@ import { ImageIcon, Loader2, CheckCircle2, XCircle, ImageOff } from "lucide-reac
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { fetchAllRows } from "@/lib/fetchAllRows";
 
 interface Product {
   id: string;
@@ -24,8 +25,8 @@ interface ProductImage {
 }
 
 interface Props {
-  products: Product[];
-  productImages: ProductImage[];
+  products?: Product[];
+  productImages?: ProductImage[];
 }
 
 type RowStatus = "pending" | "searching" | "done" | "skipped" | "error";
@@ -38,7 +39,7 @@ interface Row {
   error?: string;
 }
 
-export function BulkImageSearchDialog({ products, productImages }: Props) {
+export function BulkImageSearchDialog({ products: _productsProp, productImages: _imagesProp }: Props) {
   const [open, setOpen] = useState(false);
   const [running, setRunning] = useState(false);
   const [stop, setStop] = useState(false);
@@ -50,11 +51,18 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
   const [brandsMap, setBrandsMap] = useState<Map<string, string>>(new Map());
   const [allBrandNames, setAllBrandNames] = useState<string[]>([]);
   const [familiesMap, setFamiliesMap] = useState<Map<string, string>>(new Map());
+  const [familiesList, setFamiliesList] = useState<{ id: string; name: string; category: string }[]>([]);
+  const [selectedFamilyIds, setSelectedFamilyIds] = useState<Set<string>>(new Set());
+  const [includeNoFamily, setIncludeNoFamily] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productImages, setProductImages] = useState<ProductImage[]>([]);
+  const [loadingData, setLoadingData] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!open) return;
     (async () => {
+      setLoadingData(true);
       const { data } = await supabase.from("brands").select("id, name");
       const map = new Map<string, string>();
       const names: string[] = [];
@@ -66,10 +74,21 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
       });
       setBrandsMap(map);
       setAllBrandNames(names);
-      const { data: fams } = await supabase.from("product_families").select("id, name");
+      const { data: fams } = await supabase.from("product_families").select("id, name, category").order("category", { ascending: true }).order("name", { ascending: true });
       const fmap = new Map<string, string>();
       (fams || []).forEach((f: any) => { if (f?.id && f?.name) fmap.set(f.id, f.name); });
       setFamiliesMap(fmap);
+      setFamiliesList((fams || []) as any);
+      try {
+        const allProducts = await fetchAllRows<Product>({ table: "products", select: "id,name,image_url,brand_id,category,family_id,sku" });
+        const allImages = await fetchAllRows<ProductImage>({ table: "product_images", select: "product_id", orderBy: "position", ascending: true });
+        setProducts(allProducts);
+        setProductImages(allImages);
+      } catch (e: any) {
+        toast.error("Erro ao carregar produtos");
+      } finally {
+        setLoadingData(false);
+      }
     })();
   }, [open]);
 
@@ -80,9 +99,34 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
   }, [productImages]);
 
   const candidates = useMemo(() => {
-    if (!onlyEmpty) return products;
-    return products.filter((p) => !p.image_url && !productImagesByProduct[p.id]);
-  }, [products, productImagesByProduct, onlyEmpty]);
+    let list = products;
+    if (selectedFamilyIds.size > 0 || includeNoFamily) {
+      list = list.filter((p) => {
+        if (!p.family_id) return includeNoFamily;
+        return selectedFamilyIds.has(p.family_id);
+      });
+    }
+    if (onlyEmpty) list = list.filter((p) => !p.image_url && !productImagesByProduct[p.id]);
+    return list;
+  }, [products, productImagesByProduct, onlyEmpty, selectedFamilyIds, includeNoFamily]);
+
+  const familiesByCategory = useMemo(() => {
+    const acc: Record<string, typeof familiesList> = {};
+    familiesList.forEach((f) => {
+      const k = f.category || "—";
+      if (!acc[k]) acc[k] = [];
+      acc[k].push(f);
+    });
+    return acc;
+  }, [familiesList]);
+
+  const toggleFamily = (id: string) => {
+    setSelectedFamilyIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
 
   const start = async () => {
     if (candidates.length === 0) {
@@ -238,6 +282,45 @@ export function BulkImageSearchDialog({ products, productImages }: Props) {
             <p className="text-[11px] text-muted-foreground italic">
               Throttling automático: 0.8–1.8s entre pedidos, pausa de 15s a cada 50 produtos, e backoff de 30s se detectar bloqueio.
             </p>
+          </div>
+
+          <div className="space-y-2 rounded-md border p-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">Filtrar por famílias {selectedFamilyIds.size > 0 && <span className="text-muted-foreground font-normal">({selectedFamilyIds.size} selecionadas)</span>}</Label>
+              <div className="flex gap-2">
+                <Button type="button" size="sm" variant="ghost" disabled={running} onClick={() => setSelectedFamilyIds(new Set(familiesList.map((f) => f.id)))}>Todas</Button>
+                <Button type="button" size="sm" variant="ghost" disabled={running} onClick={() => { setSelectedFamilyIds(new Set()); setIncludeNoFamily(false); }}>Limpar</Button>
+              </div>
+            </div>
+            <p className="text-[11px] text-muted-foreground">Sem nenhuma seleção, processa todas as famílias.</p>
+            <ScrollArea className="h-48 rounded border bg-background">
+              <div className="p-2 space-y-3">
+                {Object.entries(familiesByCategory).map(([cat, fams]) => (
+                  <div key={cat}>
+                    <div className="text-xs font-semibold text-muted-foreground uppercase mb-1">{cat}</div>
+                    <div className="space-y-1 pl-1">
+                      {fams.map((f) => (
+                        <div key={f.id} className="flex items-center gap-2">
+                          <Checkbox
+                            id={`fam-${f.id}`}
+                            checked={selectedFamilyIds.has(f.id)}
+                            onCheckedChange={() => toggleFamily(f.id)}
+                            disabled={running}
+                          />
+                          <Label htmlFor={`fam-${f.id}`} className="text-sm cursor-pointer font-normal">{f.name}</Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                <div className="pt-2 border-t">
+                  <div className="flex items-center gap-2">
+                    <Checkbox id="fam-none" checked={includeNoFamily} onCheckedChange={(v) => setIncludeNoFamily(!!v)} disabled={running} />
+                    <Label htmlFor="fam-none" className="text-sm cursor-pointer font-normal italic">Produtos sem família</Label>
+                  </div>
+                </div>
+              </div>
+            </ScrollArea>
           </div>
 
           {running && (
