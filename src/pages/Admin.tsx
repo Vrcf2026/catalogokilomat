@@ -386,6 +386,10 @@ const Admin = () => {
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : filtered && filtered.length > 0 ? (
+          <>
+          <div className="flex items-center justify-between mb-4 text-sm text-muted-foreground">
+            <span>{total} produto{total !== 1 ? "s" : ""}</span>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filtered.map((product) => (
               <div key={product.id} className="relative">
@@ -419,6 +423,25 @@ const Admin = () => {
               </div>
             ))}
           </div>
+          <div className="flex items-center justify-center gap-2 mt-8 flex-wrap">
+            <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>
+              <SelectTrigger className="w-[110px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="12">12 / pág.</SelectItem>
+                <SelectItem value="24">24 / pág.</SelectItem>
+                <SelectItem value="48">48 / pág.</SelectItem>
+                <SelectItem value="50">50 / pág.</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
+              <ChevronLeft className="h-4 w-4" /> Anterior
+            </Button>
+            <span className="text-sm px-2">Página {page} de {totalPages}</span>
+            <Button variant="outline" size="sm" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages}>
+              Próximo <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+          </>
         ) : (
           <div className="text-center py-20">
             <Package className="h-16 w-16 mx-auto text-muted-foreground/40" />
