@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useState, useMemo } from "react";
-import { Search, ShieldCheck, Package, Loader2, LogOut, Trash2, CheckSquare, Square, XSquare } from "lucide-react";
+import { Search, ShieldCheck, Package, Loader2, LogOut, Trash2, CheckSquare, Square, XSquare, Settings2, ChevronDown, ChevronUp } from "lucide-react";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
@@ -37,6 +37,8 @@ const Admin = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [selectionMode, setSelectionMode] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const [dashboardOpen, setDashboardOpen] = useState(false);
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -186,36 +188,17 @@ const Admin = () => {
             <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">Admin</span>
           </div>
           <div className="flex items-center gap-2 flex-wrap justify-end">
-            <ManageCategoriesDialog categories={dbCategories} />
-            <ManageFamiliesDialog families={families} categories={categoryNames} />
-            <ManageBrandsDialog brands={brands} />
-            <ImportProductsDialog families={families} categories={categoryNames} brands={brands} />
-            <CatalogManagerDialog
-              products={products || []}
-              imagesByProduct={imagesByProduct}
-              familyMap={familyMap}
-              categories={categoryNames}
-              brands={brands}
-              brandMap={brandMap}
-            />
-            <CatalogCustomizationDialog categories={categoryNames} brands={brands} />
-            <ImageHealthCheckDialog
-              products={products || []}
-              productImages={productImages}
-              onEditProduct={(productId) => {
-                const product = products?.find(p => p.id === productId);
-                if (product) setEditingProduct(product);
-              }}
-              onImagesRemoved={() => {
-                queryClient.invalidateQueries({ queryKey: ["products"] });
-                queryClient.invalidateQueries({ queryKey: ["product_images"] });
-              }}
-            />
-            <BulkImageSearchDialog products={products || []} productImages={productImages} />
-            <ReprocessAllImagesButton />
-            <MigrateImagesDialog />
-            <GenerateDescriptionsDialog products={products || []} />
             <AddProductDialog families={families} categories={categoryNames} brands={brands} />
+            <Button
+              variant={toolsOpen ? "default" : "outline"}
+              size="sm"
+              className="gap-1.5"
+              onClick={() => setToolsOpen((v) => !v)}
+            >
+              <Settings2 className="h-4 w-4" />
+              Ferramentas
+              {toolsOpen ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+            </Button>
             <KioskAccessButton />
             <DarkModeToggle />
             <Button variant="ghost" size="icon" onClick={handleLogout} title="Sair">
@@ -223,15 +206,63 @@ const Admin = () => {
             </Button>
           </div>
         </div>
+        {toolsOpen && (
+          <div className="border-t border-border bg-muted/30">
+            <div className="container mx-auto px-4 py-3 flex items-center gap-2 flex-wrap">
+              <ManageCategoriesDialog categories={dbCategories} />
+              <ManageFamiliesDialog families={families} categories={categoryNames} />
+              <ManageBrandsDialog brands={brands} />
+              <ImportProductsDialog families={families} categories={categoryNames} brands={brands} />
+              <CatalogManagerDialog
+                products={products || []}
+                imagesByProduct={imagesByProduct}
+                familyMap={familyMap}
+                categories={categoryNames}
+                brands={brands}
+                brandMap={brandMap}
+              />
+              <CatalogCustomizationDialog categories={categoryNames} brands={brands} />
+              <ImageHealthCheckDialog
+                products={products || []}
+                productImages={productImages}
+                onEditProduct={(productId) => {
+                  const product = products?.find(p => p.id === productId);
+                  if (product) setEditingProduct(product);
+                }}
+                onImagesRemoved={() => {
+                  queryClient.invalidateQueries({ queryKey: ["products"] });
+                  queryClient.invalidateQueries({ queryKey: ["product_images"] });
+                }}
+              />
+              <BulkImageSearchDialog products={products || []} productImages={productImages} />
+              <ReprocessAllImagesButton />
+              <MigrateImagesDialog />
+              <GenerateDescriptionsDialog products={products || []} />
+            </div>
+          </div>
+        )}
       </header>
 
       <section className="container mx-auto px-4 py-6">
-        <AdminDashboard
-          products={products || []}
-          productImages={productImages}
-          families={families}
-          brands={brands}
-        />
+        <div className="flex justify-end mb-3">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            onClick={() => setDashboardOpen((v) => !v)}
+          >
+            {dashboardOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {dashboardOpen ? "Ocultar Dashboard" : "Mostrar Dashboard"}
+          </Button>
+        </div>
+        {dashboardOpen && (
+          <AdminDashboard
+            products={products || []}
+            productImages={productImages}
+            families={families}
+            brands={brands}
+          />
+        )}
       </section>
 
       <section className="container mx-auto px-4 py-8">
