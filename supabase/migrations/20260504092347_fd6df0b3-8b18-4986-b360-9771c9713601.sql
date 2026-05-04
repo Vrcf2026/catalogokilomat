@@ -1,0 +1,9 @@
+DELETE FROM public.product_images;
+DELETE FROM public.product_analytics;
+DELETE FROM public.brand_families;
+DELETE FROM public.products;
+DELETE FROM public.brands;
+DELETE FROM public.product_families;
+DELETE FROM public.categories;
+DELETE FROM public.quote_requests;
+DELETE FROM public.orphaned_product_images;
