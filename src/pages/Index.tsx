@@ -18,13 +18,13 @@ import ContactButton from "@/components/ContactButton";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import ContactFloatingBubble from "@/components/ContactFloatingBubble";
 import BrandsStrip from "@/components/BrandsStrip";
-import { fetchAllProductImages, fetchAllProducts } from "@/lib/fetchAllRows";
 
 const PAGE_SIZE_OPTIONS = [12, 24, 48];
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [familyFilter, setFamilyFilter] = useState("all");
   const [brandFilter, setBrandFilter] = useState(searchParams.get("brand") || "all");
@@ -48,6 +48,17 @@ const Index = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
+  // Debounce search
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search), 400);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  // Reset page when filters or debounced search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch, categoryFilter, familyFilter, brandFilter, pageSize]);
+
   const updateBrandFilter = (v: string) => {
     setBrandFilter(v);
     setCurrentPage(1);
@@ -56,12 +67,39 @@ const Index = () => {
     setSearchParams(next, { replace: true });
   };
 
-  const { data: products, isLoading } = useQuery({
-    queryKey: ["products", "all", "created_at"],
-    queryFn: () => fetchAllProducts("created_at", false),
+  const { data: productsResult, isLoading } = useQuery({
+    queryKey: ["products", "public-paginated", { debouncedSearch, categoryFilter, familyFilter, brandFilter, currentPage, pageSize }],
+    queryFn: async () => {
+      const client = supabase as any;
+      const buildFilters = (q: any) => {
+        q = q.eq("include_in_catalog", true);
+        const term = debouncedSearch.trim();
+        if (term) q = q.or(`name.ilike.%${term}%,sku.ilike.%${term}%`);
+        if (categoryFilter !== "all") q = q.eq("category", categoryFilter);
+        if (familyFilter !== "all") q = q.eq("family_id", familyFilter);
+        if (brandFilter !== "all") q = q.eq("brand_id", brandFilter);
+        return q;
+      };
+      const { count, error: countError } = await buildFilters(
+        client.from("products").select("id", { count: "exact", head: true })
+      );
+      if (countError) throw countError;
+      const total = count ?? 0;
+      const from = (currentPage - 1) * pageSize;
+      const to = from + pageSize - 1;
+      const { data, error } = await buildFilters(client.from("products").select("*"))
+        .order("featured", { ascending: false })
+        .order("created_at", { ascending: false })
+        .range(from, to);
+      if (error) throw error;
+      return { items: (data || []) as any[], total };
+    },
     staleTime: 5 * 60 * 1000,
     retry: 2,
   });
+  const products = productsResult?.items ?? [];
+  const total = productsResult?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   const { data: families = [] } = useQuery({
     queryKey: ["families"],
@@ -96,9 +134,19 @@ const Index = () => {
     },
   });
 
+  const visibleIds = useMemo(() => products.map((p) => p.id), [products]);
   const { data: productImages = [] } = useQuery({
-    queryKey: ["product_images", "all"],
-    queryFn: fetchAllProductImages,
+    queryKey: ["product_images", "page", visibleIds],
+    enabled: visibleIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_images")
+        .select("*")
+        .in("product_id", visibleIds)
+        .order("position", { ascending: true });
+      if (error) throw error;
+      return data || [];
+    },
   });
 
   const imagesByProduct = productImages.reduce((acc: Record<string, typeof productImages>, img) => {
@@ -110,51 +158,7 @@ const Index = () => {
   const familyMap = Object.fromEntries(families.map((f) => [f.id, f.name]));
   const brandMap = Object.fromEntries(brands.map((b) => [b.id, b.name]));
 
-  const normalize = (str: string) => str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-
-  const filtered = useMemo(() => {
-    const result = products?.filter((p) => {
-      const searchTerms = normalize(search).split(/\s+/).filter(Boolean);
-      const nameNorm = normalize(p.name);
-      const descNorm = normalize(p.description || "");
-      const matchesSearch = searchTerms.length === 0 || searchTerms.every((term) =>
-        nameNorm.includes(term) || descNorm.includes(term)
-      );
-      const matchesCategory = categoryFilter === "all" || p.category === categoryFilter;
-      const matchesFamily = familyFilter === "all" || p.family_id === familyFilter;
-      const matchesBrand = brandFilter === "all" || p.brand_id === brandFilter;
-      return matchesSearch && matchesCategory && matchesFamily && matchesBrand;
-    });
-
-    if (!result) return [];
-
-    return result.sort((a, b) => {
-      // Featured always first
-      if (a.featured && !b.featured) return -1;
-      if (!a.featured && b.featured) return 1;
-
-      switch (sortBy) {
-        case "price-asc":
-          return (a.price ?? 0) - (b.price ?? 0);
-        case "price-desc":
-          return (b.price ?? 0) - (a.price ?? 0);
-        case "name-asc":
-          return a.name.localeCompare(b.name, "pt");
-        case "name-desc":
-          return b.name.localeCompare(a.name, "pt");
-        case "newest":
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        default:
-          return 0;
-      }
-    });
-  }, [products, search, categoryFilter, familyFilter, brandFilter, sortBy]);
-
-  const totalPages = Math.ceil(filtered.length / pageSize);
-  const paginatedProducts = filtered.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  const paginatedProducts = products;
 
   // Reset page when filters/sort change
   const handleFilterChange = (setter: (v: string) => void, value: string, resetDependents?: () => void) => {
@@ -163,7 +167,7 @@ const Index = () => {
     resetDependents?.();
   };
 
-  const categories = [...new Set(products?.map((p) => p.category).filter(Boolean) || [])];
+  const categories = [...new Set(families.map((f) => f.category).filter(Boolean))];
   // Family ↔ Brand explicit associations (union with derived-from-products for backwards compat)
   const explicitFamiliesByBrand = brandFamilyLinks.reduce<Record<string, Set<string>>>((acc, l: any) => {
     if (!acc[l.brand_id]) acc[l.brand_id] = new Set();
@@ -179,17 +183,13 @@ const Index = () => {
   const visibleFamilies = families.filter((f) => {
     if (categoryFilter !== "all" && f.category !== categoryFilter) return false;
     if (brandFilter === "all") return true;
-    const explicit = explicitFamiliesByBrand[brandFilter]?.has(f.id);
-    const derived = products?.some((p) => p.family_id === f.id && p.brand_id === brandFilter);
-    return explicit || derived;
+    return explicitFamiliesByBrand[brandFilter]?.has(f.id) ?? false;
   });
   const visibleBrands = brands.filter((b) => {
-    const matchesProducts = products?.some((p) => p.brand_id === b.id && (categoryFilter === "all" || p.category === categoryFilter) && (familyFilter === "all" || p.family_id === familyFilter));
     if (familyFilter !== "all") {
-      const explicit = explicitBrandsByFamily[familyFilter]?.has(b.id);
-      return matchesProducts || explicit;
+      return explicitBrandsByFamily[familyFilter]?.has(b.id) ?? false;
     }
-    return matchesProducts;
+    return true;
   });
 
   return (
@@ -275,9 +275,9 @@ const Index = () => {
       />
 
       <section className="container mx-auto px-4 pb-4" data-results-anchor>
-        {!isLoading && filtered.length > 0 && (
+        {!isLoading && total > 0 && (
           <p className="text-sm text-muted-foreground text-center">
-            {filtered.length} produto{filtered.length !== 1 ? "s" : ""} encontrado{filtered.length !== 1 ? "s" : ""}
+            {total} produto{total !== 1 ? "s" : ""} encontrado{total !== 1 ? "s" : ""}
             {totalPages > 1 && ` — Página ${currentPage} de ${totalPages}`}
           </p>
         )}
@@ -327,7 +327,7 @@ const Index = () => {
         )}
       </section>
 
-      {(totalPages > 1 || filtered.length > 12) && (
+      {(totalPages > 1 || total > 12) && (
         <section className="container mx-auto px-4 pb-16">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             {totalPages > 1 && (
