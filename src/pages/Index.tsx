@@ -38,8 +38,6 @@ const Index = () => {
     const urlBrand = searchParams.get("brand") || "all";
     if (urlBrand !== brandFilter) {
       setBrandFilter(urlBrand);
-      setCategoryFilter("all");
-      setFamilyFilter("all");
       setCurrentPage(1);
       // Scroll to results
       setTimeout(() => {
