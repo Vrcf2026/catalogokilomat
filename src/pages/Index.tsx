@@ -91,12 +91,22 @@ const Index = () => {
   const { data: productImages = [] } = useQuery({
     queryKey: ["product_images"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("product_images")
-        .select("*")
-        .order("position", { ascending: true });
-      if (error) throw error;
-      return data;
+      const pageSize = 1000;
+      let from = 0;
+      const all: any[] = [];
+      while (true) {
+        const { data, error } = await supabase
+          .from("product_images")
+          .select("*")
+          .order("position", { ascending: true })
+          .range(from, from + pageSize - 1);
+        if (error) throw error;
+        if (!data || data.length === 0) break;
+        all.push(...data);
+        if (data.length < pageSize) break;
+        from += pageSize;
+      }
+      return all;
     },
   });
 
