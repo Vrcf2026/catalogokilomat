@@ -9,12 +9,12 @@ const CatalogoDestaques = () => {
   const navigate = useNavigate();
 
   const { data: products = [], isLoading: loadingProducts } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", "all", "name"],
     queryFn: () => fetchAllProducts("name", true),
   });
 
   const { data: productImages = [] } = useQuery({
-    queryKey: ["product_images"],
+    queryKey: ["product_images", "all"],
     queryFn: fetchAllProductImages,
   });
 
