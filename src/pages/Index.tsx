@@ -57,7 +57,7 @@ const Index = () => {
   };
 
   const { data: products, isLoading } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", "all", "created_at"],
     queryFn: () => fetchAllProducts("created_at", false),
     staleTime: 5 * 60 * 1000,
     retry: 2,
@@ -97,7 +97,7 @@ const Index = () => {
   });
 
   const { data: productImages = [] } = useQuery({
-    queryKey: ["product_images"],
+    queryKey: ["product_images", "all"],
     queryFn: fetchAllProductImages,
   });
 
