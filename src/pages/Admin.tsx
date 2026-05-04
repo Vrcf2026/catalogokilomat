@@ -26,6 +26,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { fetchAllProductImages, fetchAllProducts } from "@/lib/fetchAllRows";
 
 const Admin = () => {
   const [search, setSearch] = useState("");
@@ -46,15 +47,8 @@ const Admin = () => {
   };
 
   const { data: products, isLoading } = useQuery({
-    queryKey: ["products"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
+    queryKey: ["products", "all", "created_at"],
+    queryFn: () => fetchAllProducts("created_at", false),
   });
 
   const { data: families = [] } = useQuery({
@@ -94,15 +88,8 @@ const Admin = () => {
   });
 
   const { data: productImages = [] } = useQuery({
-    queryKey: ["product_images"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("product_images")
-        .select("*")
-        .order("position", { ascending: true });
-      if (error) throw error;
-      return data;
-    },
+    queryKey: ["product_images", "all"],
+    queryFn: fetchAllProductImages,
   });
 
   const imagesByProduct = productImages.reduce((acc: Record<string, typeof productImages>, img) => {

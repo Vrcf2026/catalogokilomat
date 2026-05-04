@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { BookOpen, Loader2 } from "lucide-react";
 import { CatalogViewer } from "@/components/CatalogViewer";
+import { fetchAllProductImages, fetchAllProducts } from "@/lib/fetchAllRows";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import kilomatLogo from "@/assets/kilomat-wordmark.png";
@@ -57,21 +58,13 @@ const Catalogos = () => {
   }, [isKiosk]);
 
   const { data: products = [], isLoading: isLoadingProducts } = useQuery({
-    queryKey: ["products"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("products").select("*").order("name", { ascending: true });
-      if (error) throw error;
-      return data;
-    },
+    queryKey: ["products", "all", "name"],
+    queryFn: () => fetchAllProducts("name", true),
   });
 
   const { data: productImages = [], isLoading: isLoadingProductImages } = useQuery({
-    queryKey: ["product_images"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("product_images").select("*").order("position", { ascending: true });
-      if (error) throw error;
-      return data;
-    },
+    queryKey: ["product_images", "all"],
+    queryFn: fetchAllProductImages,
   });
 
   const { data: families = [], isLoading: isLoadingFamilies } = useQuery({

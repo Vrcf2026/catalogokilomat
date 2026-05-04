@@ -18,6 +18,7 @@ import ContactButton from "@/components/ContactButton";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import ContactFloatingBubble from "@/components/ContactFloatingBubble";
 import BrandsStrip from "@/components/BrandsStrip";
+import { fetchAllProductImages, fetchAllProducts } from "@/lib/fetchAllRows";
 
 const PAGE_SIZE_OPTIONS = [12, 24, 48];
 
@@ -56,52 +57,8 @@ const Index = () => {
   };
 
   const { data: products, isLoading } = useQuery({
-    queryKey: ["products"],
-    queryFn: async () => {
-      // Paginate to bypass Supabase's default 1000-row cap.
-      // Use exact count + parallel chunked range fetches with per-chunk retry,
-      // so a single transient failure does not truncate the catalog.
-      const COLUMNS = "id,name,sku,description,category,price,image_url,family_id,brand_id,featured,created_at";
-      const PAGE = 1000;
-
-      const { count, error: countError } = await supabase
-        .from("products")
-        .select("id", { count: "exact", head: true });
-      if (countError) throw countError;
-      const total = count ?? 0;
-      if (total === 0) return [];
-
-      const fetchChunk = async (from: number): Promise<any[]> => {
-        const to = Math.min(from + PAGE - 1, total - 1);
-        let lastErr: any;
-        for (let attempt = 0; attempt < 3; attempt++) {
-          const { data, error } = await supabase
-            .from("products")
-            .select(COLUMNS)
-            .order("created_at", { ascending: false })
-            .range(from, to);
-          if (!error && data) return data;
-          lastErr = error;
-          await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
-        }
-        throw lastErr ?? new Error("Failed to fetch products chunk");
-      };
-
-      const offsets: number[] = [];
-      for (let i = 0; i < total; i += PAGE) offsets.push(i);
-      // Limit concurrency to 3 to avoid overwhelming the API
-      const results: any[][] = new Array(offsets.length);
-      let idx = 0;
-      const workers = Array.from({ length: Math.min(3, offsets.length) }, async () => {
-        while (true) {
-          const my = idx++;
-          if (my >= offsets.length) return;
-          results[my] = await fetchChunk(offsets[my]);
-        }
-      });
-      await Promise.all(workers);
-      return results.flat();
-    },
+    queryKey: ["products", "all", "created_at"],
+    queryFn: () => fetchAllProducts("created_at", false),
     staleTime: 5 * 60 * 1000,
     retry: 2,
   });
@@ -140,25 +97,8 @@ const Index = () => {
   });
 
   const { data: productImages = [] } = useQuery({
-    queryKey: ["product_images"],
-    queryFn: async () => {
-      const pageSize = 1000;
-      let from = 0;
-      const all: any[] = [];
-      while (true) {
-        const { data, error } = await supabase
-          .from("product_images")
-          .select("*")
-          .order("position", { ascending: true })
-          .range(from, from + pageSize - 1);
-        if (error) throw error;
-        if (!data || data.length === 0) break;
-        all.push(...data);
-        if (data.length < pageSize) break;
-        from += pageSize;
-      }
-      return all;
-    },
+    queryKey: ["product_images", "all"],
+    queryFn: fetchAllProductImages,
   });
 
   const imagesByProduct = productImages.reduce((acc: Record<string, typeof productImages>, img) => {

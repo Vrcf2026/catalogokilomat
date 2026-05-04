@@ -3,26 +3,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { CatalogViewer } from "@/components/CatalogViewer";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import { fetchAllProductImages, fetchAllProducts } from "@/lib/fetchAllRows";
 
 const CatalogoDestaques = () => {
   const navigate = useNavigate();
 
   const { data: products = [], isLoading: loadingProducts } = useQuery({
-    queryKey: ["products"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("products").select("*").order("name", { ascending: true });
-      if (error) throw error;
-      return data;
-    },
+    queryKey: ["products", "all", "name"],
+    queryFn: () => fetchAllProducts("name", true),
   });
 
   const { data: productImages = [] } = useQuery({
-    queryKey: ["product_images"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("product_images").select("*").order("position", { ascending: true });
-      if (error) throw error;
-      return data;
-    },
+    queryKey: ["product_images", "all"],
+    queryFn: fetchAllProductImages,
   });
 
   const { data: families = [] } = useQuery({
