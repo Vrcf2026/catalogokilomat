@@ -72,7 +72,6 @@ const Index = () => {
     queryFn: async () => {
       const client = supabase as any;
       const buildFilters = (q: any) => {
-        q = q.eq("include_in_catalog", true);
         const term = debouncedSearch.trim();
         if (term) q = q.or(`name.ilike.%${term}%,sku.ilike.%${term}%`);
         if (categoryFilter !== "all") q = q.eq("category", categoryFilter);
