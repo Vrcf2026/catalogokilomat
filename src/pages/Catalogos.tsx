@@ -58,12 +58,12 @@ const Catalogos = () => {
   }, [isKiosk]);
 
   const { data: products = [], isLoading: isLoadingProducts } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", "all", "name"],
     queryFn: () => fetchAllProducts("name", true),
   });
 
   const { data: productImages = [], isLoading: isLoadingProductImages } = useQuery({
-    queryKey: ["product_images"],
+    queryKey: ["product_images", "all"],
     queryFn: fetchAllProductImages,
   });
 
