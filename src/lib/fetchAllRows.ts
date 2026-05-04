@@ -32,6 +32,7 @@ export const fetchAllRows = async <T,>({ table, select, orderBy = "created_at", 
     for (let attempt = 0; attempt < 3; attempt += 1) {
       let query = client.from(table).select(select);
       if (orderBy) query = query.order(orderBy, { ascending });
+      if (orderBy !== "id") query = query.order("id", { ascending: true });
       const { data, error } = await query.range(from, to);
 
       if (!error && data) return data as T[];
