@@ -2,14 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetailDialog } from "@/components/ProductDetailDialog";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin } from "lucide-react";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { ProductFilters } from "@/components/ProductFilters";
 import kilomatLogo from "@/assets/kilomat-wordmark.png";
 import kilomatShield from "@/assets/kilomat-logo.png";
 import kilomatKIcon from "@/assets/kilomat-k-icon.png";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { CartDrawer } from "@/components/CartDrawer";
 import { Button } from "@/components/ui/button";
@@ -22,15 +22,38 @@ import BrandsStrip from "@/components/BrandsStrip";
 const PAGE_SIZE_OPTIONS = [12, 24, 48];
 
 const Index = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [familyFilter, setFamilyFilter] = useState("all");
-  const [brandFilter, setBrandFilter] = useState("all");
+  const [brandFilter, setBrandFilter] = useState(searchParams.get("brand") || "all");
   const [sortBy, setSortBy] = useState("featured");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(12);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const { totalItems, setIsOpen } = useCart();
+
+  // Sync brand filter with URL ?brand=<id>
+  useEffect(() => {
+    const urlBrand = searchParams.get("brand") || "all";
+    if (urlBrand !== brandFilter) {
+      setBrandFilter(urlBrand);
+      setCurrentPage(1);
+      // Scroll to results
+      setTimeout(() => {
+        document.querySelector("[data-results-anchor]")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  const updateBrandFilter = (v: string) => {
+    setBrandFilter(v);
+    setCurrentPage(1);
+    const next = new URLSearchParams(searchParams);
+    if (v === "all") next.delete("brand"); else next.set("brand", v);
+    setSearchParams(next, { replace: true });
+  };
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["products"],
@@ -303,7 +326,7 @@ const Index = () => {
         familyFilter={familyFilter}
         onFamilyChange={(v) => handleFilterChange(setFamilyFilter, v)}
         brandFilter={brandFilter}
-        onBrandChange={(v) => handleFilterChange(setBrandFilter, v)}
+        onBrandChange={updateBrandFilter}
         sortBy={sortBy}
         onSortChange={(v) => { setSortBy(v); setCurrentPage(1); }}
         categories={categories}
@@ -311,7 +334,7 @@ const Index = () => {
         visibleBrands={visibleBrands}
       />
 
-      <section className="container mx-auto px-4 pb-4">
+      <section className="container mx-auto px-4 pb-4" data-results-anchor>
         {!isLoading && filtered.length > 0 && (
           <p className="text-sm text-muted-foreground text-center">
             {filtered.length} produto{filtered.length !== 1 ? "s" : ""} encontrado{filtered.length !== 1 ? "s" : ""}
