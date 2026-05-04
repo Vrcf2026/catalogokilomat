@@ -47,7 +47,7 @@ const Admin = () => {
   };
 
   const { data: products, isLoading } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", "all", "created_at"],
     queryFn: () => fetchAllProducts("created_at", false),
   });
 
@@ -88,7 +88,7 @@ const Admin = () => {
   });
 
   const { data: productImages = [] } = useQuery({
-    queryKey: ["product_images"],
+    queryKey: ["product_images", "all"],
     queryFn: fetchAllProductImages,
   });
 
