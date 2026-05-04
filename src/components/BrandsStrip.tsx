@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
 
 const BrandsStrip = () => {
   const { data: brands = [], isLoading } = useQuery({
@@ -25,7 +26,7 @@ const BrandsStrip = () => {
     >
       <div className="container mx-auto px-4">
         <p className="text-center text-xs uppercase tracking-widest text-muted-foreground mb-4">
-          Trabalhamos com as melhores marcas
+          Trabalhamos com as melhores marcas — clique para filtrar
         </p>
         <div className="relative overflow-hidden">
           <div
@@ -33,10 +34,12 @@ const BrandsStrip = () => {
             style={{ animation: "kilomat-scroll-x 40s linear infinite" }}
           >
             {items.map((b, i) => (
-              <div
+              <Link
                 key={`${b.id}-${i}`}
-                className="shrink-0 flex items-center justify-center h-10 sm:h-12 px-3"
+                to={`/?brand=${b.id}`}
+                className="shrink-0 flex items-center justify-center h-10 sm:h-12 px-3 hover:scale-105 transition-transform cursor-pointer"
                 title={b.name}
+                aria-label={`Ver produtos ${b.name}`}
               >
                 {b.logo_url ? (
                   <img
@@ -50,7 +53,7 @@ const BrandsStrip = () => {
                     {b.name}
                   </span>
                 )}
-              </div>
+              </Link>
             ))}
           </div>
         </div>
