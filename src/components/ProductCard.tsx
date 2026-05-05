@@ -67,7 +67,7 @@ const categoryIconMap: Record<string, React.ElementType> = {
 };
 
 const CategoryPlaceholder = ({ category }: { category: string | null }) => {
-  const Icon = (category && categoryIconMap[category]) ?? Package;
+  const Icon: React.ElementType = (category && categoryIconMap[category]) || Package;
   return (
     <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground w-full h-full bg-secondary/60">
       <Icon className="h-12 w-12 opacity-40" />
