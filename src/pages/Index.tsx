@@ -158,6 +158,7 @@ const Index = () => {
   const brandMap = Object.fromEntries(brands.map((b) => [b.id, b.name]));
 
   const paginatedProducts = products;
+  const hasAnyPrice = products.some((p) => p.price != null);
 
   // Reset page when filters/sort change
   const handleFilterChange = (setter: (v: string) => void, value: string, resetDependents?: () => void) => {
@@ -412,12 +413,16 @@ const Index = () => {
                   kilomat.pt
                 </a>
               </p>
-              <p className="text-xs text-accent-foreground/70">
-                Todos os preços apresentados incluem IVA à taxa legal em vigor.
-              </p>
-              <p className="text-xs text-accent-foreground/70">
-                Os preços são meramente indicativos e podem sofrer alterações sem aviso prévio.
-              </p>
+              {hasAnyPrice && (
+                <>
+                  <p className="text-xs text-accent-foreground/70">
+                    Todos os preços apresentados incluem IVA à taxa legal em vigor.
+                  </p>
+                  <p className="text-xs text-accent-foreground/70">
+                    Os preços são meramente indicativos e podem sofrer alterações sem aviso prévio.
+                  </p>
+                </>
+              )}
               <p className="text-xs text-accent-foreground/70">
                 As imagens apresentadas são meramente ilustrativas.
               </p>
