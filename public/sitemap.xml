@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://kilomat.pt/</loc>
+    <loc>https://showroom.kilomat.pt/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://kilomat.pt/catalogos</loc>
+    <loc>https://showroom.kilomat.pt/catalogos</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://kilomat.pt/termos-e-condicoes</loc>
+    <loc>https://showroom.kilomat.pt/termos-e-condicoes</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://kilomat.pt/politica-cookies</loc>
+    <loc>https://showroom.kilomat.pt/politica-cookies</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

@@ -5,4 +5,4 @@ Disallow: /login
 Disallow: /catalogos/destaques
 Disallow: /catalogos/kilomat
 
-Sitemap: https://kilomat.pt/sitemap.xml
+Sitemap: https://showroom.kilomat.pt/sitemap.xml
