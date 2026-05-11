@@ -28,6 +28,59 @@ export function AdminDashboard({ products, productImages, families, brands }: Ad
     return null;
   })();
 
+  const { data: statsData } = useQuery({
+    queryKey: ["admin_dashboard_stats"],
+    queryFn: async () => {
+      const [total, catalog, featured, semImagem] = await Promise.all([
+        supabase.from("products").select("id", { count: "exact", head: true }),
+        supabase.from("products").select("id", { count: "exact", head: true }).eq("include_in_catalog", true),
+        supabase.from("products").select("id", { count: "exact", head: true }).eq("featured", true),
+        supabase.from("products").select("id", { count: "exact", head: true }).is("image_url", null),
+      ]);
+      return {
+        totalProducts: total.count ?? 0,
+        catalogProducts: catalog.count ?? 0,
+        featuredProducts: featured.count ?? 0,
+        productsWithoutImage: semImagem.count ?? 0,
+      };
+    },
+    staleTime: 60000,
+  });
+
+  const { data: familyStats } = useQuery({
+    queryKey: ["admin_family_stats"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("products")
+        .select("family_id, product_families(name)")
+        .not("family_id", "is", null);
+      const counts: Record<string, number> = {};
+      (data || []).forEach((p: any) => {
+        const name = p.product_families?.name || "Sem família";
+        counts[name] = (counts[name] || 0) + 1;
+      });
+      return counts;
+    },
+    staleTime: 60000,
+  });
+
+  const { data: brandStats } = useQuery({
+    queryKey: ["admin_brand_stats"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("products")
+        .select("brand_id, brands(name)")
+        .not("brand_id", "is", null);
+      const counts: Record<string, number> = {};
+      (data || []).forEach((p: any) => {
+        const name = p.brands?.name || "Sem marca";
+        counts[name] = (counts[name] || 0) + 1;
+      });
+      return counts;
+    },
+    staleTime: 60000,
+  });
+
   const { data: analytics = [] } = useQuery({
     queryKey: ["product_analytics", dateRange],
     queryFn: async () => {
@@ -63,29 +116,14 @@ export function AdminDashboard({ products, productImages, families, brands }: Ad
     }
   };
 
-  // Stats
-  const totalProducts = products.length;
-  const catalogProducts = products.filter((p) => p.include_in_catalog).length;
-  const featuredProducts = products.filter((p) => p.featured).length;
-  const productsWithoutImage = products.filter((p) => !p.image_url).length;
+  // Stats from DB
+  const totalProducts = statsData?.totalProducts ?? 0;
+  const catalogProducts = statsData?.catalogProducts ?? 0;
+  const featuredProducts = statsData?.featuredProducts ?? 0;
+  const productsWithoutImage = statsData?.productsWithoutImage ?? 0;
 
-  // By family
-  const familyNameMap = Object.fromEntries(families.map((f) => [f.id, f.name]));
-  const byFamily: Record<string, number> = {};
-  products.forEach((p) => {
-    const name = p.family_id ? (familyNameMap[p.family_id] || "Desconhecida") : "Sem família";
-    byFamily[name] = (byFamily[name] || 0) + 1;
-  });
-
-  // By brand
-  const brandNameMap = Object.fromEntries(brands.map((b) => [b.id, b.name]));
-  const byBrand: Record<string, number> = {};
-  products.forEach((p) => {
-    if (p.brand_id) {
-      const name = brandNameMap[p.brand_id] || "Desconhecida";
-      byBrand[name] = (byBrand[name] || 0) + 1;
-    }
-  });
+  const byFamily = familyStats ?? {};
+  const byBrand = brandStats ?? {};
 
   // Analytics aggregation
   const clickCounts: Record<string, number> = {};
@@ -178,7 +216,7 @@ export function AdminDashboard({ products, productImages, families, brands }: Ad
             <CardTitle className="text-sm font-medium">Por Família</CardTitle>
           </CardHeader>
           <CardContent>
-            <DistributionList items={byFamily} total={totalProducts} />
+            <DistributionList items={byFamily} total={Object.values(byFamily).reduce((a, b) => a + b, 0) || 1} />
           </CardContent>
         </Card>
         <Card>
