@@ -314,7 +314,7 @@ const Admin = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Categorias</SelectItem>
-              {categoryNames.map((cat) => (
+              {[...categoryNames].sort((a, b) => a.localeCompare(b, "pt", { sensitivity: "base" })).map((cat) => (
                 <SelectItem key={cat} value={cat}>{cat}</SelectItem>
               ))}
             </SelectContent>
@@ -326,7 +326,7 @@ const Admin = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Famílias</SelectItem>
-                {visibleFamilies.map((f) => (
+                {[...visibleFamilies].sort((a, b) => a.name.localeCompare(b.name, "pt", { sensitivity: "base" })).map((f) => (
                   <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>
                 ))}
               </SelectContent>
@@ -339,7 +339,7 @@ const Admin = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Marcas</SelectItem>
-                {visibleBrands.map((b) => (
+                {[...visibleBrands].sort((a, b) => a.name.localeCompare(b.name, "pt", { sensitivity: "base" })).map((b) => (
                   <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
                 ))}
               </SelectContent>
