@@ -75,7 +75,7 @@ export const ProductFilters = ({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">Todas as Categorias</SelectItem>
-          {categories.map((cat) => (
+          {[...categories].sort((a, b) => a.localeCompare(b, "pt", { sensitivity: "base" })).map((cat) => (
             <SelectItem key={cat} value={cat}>{cat}</SelectItem>
           ))}
         </SelectContent>
@@ -88,7 +88,7 @@ export const ProductFilters = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todas as Famílias</SelectItem>
-            {visibleFamilies.map((f) => (
+            {[...visibleFamilies].sort((a, b) => a.name.localeCompare(b.name, "pt", { sensitivity: "base" })).map((f) => (
               <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>
             ))}
           </SelectContent>
@@ -102,7 +102,7 @@ export const ProductFilters = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todas as Marcas</SelectItem>
-            {visibleBrands.map((b) => (
+            {[...visibleBrands].sort((a, b) => a.name.localeCompare(b.name, "pt", { sensitivity: "base" })).map((b) => (
               <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
             ))}
           </SelectContent>
