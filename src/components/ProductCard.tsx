@@ -1,5 +1,6 @@
 import { useState, useCallback, forwardRef } from "react";
 import { Package, ImageOff, Pencil, ShoppingCart, Minus, Plus, Star, BookOpen, Paintbrush, ArrowUpFromLine, FlaskConical, Zap, Wind, Layers, Pipette, Square, ShoppingBag, Anchor, Home, Network, Circle, Wrench, Plug, Flame, Waves, Lock, ShieldCheck, Disc, Gauge, PanelTop } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -80,6 +81,7 @@ interface ProductCardProps {
   id: string;
   name: string;
   sku?: string | null;
+  slug?: string | null;
   description: string | null;
   category: string | null;
   price: number | null;
@@ -92,7 +94,7 @@ interface ProductCardProps {
   isAdmin?: boolean;
 }
 
-export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onClick?: () => void }>(function ProductCard({ id, name, sku, description, category, price, imageUrl, images, familyName, onEdit, isAdmin, onClick, featured, includeInCatalog }, ref) {
+export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onClick?: () => void }>(function ProductCard({ id, name, sku, slug, description, category, price, imageUrl, images, familyName, onEdit, isAdmin, onClick, featured, includeInCatalog }, ref) {
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
   const queryClient = useQueryClient();
@@ -176,14 +178,26 @@ export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onCli
             </span>
           )}
         </div>
-        <h3 className="font-heading font-semibold text-card-foreground line-clamp-1">{name}</h3>
+        {slug && !isAdmin ? (
+          <Link
+            to={`/produto/${slug}`}
+            className="block font-heading font-semibold text-card-foreground line-clamp-2 hover:text-primary transition-colors"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {name}
+          </Link>
+        ) : (
+          <h3 className="font-heading font-semibold text-card-foreground line-clamp-2">{name}</h3>
+        )}
         {description && (
           <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
         )}
-        {price != null && (
+        {price != null ? (
           <p className="font-heading font-bold text-lg text-foreground">
             {price.toFixed(2).replace(".", ",")} €
           </p>
+        ) : (
+          <p className="text-xs text-muted-foreground italic">Consulte disponibilidade</p>
         )}
 
         {/* Admin toggles */}

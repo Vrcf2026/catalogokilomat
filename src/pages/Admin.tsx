@@ -14,6 +14,7 @@ import { BulkImageSearchDialog } from "@/components/BulkImageSearchDialog";
 import { ReprocessAllImagesButton } from "@/components/ReprocessAllImagesButton";
 import { MigrateImagesDialog } from "@/components/MigrateImagesDialog";
 import { GenerateDescriptionsDialog } from "@/components/GenerateDescriptionsDialog";
+import HomepageHighlightsDialog from "@/components/HomepageHighlightsDialog";
 import { KioskAccessButton } from "@/components/KioskAccessButton";
 import { AdminDashboard } from "@/components/AdminDashboard";
 import { Input } from "@/components/ui/input";
@@ -275,6 +276,7 @@ const Admin = () => {
               <ReprocessAllImagesButton />
               <MigrateImagesDialog />
               <GenerateDescriptionsDialog products={products || []} />
+              <HomepageHighlightsDialog brands={brands} categories={categoryNames} />
             </div>
           </div>
         )}

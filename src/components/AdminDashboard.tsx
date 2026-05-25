@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart3, Package, ImageOff, Star, MousePointerClick, ShoppingCart, Eye, Trash2, CalendarDays } from "lucide-react";
+import { BarChart3, Package, ImageOff, Star, MousePointerClick, ShoppingCart, Eye, Trash2, CalendarDays, Link as LinkIcon, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ interface AdminDashboardProps {
 export function AdminDashboard({ products, productImages, families, brands }: AdminDashboardProps) {
   const [dateRange, setDateRange] = useState("all");
   const [clearing, setClearing] = useState(false);
+  const [generatingSlugs, setGeneratingSlugs] = useState(false);
   const queryClient = useQueryClient();
 
   const dateFilter = (() => {
@@ -116,6 +117,59 @@ export function AdminDashboard({ products, productImages, families, brands }: Ad
     }
   };
 
+  const generateSlug = (text: string): string =>
+    text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "")
+      .substring(0, 200);
+
+  const generateMissingSlugs = async () => {
+    setGeneratingSlugs(true);
+    try {
+      let totalUpdated = 0;
+      // Loop until no more rows without slug
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const { data: rows, error } = await (supabase as any)
+          .from("products")
+          .select("id, name, sku")
+          .is("slug", null)
+          .limit(500);
+        if (error) throw error;
+        if (!rows || rows.length === 0) break;
+
+        const updates = rows.map((p: any) => {
+          const base = generateSlug(p.name || "");
+          const suffix = p.sku ? `-${p.sku.toLowerCase().replace(/[^a-z0-9]/g, "")}` : "";
+          return { id: p.id, slug: `${base}${suffix}` || p.id };
+        });
+
+        for (let i = 0; i < updates.length; i += 50) {
+          const batch = updates.slice(i, i + 50);
+          await Promise.all(
+            batch.map((u: any) =>
+              (supabase as any).from("products").update({ slug: u.slug }).eq("id", u.id)
+            )
+          );
+        }
+        totalUpdated += updates.length;
+        if (rows.length < 500) break;
+      }
+      if (totalUpdated === 0) toast.info("Todos os produtos já têm slug.");
+      else toast.success(`${totalUpdated} slugs gerados.`);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    } catch (e: any) {
+      toast.error("Erro: " + e.message);
+    } finally {
+      setGeneratingSlugs(false);
+    }
+  };
+
   // Stats from DB
   const totalProducts = statsData?.totalProducts ?? 0;
   const catalogProducts = statsData?.catalogProducts ?? 0;
@@ -182,6 +236,16 @@ export function AdminDashboard({ products, productImages, families, brands }: Ad
         >
           <Trash2 className="h-3.5 w-3.5" />
           {clearing ? "A limpar..." : "Limpar Analytics"}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={generateMissingSlugs}
+          disabled={generatingSlugs}
+          className="gap-1.5"
+        >
+          {generatingSlugs ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <LinkIcon className="h-3.5 w-3.5" />}
+          Gerar slugs em falta
         </Button>
       </div>
 

@@ -4,7 +4,7 @@ const PAGE_SIZE = 1000;
 const CONCURRENCY = 3;
 
 export const PRODUCT_COLUMNS =
-  "id,name,sku,description,category,price,image_url,family_id,brand_id,featured,include_in_catalog,created_at,updated_at";
+  "id,name,sku,slug,description,category,price,image_url,family_id,brand_id,featured,include_in_catalog,created_at,updated_at";
 
 type FetchAllOptions = {
   table: string;

@@ -468,9 +468,24 @@ export function ImportProductsDialog({ families: initialFamilies, categories, br
           })
         );
 
+        const slugify = (text: string): string =>
+          text
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/^-|-$/g, "")
+            .substring(0, 200);
         const payload = plan.toCreate.map((r) => ({
           name: r.nome,
           sku: r.sku || null,
+          slug: (() => {
+            const base = slugify(r.nome || "");
+            const suffix = r.sku ? `-${r.sku.toLowerCase().replace(/[^a-z0-9]/g, "")}` : "";
+            return `${base}${suffix}` || null;
+          })(),
           description: r.descricao || null,
           category: r.categoria || null,
           price: r.preco ?? null,

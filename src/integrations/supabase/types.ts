@@ -206,6 +206,36 @@ export type Database = {
         }
         Relationships: []
       }
+      homepage_highlights: {
+        Row: {
+          active: boolean
+          created_at: string | null
+          id: string
+          label: string
+          position: number
+          ref_id: string
+          type: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string | null
+          id?: string
+          label: string
+          position?: number
+          ref_id: string
+          type: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string | null
+          id?: string
+          label?: string
+          position?: number
+          ref_id?: string
+          type?: string
+        }
+        Relationships: []
+      }
       orphaned_product_images: {
         Row: {
           expires_at: string
@@ -348,6 +378,7 @@ export type Database = {
           name: string
           price: number | null
           sku: string | null
+          slug: string | null
           updated_at: string
         }
         Insert: {
@@ -363,6 +394,7 @@ export type Database = {
           name: string
           price?: number | null
           sku?: string | null
+          slug?: string | null
           updated_at?: string
         }
         Update: {
@@ -378,6 +410,7 @@ export type Database = {
           name?: string
           price?: number | null
           sku?: string | null
+          slug?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -483,6 +516,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      generate_slug: { Args: { input: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
