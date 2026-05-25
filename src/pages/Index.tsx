@@ -3,9 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetailDialog } from "@/components/ProductDetailDialog";
 import { useState, useMemo, useEffect } from "react";
-import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin } from "lucide-react";
+import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin, Search, Send, Paintbrush, Zap, Wrench, FlaskConical, ShieldCheck, ShoppingBag, Layers, Lock, Disc, Anchor, Pipette, Plug, Flame, Gauge, LayoutGrid as LayoutGridIcon } from "lucide-react";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { ProductFilters } from "@/components/ProductFilters";
+import { Input } from "@/components/ui/input";
+import { PRODUCT_COLUMNS } from "@/lib/fetchAllRows";
 import kilomatLogo from "@/assets/kilomat-wordmark.png";
 import kilomatShield from "@/assets/kilomat-logo.png";
 import kilomatKIcon from "@/assets/kilomat-k-icon.png";
@@ -19,7 +21,27 @@ import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import ContactFloatingBubble from "@/components/ContactFloatingBubble";
 import BrandsStrip from "@/components/BrandsStrip";
 
-const PAGE_SIZE_OPTIONS = [12, 24, 48];
+const PAGE_SIZE_OPTIONS = [24, 48, 96];
+
+type HomeView = "home" | "catalog";
+
+const categoryIconMap: Record<string, React.ElementType> = {
+  "Tintas": Paintbrush,
+  "Ferramenta Eletrica": Zap,
+  "Ferramentas Manuais": Wrench,
+  "Discos": Disc,
+  "Fixacao": Anchor,
+  "Canalizacao": Pipette,
+  "Cimentos e Argamassas": Layers,
+  "Material Electrico": Plug,
+  "Quimicos": FlaskConical,
+  "Higiene e Proteccao": ShieldCheck,
+  "Ferragens": Lock,
+  "Drogaria": ShoppingBag,
+  "Solda": Flame,
+  "Gas": Gauge,
+};
+const getCategoryIcon = (cat: string): React.ElementType => categoryIconMap[cat] || LayoutGridIcon;
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -30,8 +52,12 @@ const Index = () => {
   const [brandFilter, setBrandFilter] = useState(searchParams.get("brand") || "all");
   const [sortBy, setSortBy] = useState("featured");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(12);
+  const [pageSize, setPageSize] = useState(24);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [activeView, setActiveView] = useState<HomeView>(
+    (searchParams.get("brand") || searchParams.get("categoria")) ? "catalog" : "home"
+  );
+  const [catalogTitle, setCatalogTitle] = useState("Catálogo");
   const { totalItems, setIsOpen } = useCart();
 
   // Sync brand filter with URL ?brand=<id>
@@ -67,6 +93,35 @@ const Index = () => {
     setSearchParams(next, { replace: true });
   };
 
+  const openCatalog = (type: "brand" | "category" | "all", value: string, title: string) => {
+    setCatalogTitle(title);
+    if (type === "brand") {
+      updateBrandFilter(value);
+      setCategoryFilter("all");
+      setFamilyFilter("all");
+    } else if (type === "category") {
+      setCategoryFilter(value);
+      updateBrandFilter("all");
+      setFamilyFilter("all");
+    } else {
+      updateBrandFilter("all");
+      setCategoryFilter("all");
+      setFamilyFilter("all");
+    }
+    setCurrentPage(1);
+    setActiveView("catalog");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const goHome = () => {
+    setActiveView("home");
+    setSearch("");
+    updateBrandFilter("all");
+    setCategoryFilter("all");
+    setFamilyFilter("all");
+    setCurrentPage(1);
+  };
+
   const { data: productsResult, isLoading } = useQuery({
     queryKey: ["products", "public-paginated", { debouncedSearch, categoryFilter, familyFilter, brandFilter, currentPage, pageSize }],
     queryFn: async () => {
@@ -86,7 +141,7 @@ const Index = () => {
       const total = count ?? 0;
       const from = (currentPage - 1) * pageSize;
       const to = from + pageSize - 1;
-      const { data, error } = await buildFilters(client.from("products").select("*"))
+      const { data, error } = await buildFilters(client.from("products").select(PRODUCT_COLUMNS))
         .order("featured", { ascending: false })
         .order("created_at", { ascending: false })
         .range(from, to);
@@ -95,10 +150,73 @@ const Index = () => {
     },
     staleTime: 5 * 60 * 1000,
     retry: 2,
+    enabled: activeView === "catalog",
   });
   const products = productsResult?.items ?? [];
   const total = productsResult?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+  // Homepage highlights
+  const { data: highlightedBrands = [] } = useQuery({
+    queryKey: ["homepage_highlights", "brand"],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("homepage_highlights")
+        .select("ref_id, label, position")
+        .eq("type", "brand")
+        .eq("active", true)
+        .order("position", { ascending: true });
+      if (error) throw error;
+      return data as { ref_id: string; label: string; position: number }[];
+    },
+  });
+
+  const { data: highlightedCategories = [] } = useQuery({
+    queryKey: ["homepage_highlights", "category"],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("homepage_highlights")
+        .select("ref_id, label, position")
+        .eq("type", "category")
+        .eq("active", true)
+        .order("position", { ascending: true });
+      if (error) throw error;
+      return data as { ref_id: string; label: string; position: number }[];
+    },
+  });
+
+  const { data: featuredProducts = [] } = useQuery({
+    queryKey: ["featured_products_home"],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("products")
+        .select(PRODUCT_COLUMNS)
+        .eq("featured", true)
+        .eq("include_in_catalog", true)
+        .order("created_at", { ascending: false })
+        .limit(4);
+      if (error) throw error;
+      return data || [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: brandStats } = useQuery({
+    queryKey: ["public_brand_stats"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("products")
+        .select("brand_id, brands(name)")
+        .not("brand_id", "is", null);
+      const counts: Record<string, number> = {};
+      (data || []).forEach((p: any) => {
+        const n = p.brands?.name;
+        if (n) counts[n] = (counts[n] || 0) + 1;
+      });
+      return counts;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
   const { data: families = [] } = useQuery({
     queryKey: ["families"],
@@ -148,7 +266,27 @@ const Index = () => {
     },
   });
 
+  const featuredIds = useMemo(() => featuredProducts.map((p: any) => p.id), [featuredProducts]);
+  const { data: featuredImages = [] } = useQuery({
+    queryKey: ["product_images", "featured_home", featuredIds],
+    enabled: featuredIds.length > 0,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_images")
+        .select("*")
+        .in("product_id", featuredIds)
+        .order("position", { ascending: true });
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
   const imagesByProduct = productImages.reduce((acc: Record<string, typeof productImages>, img) => {
+    if (!acc[img.product_id]) acc[img.product_id] = [];
+    acc[img.product_id].push(img);
+    return acc;
+  }, {});
+  const featuredImagesByProduct = featuredImages.reduce((acc: Record<string, any[]>, img: any) => {
     if (!acc[img.product_id]) acc[img.product_id] = [];
     acc[img.product_id].push(img);
     return acc;
@@ -196,7 +334,9 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto flex items-center justify-between px-3 py-2 sm:px-4 sm:py-4">
-          <img src={kilomatLogo} alt="Kilomat Logo" className="h-10 sm:h-20 w-auto drop-shadow-md" />
+          <button onClick={goHome} className="shrink-0">
+            <img src={kilomatLogo} alt="Kilomat Logo" className="h-10 sm:h-20 w-auto drop-shadow-md" />
+          </button>
           <div className="flex items-center gap-2 sm:gap-3">
             <DarkModeToggle />
             <Button variant="outline" size="sm" className="relative gap-1 sm:gap-1.5 text-xs sm:text-sm h-8 sm:h-9 px-2.5 sm:px-3" onClick={() => setIsOpen(true)}>
@@ -215,7 +355,9 @@ const Index = () => {
         </div>
       </header>
 
-      <section className="container mx-auto px-4 py-12 text-center">
+      {activeView === "home" ? (
+      <>
+      <section className="container mx-auto px-4 py-10 text-center">
         <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-4">
           <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
           Desde 2007 · Montijo
@@ -256,7 +398,176 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Como funciona */}
+      <section className="bg-muted/40 border-y border-border py-6 px-4">
+        <div className="container mx-auto max-w-2xl">
+          <p className="text-center text-sm font-medium text-foreground mb-5">
+            Consulte o nosso catálogo, seleccione os produtos e solicite o seu orçamento
+          </p>
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Search className="h-5 w-5 text-primary" />
+              </div>
+              <p className="text-xs font-medium text-foreground">Pesquise</p>
+              <p className="text-[11px] text-muted-foreground">por produto, marca ou categoria</p>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <ShoppingCart className="h-5 w-5 text-primary" />
+              </div>
+              <p className="text-xs font-medium text-foreground">Seleccione</p>
+              <p className="text-[11px] text-muted-foreground">adicione ao orçamento</p>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Send className="h-5 w-5 text-primary" />
+              </div>
+              <p className="text-xs font-medium text-foreground">Receba</p>
+              <p className="text-[11px] text-muted-foreground">resposta em 24 horas</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pesquisa destacada */}
+      <section className="container mx-auto px-4 py-5">
+        <div className="relative max-w-lg mx-auto">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input
+            placeholder="Pesquise por produto, referência ou marca..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              if (e.target.value.length > 0) {
+                setCatalogTitle("Resultados");
+                setActiveView("catalog");
+              }
+            }}
+            className="pl-11 h-12 text-base bg-card border-border shadow-sm"
+          />
+        </div>
+      </section>
+
       <BrandsStrip />
+
+      {/* Marcas em destaque */}
+      {highlightedBrands.length > 0 && (
+        <section className="container mx-auto px-4 py-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="h-px flex-1 bg-border" />
+            <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Navegue por marca</p>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {highlightedBrands.map((b) => {
+              const count = brandStats?.[b.label] ?? 0;
+              return (
+                <button
+                  key={b.ref_id}
+                  onClick={() => openCatalog("brand", b.ref_id, b.label)}
+                  className="flex flex-col items-center justify-center gap-1 p-3 bg-card border border-border rounded-xl hover:border-primary hover:shadow-sm transition-all min-h-[68px]"
+                >
+                  <span className="text-sm font-bold text-foreground leading-tight text-center">{b.label}</span>
+                  {count > 0 && <span className="text-[10px] text-muted-foreground">{count} produtos</span>}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Categorias em destaque */}
+      {highlightedCategories.length > 0 && (
+        <section className="container mx-auto px-4 py-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="h-px flex-1 bg-border" />
+            <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Navegue por categoria</p>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {highlightedCategories.map((c) => {
+              const Icon = getCategoryIcon(c.ref_id);
+              return (
+                <button
+                  key={c.ref_id}
+                  onClick={() => openCatalog("category", c.ref_id, c.label)}
+                  className="flex flex-col items-center justify-center gap-2 p-3 bg-card border border-border rounded-xl hover:border-primary hover:shadow-sm transition-all text-center min-h-[80px]"
+                >
+                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <span className="text-[11px] font-semibold text-foreground leading-tight">{c.label}</span>
+                </button>
+              );
+            })}
+            <button
+              onClick={() => openCatalog("all", "all", "Todos os produtos")}
+              className="flex flex-col items-center justify-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-xl hover:border-primary hover:bg-primary/10 transition-all text-center min-h-[80px]"
+            >
+              <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center">
+                <LayoutGridIcon className="h-5 w-5 text-primary" />
+              </div>
+              <span className="text-[11px] font-semibold text-primary leading-tight">Ver tudo</span>
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* Produtos em destaque */}
+      {featuredProducts.length > 0 && (
+        <section className="container mx-auto px-4 py-4 pb-8">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="h-px flex-1 bg-border" />
+            <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Destaques</p>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {featuredProducts.map((product: any) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                sku={product.sku}
+                slug={product.slug}
+                description={product.description}
+                category={product.category}
+                price={product.price}
+                imageUrl={product.image_url}
+                images={featuredImagesByProduct[product.id] || []}
+                familyName={product.family_id ? familyMap[product.family_id] || null : null}
+                featured={product.featured}
+                onClick={() => setSelectedProduct({
+                  id: product.id,
+                  name: product.name,
+                  sku: product.sku,
+                  description: product.description,
+                  category: product.category,
+                  price: product.price,
+                  imageUrl: product.image_url,
+                  images: featuredImagesByProduct[product.id] || [],
+                  familyName: product.family_id ? familyMap[product.family_id] || null : null,
+                  brandName: product.brand_id ? brandMap[product.brand_id] || null : null,
+                })}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+      </>
+      ) : (
+      <>
+      {/* Catalog header */}
+      <div className="bg-card border-b border-border px-4 py-3 flex items-center gap-3 sticky top-[57px] sm:top-[97px] z-40">
+        <Button variant="outline" size="sm" onClick={goHome} className="gap-1.5 shrink-0">
+          <ChevronLeft className="h-4 w-4" />
+          Início
+        </Button>
+        <span className="font-heading font-semibold text-sm text-foreground truncate">{catalogTitle}</span>
+        {total > 0 && (
+          <span className="text-xs text-muted-foreground ml-auto shrink-0">{total} produtos</span>
+        )}
+      </div>
 
       <ProductFilters
         search={search}
@@ -274,11 +585,12 @@ const Index = () => {
         visibleBrands={visibleBrands}
       />
 
-      <section className="container mx-auto px-4 pb-4" data-results-anchor>
+      <section className="container mx-auto px-4 pb-2" data-results-anchor>
         {!isLoading && total > 0 && (
           <p className="text-sm text-muted-foreground text-center">
             {total} produto{total !== 1 ? "s" : ""} encontrado{total !== 1 ? "s" : ""}
-            {totalPages > 1 && ` — Página ${currentPage} de ${totalPages}`}
+            {totalPages > 1 && totalPages <= 50 && ` — Página ${currentPage} de ${totalPages}`}
+            {totalPages > 50 && ` — Página ${currentPage}`}
           </p>
         )}
       </section>
@@ -289,13 +601,14 @@ const Index = () => {
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : paginatedProducts.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
             {paginatedProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 id={product.id}
                 name={product.name}
                 sku={product.sku}
+                slug={product.slug}
                 description={product.description}
                 category={product.category}
                 price={product.price}
@@ -322,12 +635,12 @@ const Index = () => {
           <div className="text-center py-20">
             <Package className="h-16 w-16 mx-auto text-muted-foreground/40" />
             <h3 className="mt-4 font-heading text-lg font-semibold text-foreground">Nenhum produto encontrado</h3>
-            <p className="mt-1 text-muted-foreground">Nenhum produto disponível no momento.</p>
+            <p className="mt-1 text-muted-foreground">Tente ajustar os filtros.</p>
           </div>
         )}
       </section>
 
-      {(totalPages > 1 || total > 12) && (
+      {(totalPages > 1 || total > 24) && (
         <section className="container mx-auto px-4 pb-16">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             {totalPages > 1 && (
@@ -390,6 +703,8 @@ const Index = () => {
             </div>
           </div>
         </section>
+      )}
+      </>
       )}
 
       <footer className="border-t border-border bg-accent text-accent-foreground py-8">
