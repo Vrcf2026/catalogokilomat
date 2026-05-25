@@ -94,10 +94,7 @@ interface ProductCardProps {
   isAdmin?: boolean;
 }
 
-export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onClick?: () => void }>(function ProductCard({ id, name, sku, description, category, price, imageUrl, images, familyName, onEdit, isAdmin, onClick, featured, includeInCatalog }, ref) {
-  // Note: slug is intentionally read from props below when needed
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _slug = (arguments as any)[0]?.slug as string | null | undefined;
+export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onClick?: () => void }>(function ProductCard({ id, name, sku, slug, description, category, price, imageUrl, images, familyName, onEdit, isAdmin, onClick, featured, includeInCatalog }, ref) {
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
   const queryClient = useQueryClient();
@@ -181,14 +178,26 @@ export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onCli
             </span>
           )}
         </div>
-        <h3 className="font-heading font-semibold text-card-foreground line-clamp-1">{name}</h3>
+        {slug && !isAdmin ? (
+          <Link
+            to={`/produto/${slug}`}
+            className="block font-heading font-semibold text-card-foreground line-clamp-2 hover:text-primary transition-colors"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {name}
+          </Link>
+        ) : (
+          <h3 className="font-heading font-semibold text-card-foreground line-clamp-2">{name}</h3>
+        )}
         {description && (
           <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
         )}
-        {price != null && (
+        {price != null ? (
           <p className="font-heading font-bold text-lg text-foreground">
             {price.toFixed(2).replace(".", ",")} €
           </p>
+        ) : (
+          <p className="text-xs text-muted-foreground italic">Consulte disponibilidade</p>
         )}
 
         {/* Admin toggles */}
