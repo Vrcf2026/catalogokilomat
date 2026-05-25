@@ -1,5 +1,6 @@
 import { useState, useCallback, forwardRef } from "react";
 import { Package, ImageOff, Pencil, ShoppingCart, Minus, Plus, Star, BookOpen, Paintbrush, ArrowUpFromLine, FlaskConical, Zap, Wind, Layers, Pipette, Square, ShoppingBag, Anchor, Home, Network, Circle, Wrench, Plug, Flame, Waves, Lock, ShieldCheck, Disc, Gauge, PanelTop } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -80,6 +81,7 @@ interface ProductCardProps {
   id: string;
   name: string;
   sku?: string | null;
+  slug?: string | null;
   description: string | null;
   category: string | null;
   price: number | null;
@@ -93,6 +95,9 @@ interface ProductCardProps {
 }
 
 export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onClick?: () => void }>(function ProductCard({ id, name, sku, description, category, price, imageUrl, images, familyName, onEdit, isAdmin, onClick, featured, includeInCatalog }, ref) {
+  // Note: slug is intentionally read from props below when needed
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _slug = (arguments as any)[0]?.slug as string | null | undefined;
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
   const queryClient = useQueryClient();
