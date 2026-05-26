@@ -451,32 +451,6 @@ const Index = () => {
 
       <BrandsStrip />
 
-      {/* Marcas em destaque */}
-      {highlightedBrands.length > 0 && (
-        <section className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="h-px flex-1 bg-border" />
-            <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Navegue por marca</p>
-            <div className="h-px flex-1 bg-border" />
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {highlightedBrands.map((b) => {
-              const count = brandStats?.[b.label] ?? 0;
-              return (
-                <button
-                  key={b.ref_id}
-                  onClick={() => openCatalog("brand", b.ref_id, b.label)}
-                  className="flex flex-col items-center justify-center gap-1 p-3 bg-card border border-border rounded-xl hover:border-primary hover:shadow-sm transition-all min-h-[68px]"
-                >
-                  <span className="text-sm font-bold text-foreground leading-tight text-center">{b.label}</span>
-                  {count > 0 && <span className="text-[10px] text-muted-foreground">{count} produtos</span>}
-                </button>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
       {/* Categorias em destaque */}
       {highlightedCategories.length > 0 && (
         <section className="container mx-auto px-4 py-4">
