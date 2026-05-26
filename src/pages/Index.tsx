@@ -493,7 +493,7 @@ const Index = () => {
         <section className="container mx-auto px-4 py-4 pb-8">
           <div className="flex items-center gap-3 mb-3">
             <div className="h-px flex-1 bg-border" />
-            <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Destaques</p>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Produtos em Destaque</p>
             <div className="h-px flex-1 bg-border" />
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -510,6 +510,7 @@ const Index = () => {
                 imageUrl={product.image_url}
                 images={featuredImagesByProduct[product.id] || []}
                 familyName={product.family_id ? familyMap[product.family_id] || null : null}
+                brandName={product.brand_id ? brandMap[product.brand_id] || null : null}
                 featured={product.featured}
                 onClick={() => setSelectedProduct({
                   id: product.id,
