@@ -192,9 +192,8 @@ const Index = () => {
         .from("products")
         .select(PRODUCT_COLUMNS)
         .eq("featured", true)
-        .eq("include_in_catalog", true)
         .order("created_at", { ascending: false })
-        .limit(4);
+        .limit(8);
       if (error) throw error;
       return data || [];
     },
