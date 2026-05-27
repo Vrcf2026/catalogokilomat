@@ -377,6 +377,7 @@ export type Database = {
           include_in_catalog: boolean
           name: string
           price: number | null
+          show_on_homepage: boolean
           sku: string | null
           slug: string | null
           updated_at: string
@@ -393,6 +394,7 @@ export type Database = {
           include_in_catalog?: boolean
           name: string
           price?: number | null
+          show_on_homepage?: boolean
           sku?: string | null
           slug?: string | null
           updated_at?: string
@@ -409,6 +411,7 @@ export type Database = {
           include_in_catalog?: boolean
           name?: string
           price?: number | null
+          show_on_homepage?: boolean
           sku?: string | null
           slug?: string | null
           updated_at?: string
