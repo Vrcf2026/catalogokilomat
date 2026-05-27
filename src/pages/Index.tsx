@@ -431,20 +431,31 @@ const Index = () => {
 
       {/* Pesquisa destacada */}
       <section className="container mx-auto px-4 py-5">
-        <div className="relative max-w-lg mx-auto">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input
-            placeholder="Pesquise por produto, referência ou marca..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              if (e.target.value.length > 0) {
-                setCatalogTitle("Resultados");
-                setActiveView("catalog");
-              }
-            }}
-            className="pl-11 h-12 text-base bg-card border-border shadow-sm"
-          />
+        <div className="max-w-lg mx-auto flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input
+              placeholder="Pesquise por produto, referência ou marca..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && search.trim().length > 0) {
+                  setCatalogTitle("Resultados");
+                  setActiveView("catalog");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+              }}
+              className="pl-11 h-12 text-base bg-card border-border shadow-sm"
+            />
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => openCatalog("all", "all", "Todos os produtos")}
+            className="h-12 px-4 shrink-0 gap-1.5"
+          >
+            <LayoutGridIcon className="h-4 w-4" />
+            <span className="hidden sm:inline">Ver tudo</span>
+          </Button>
         </div>
       </section>
 
