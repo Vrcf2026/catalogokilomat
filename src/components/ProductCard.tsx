@@ -1,5 +1,5 @@
 import { useState, useCallback, forwardRef } from "react";
-import { Package, ImageOff, Pencil, ShoppingCart, Minus, Plus, Star, BookOpen, Paintbrush, ArrowUpFromLine, FlaskConical, Zap, Wind, Layers, Pipette, Square, ShoppingBag, Anchor, Home, Network, Circle, Wrench, Plug, Flame, Waves, Lock, ShieldCheck, Disc, Gauge, PanelTop } from "lucide-react";
+import { Package, ImageOff, Pencil, ShoppingCart, Minus, Plus, Star, BookOpen, Paintbrush, ArrowUpFromLine, FlaskConical, Zap, Wind, Layers, Pipette, Square, ShoppingBag, Anchor, Home, Network, Circle, Wrench, Plug, Flame, Waves, Lock, ShieldCheck, Disc, Gauge, PanelTop, House } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
@@ -91,11 +91,12 @@ interface ProductCardProps {
   brandName?: string | null;
   featured?: boolean;
   includeInCatalog?: boolean;
+  showOnHomepage?: boolean;
   onEdit?: () => void;
   isAdmin?: boolean;
 }
 
-export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onClick?: () => void }>(function ProductCard({ id, name, sku, slug, description, category, price, imageUrl, images, familyName, brandName, onEdit, isAdmin, onClick, featured, includeInCatalog }, ref) {
+export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onClick?: () => void }>(function ProductCard({ id, name, sku, slug, description, category, price, imageUrl, images, familyName, brandName, onEdit, isAdmin, onClick, featured, includeInCatalog, showOnHomepage }, ref) {
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
   const queryClient = useQueryClient();
@@ -106,7 +107,7 @@ export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onCli
   const [selectedIndex, setSelectedIndex] = useState(0);
   const currentImage = allImages[selectedIndex] || null;
 
-  const toggleField = async (field: "featured" | "include_in_catalog", value: boolean) => {
+  const toggleField = async (field: "featured" | "include_in_catalog" | "show_on_homepage", value: boolean) => {
     const updateData: any = {};
     updateData[field] = value;
     const { error } = await supabase.from("products").update(updateData).eq("id", id);
@@ -227,6 +228,16 @@ export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onCli
               <Switch
                 checked={!!featured}
                 onCheckedChange={(v) => toggleField("featured", v)}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                <House className="h-3 w-3" />
+                Homepage
+              </label>
+              <Switch
+                checked={!!showOnHomepage}
+                onCheckedChange={(v) => toggleField("show_on_homepage", v)}
               />
             </div>
           </div>

@@ -186,14 +186,14 @@ const Index = () => {
   });
 
   const { data: featuredProducts = [] } = useQuery({
-    queryKey: ["featured_products_home"],
+    queryKey: ["homepage_products"],
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("products")
         .select(PRODUCT_COLUMNS)
-        .eq("featured", true)
-        .order("created_at", { ascending: false })
-        .limit(8);
+        .eq("show_on_homepage", true)
+        .order("name", { ascending: true })
+        .limit(12);
       if (error) throw error;
       return data || [];
     },

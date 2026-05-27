@@ -406,6 +406,14 @@ const Admin = () => {
                     />
                   </div>
                 )}
+                {product.show_on_homepage && (
+                  <div
+                    className="absolute top-2 right-2 z-20 bg-primary text-primary-foreground rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 shadow-md"
+                    title="A aparecer na homepage"
+                  >
+                    🏠 Homepage
+                  </div>
+                )}
                 <div className={selectionMode && selectedIds.has(product.id) ? "ring-2 ring-primary rounded-lg" : ""}>
                   <ProductCard
                     id={product.id}
@@ -418,6 +426,7 @@ const Admin = () => {
                     familyName={product.family_id ? familyMap[product.family_id] || null : null}
                     featured={product.featured}
                     includeInCatalog={product.include_in_catalog}
+                    showOnHomepage={product.show_on_homepage}
                     onEdit={() => !selectionMode && setEditingProduct(product)}
                     isAdmin
                   />
