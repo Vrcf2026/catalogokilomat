@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -17,10 +17,29 @@ const BrandsStrip = () => {
     },
   });
 
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const offsetRef = useRef(0);
+  const segmentWidthRef = useRef(0);
   const [isHovered, setIsHovered] = useState(false);
   const isHoveredRef = useRef(false);
   const repetitionCount = Math.max(4, Math.ceil(24 / Math.max(brands.length, 1)));
+
+  const applyOffset = useCallback(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    track.style.transform = `translate3d(${-offsetRef.current}px, 0, 0)`;
+  }, []);
+
+  const recalculateSegment = useCallback(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const segmentWidth = track.scrollWidth / repetitionCount;
+    segmentWidthRef.current = Number.isFinite(segmentWidth) ? segmentWidth : 0;
+    if (segmentWidthRef.current > 0) {
+      offsetRef.current = ((offsetRef.current % segmentWidthRef.current) + segmentWidthRef.current) % segmentWidthRef.current;
+      applyOffset();
+    }
+  }, [applyOffset, repetitionCount]);
 
   const setPaused = (paused: boolean) => {
     isHoveredRef.current = paused;
@@ -28,29 +47,40 @@ const BrandsStrip = () => {
   };
 
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el || brands.length === 0) return;
+    const track = trackRef.current;
+    if (!track || brands.length === 0) return;
     let rafId: number;
     let last = performance.now();
     const speed = 40; // px per second
+    recalculateSegment();
+    const resizeObserver = new ResizeObserver(recalculateSegment);
+    resizeObserver.observe(track);
+    window.addEventListener("resize", recalculateSegment);
+
     const tick = (now: number) => {
-      const dt = (now - last) / 1000;
+      const dt = Math.min((now - last) / 1000, 0.1);
       last = now;
-      if (!isHoveredRef.current && el) {
-        el.scrollLeft += speed * dt;
-        const segmentWidth = el.scrollWidth / repetitionCount;
-        if (segmentWidth > 0 && el.scrollLeft >= segmentWidth) el.scrollLeft -= segmentWidth;
+      const segmentWidth = segmentWidthRef.current;
+      if (!isHoveredRef.current && segmentWidth > 0) {
+        offsetRef.current += speed * dt;
+        if (offsetRef.current >= segmentWidth) offsetRef.current -= segmentWidth;
+        applyOffset();
       }
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafId);
-  }, [brands.length, repetitionCount]);
+    return () => {
+      cancelAnimationFrame(rafId);
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", recalculateSegment);
+    };
+  }, [applyOffset, brands.length, recalculateSegment]);
 
   const nudge = (dir: 1 | -1) => {
-    const el = scrollRef.current;
-    if (!el) return;
-    el.scrollBy({ left: dir * 240, behavior: "smooth" });
+    const segmentWidth = segmentWidthRef.current;
+    if (segmentWidth <= 0) return;
+    offsetRef.current = ((offsetRef.current + dir * 240) % segmentWidth + segmentWidth) % segmentWidth;
+    applyOffset();
   };
 
   if (isLoading || brands.length === 0) return null;
@@ -88,11 +118,9 @@ const BrandsStrip = () => {
             <ChevronRight className="h-5 w-5" />
           </button>
           <div
-            ref={scrollRef}
-            className="overflow-x-auto scrollbar-none"
-            style={{ scrollbarWidth: "none" }}
+            className="overflow-hidden"
           >
-            <div className="flex gap-8 sm:gap-12 w-max">
+            <div ref={trackRef} className="flex gap-8 sm:gap-12 w-max will-change-transform">
             {items.map((b, i) => (
               <Link
                 key={`${b.id}-${i}`}
