@@ -20,7 +20,12 @@ const BrandsStrip = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const isHoveredRef = useRef(false);
-  useEffect(() => { isHoveredRef.current = isHovered; }, [isHovered]);
+  const repetitionCount = Math.max(4, Math.ceil(24 / Math.max(brands.length, 1)));
+
+  const setPaused = (paused: boolean) => {
+    isHoveredRef.current = paused;
+    setIsHovered(paused);
+  };
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -33,14 +38,14 @@ const BrandsStrip = () => {
       last = now;
       if (!isHoveredRef.current && el) {
         el.scrollLeft += speed * dt;
-        const half = el.scrollWidth / 2;
-        if (el.scrollLeft >= half) el.scrollLeft -= half;
+        const segmentWidth = el.scrollWidth / repetitionCount;
+        if (segmentWidth > 0 && el.scrollLeft >= segmentWidth) el.scrollLeft -= segmentWidth;
       }
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
-  }, [brands.length]);
+  }, [brands.length, repetitionCount]);
 
   const nudge = (dir: 1 | -1) => {
     const el = scrollRef.current;
@@ -50,20 +55,22 @@ const BrandsStrip = () => {
 
   if (isLoading || brands.length === 0) return null;
 
-  const items = [...brands, ...brands];
+  const items = Array.from({ length: repetitionCount }, () => brands).flat();
 
   return (
     <section
       className="border-y border-border/50 bg-muted/30 py-6 overflow-hidden"
       aria-label="Marcas que trabalhamos"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       <div className="container mx-auto px-4">
         <p className="text-center text-xs uppercase tracking-widest text-muted-foreground mb-4">
           Trabalhamos com as melhores marcas — clique para filtrar
         </p>
-        <div className="relative">
+        <div
+          className="relative"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+        >
           <button
             type="button"
             onClick={() => nudge(-1)}
