@@ -55,20 +55,22 @@ const BrandsStrip = () => {
 
   if (isLoading || brands.length === 0) return null;
 
-  const items = [...brands, ...brands];
+  const items = Array.from({ length: repetitionCount }, () => brands).flat();
 
   return (
     <section
       className="border-y border-border/50 bg-muted/30 py-6 overflow-hidden"
       aria-label="Marcas que trabalhamos"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       <div className="container mx-auto px-4">
         <p className="text-center text-xs uppercase tracking-widest text-muted-foreground mb-4">
           Trabalhamos com as melhores marcas — clique para filtrar
         </p>
-        <div className="relative">
+        <div
+          className="relative"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+        >
           <button
             type="button"
             onClick={() => nudge(-1)}
