@@ -20,7 +20,12 @@ const BrandsStrip = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const isHoveredRef = useRef(false);
-  useEffect(() => { isHoveredRef.current = isHovered; }, [isHovered]);
+  const repetitionCount = Math.max(4, Math.ceil(24 / Math.max(brands.length, 1)));
+
+  const setPaused = (paused: boolean) => {
+    isHoveredRef.current = paused;
+    setIsHovered(paused);
+  };
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -33,14 +38,14 @@ const BrandsStrip = () => {
       last = now;
       if (!isHoveredRef.current && el) {
         el.scrollLeft += speed * dt;
-        const half = el.scrollWidth / 2;
-        if (el.scrollLeft >= half) el.scrollLeft -= half;
+        const segmentWidth = el.scrollWidth / repetitionCount;
+        if (segmentWidth > 0 && el.scrollLeft >= segmentWidth) el.scrollLeft -= segmentWidth;
       }
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
-  }, [brands.length]);
+  }, [brands.length, repetitionCount]);
 
   const nudge = (dir: 1 | -1) => {
     const el = scrollRef.current;
