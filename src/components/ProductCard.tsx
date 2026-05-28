@@ -203,9 +203,7 @@ export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onCli
           <p className="font-heading font-bold text-lg text-foreground">
             {price.toFixed(2).replace(".", ",")} €
           </p>
-        ) : (
-          <p className="text-xs text-muted-foreground italic">Consulte disponibilidade</p>
-        )}
+        ) : null}
 
         {/* Admin toggles */}
         {isAdmin && (

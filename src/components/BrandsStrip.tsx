@@ -19,6 +19,8 @@ const BrandsStrip = () => {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const isHoveredRef = useRef(false);
+  useEffect(() => { isHoveredRef.current = isHovered; }, [isHovered]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -29,7 +31,7 @@ const BrandsStrip = () => {
     const tick = (now: number) => {
       const dt = (now - last) / 1000;
       last = now;
-      if (!isHovered && el) {
+      if (!isHoveredRef.current && el) {
         el.scrollLeft += speed * dt;
         const half = el.scrollWidth / 2;
         if (el.scrollLeft >= half) el.scrollLeft -= half;
@@ -38,7 +40,7 @@ const BrandsStrip = () => {
     };
     rafId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafId);
-  }, [brands.length, isHovered]);
+  }, [brands.length]);
 
   const nudge = (dir: 1 | -1) => {
     const el = scrollRef.current;
