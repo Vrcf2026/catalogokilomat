@@ -820,7 +820,7 @@ const Index = () => {
 
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <img src={kilomatKIcon} alt="Kilomat" className="h-12 w-auto" />
+              <img src={kilomatKIcon} alt="Kilomat" width={90} height={86} className="h-12 w-auto" loading="lazy" decoding="async" />
               <div>
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <p className="font-heading font-bold text-sm">Kilomat — Materiais de Construção</p>
@@ -829,8 +829,8 @@ const Index = () => {
                     Desde 2007 · Montijo
                   </span>
                 </div>
-                <p className="text-xs text-accent-foreground/70 mt-1">Materiais de construção, ferramentas, canalização e tintas</p>
-                <p className="text-xs text-accent-foreground/70 mt-1">
+                <p className="text-xs text-accent-foreground/85 mt-1">Materiais de construção, ferramentas, canalização e tintas</p>
+                <p className="text-xs text-accent-foreground/85 mt-1">
                   <a href="tel:+351938283386" className="hover:text-primary transition-colors">+351 938 283 386</a>
                   {" · "}
                   <a href="mailto:info@kilomat.pt" className="hover:text-primary transition-colors">info@kilomat.pt</a>
@@ -838,22 +838,22 @@ const Index = () => {
               </div>
             </div>
             <div className="text-center md:text-right space-y-1">
-              <p className="text-xs text-accent-foreground/70">
+              <p className="text-xs text-accent-foreground/85">
                 <a href="https://kilomat.pt" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                   kilomat.pt
                 </a>
               </p>
               {hasAnyPrice && (
                 <>
-                  <p className="text-xs text-accent-foreground/70">
+                  <p className="text-xs text-accent-foreground/85">
                     Todos os preços apresentados incluem IVA à taxa legal em vigor.
                   </p>
-                  <p className="text-xs text-accent-foreground/70">
+                  <p className="text-xs text-accent-foreground/85">
                     Os preços são meramente indicativos e podem sofrer alterações sem aviso prévio.
                   </p>
                 </>
               )}
-              <p className="text-xs text-accent-foreground/70">
+              <p className="text-xs text-accent-foreground/85">
                 As imagens apresentadas são meramente ilustrativas.
               </p>
               <p className="text-xs mt-2 space-x-3">
