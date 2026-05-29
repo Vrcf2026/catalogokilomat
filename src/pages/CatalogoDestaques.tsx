@@ -4,6 +4,7 @@ import { CatalogViewer } from "@/components/CatalogViewer";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { fetchAllProductImages, fetchAllProducts } from "@/lib/fetchAllRows";
+import { SEO } from "@/components/SEO";
 
 const CatalogoDestaques = () => {
   const navigate = useNavigate();
@@ -57,15 +58,22 @@ const CatalogoDestaques = () => {
   }
 
   return (
-    <CatalogViewer
-      category="Destaques"
-      products={featuredProducts}
-      imagesByProduct={imagesByProduct}
-      familyMap={familyMap}
-      onBack={() => navigate("/")}
-      customLogoUrl={custom?.logo_url}
-      customCoverUrl={custom?.cover_image_url}
-    />
+    <>
+      <SEO
+        title="Destaques Kilomat — Produtos em Destaque"
+        description="Veja os produtos em destaque da Kilomat: ofertas e novidades em materiais de construção, ferramentas e EPI, num catálogo digital folheável."
+        path="/catalogos/destaques"
+      />
+      <CatalogViewer
+        category="Destaques"
+        products={featuredProducts}
+        imagesByProduct={imagesByProduct}
+        familyMap={familyMap}
+        onBack={() => navigate("/")}
+        customLogoUrl={custom?.logo_url}
+        customCoverUrl={custom?.cover_image_url}
+      />
+    </>
   );
 };
 
