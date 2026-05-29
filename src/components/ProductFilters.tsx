@@ -137,6 +137,8 @@ export const ProductFilters = ({
               size="icon"
               className="shrink-0 relative"
               onClick={() => setFiltersOpen(!filtersOpen)}
+              aria-label={filtersOpen ? "Fechar filtros" : "Abrir filtros"}
+              aria-expanded={filtersOpen}
             >
               <SlidersHorizontal className="h-4 w-4" />
               {activeFilterCount > 0 && (
