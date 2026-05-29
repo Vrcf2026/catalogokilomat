@@ -369,7 +369,7 @@ const Index = () => {
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto flex items-center gap-3 px-3 py-2 sm:px-4 sm:py-3">
           <button onClick={goHome} aria-label="Ir para o início — Kilomat" className="shrink-0">
-            <img src={kilomatLogo} alt="Kilomat Logo" className="h-8 sm:h-10 w-auto drop-shadow-md" />
+            <img src={kilomatLogo} alt="Kilomat Logo" width={510} height={126} className="h-8 sm:h-10 w-auto drop-shadow-md" loading="eager" fetchPriority="high" decoding="async" />
           </button>
           <div className="relative flex-1 max-w-2xl mx-auto">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -424,9 +424,9 @@ const Index = () => {
         <section className="border-b border-border bg-card/40">
           <div className="container mx-auto px-2 sm:px-4">
             <div className="flex items-center justify-between px-4 pt-3 pb-1">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Explorar por categoria
-              </p>
+              </h2>
               <div className="flex items-center gap-1">
                 <button
                   type="button"
@@ -459,6 +459,8 @@ const Index = () => {
                   const allActive = categoryFilter === "all";
                   return (
                     <button
+                      type="button"
+                      aria-label="Ver todos os produtos"
                       onClick={() => openCatalog("all", "all", "Todos os produtos")}
                       className={`shrink-0 flex flex-col items-center justify-center gap-1.5 p-2 min-w-[80px] w-[80px] h-[80px] sm:min-w-[96px] sm:w-[96px] sm:h-[96px] rounded-xl border transition-all ${allCategoryMeta.bg} ${allActive ? "border-primary ring-2 ring-primary/20" : "border-border hover:border-primary/50"}`}
                     >
@@ -474,6 +476,8 @@ const Index = () => {
                   return (
                     <button
                       key={c.id}
+                      type="button"
+                      aria-label={`Ver categoria ${c.name}`}
                       onClick={() => openCatalog("category", c.name, c.name)}
                       title={c.name}
                       className={`shrink-0 flex flex-col items-center justify-center gap-1.5 p-2 min-w-[80px] w-[80px] h-[80px] sm:min-w-[96px] sm:w-[96px] sm:h-[96px] rounded-xl border transition-all ${meta.bg} ${active ? "border-primary ring-2 ring-primary/20" : "border-border hover:border-primary/50"}`}
@@ -484,6 +488,8 @@ const Index = () => {
                   );
                 })}
                 <button
+                  type="button"
+                  aria-label="Ver todas as categorias"
                   onClick={() => openCatalog("all", "all", "Todos os produtos")}
                   className="flex flex-col items-center justify-center gap-1.5 p-2 min-w-[80px] w-[80px] h-[80px] sm:min-w-[96px] sm:w-[96px] sm:h-[96px] rounded-xl border border-dashed border-border hover:border-primary/50 transition-all shrink-0 text-muted-foreground hover:text-primary"
                 >
