@@ -50,12 +50,24 @@ serve(async (req) => {
       });
     }
 
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const nameStr = String(name).trim();
+    const emailStr = String(email).trim();
+    const messageStr = String(message).trim();
+    if (
+      nameStr.length > 200 ||
+      emailStr.length > 255 ||
+      messageStr.length > 2000 ||
+      !EMAIL_RE.test(emailStr)
+    ) {
+      return new Response(JSON.stringify({ error: "Dados inválidos" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const requestId = crypto.randomUUID();
-    const data = {
-      name: String(name),
-      email: String(email),
-      message: String(message),
-    };
+    const data = { name: nameStr, email: emailStr, message: messageStr };
 
     await invokeTransactionalEmail({
       templateName: "suggestion-admin",

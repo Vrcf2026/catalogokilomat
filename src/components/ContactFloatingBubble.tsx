@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { HONEYPOT_FIELD_NAME, honeypotStyle, isLikelyBot } from "@/lib/antiBot";
 
 const STORAGE_KEY = "kilomat-contact-bubble-dismissed-at";
 const DISMISS_DURATION_MS = 24 * 60 * 60 * 1000; // 24h
@@ -22,6 +23,15 @@ const ContactFloatingBubble = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [honeypot, setHoneypot] = useState("");
+  const [formOpenedAt, setFormOpenedAt] = useState(() => Date.now());
+
+  useEffect(() => {
+    if (dialogOpen) {
+      setFormOpenedAt(Date.now());
+      setHoneypot("");
+    }
+  }, [dialogOpen]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -44,6 +54,14 @@ const ContactFloatingBubble = () => {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
       toast.error("Por favor preencha nome, email e mensagem.");
+      return;
+    }
+    if (isLikelyBot({ honeypotValue: honeypot, formOpenedAt })) {
+      // Silent success to avoid teaching bots what triggered the block
+      toast.success("Mensagem enviada! Entraremos em contacto brevemente.");
+      setForm({ name: "", email: "", phone: "", message: "" });
+      setDialogOpen(false);
+      dismiss();
       return;
     }
     setIsSubmitting(true);
@@ -141,6 +159,16 @@ const ContactFloatingBubble = () => {
               <Textarea id="bubble-message" rows={4} value={form.message} maxLength={1000} required
                 onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))} />
             </div>
+            <input
+              type="text"
+              name={HONEYPOT_FIELD_NAME}
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              style={honeypotStyle}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+            />
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? "A enviar..." : "Enviar Mensagem"}
             </Button>

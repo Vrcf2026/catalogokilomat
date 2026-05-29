@@ -29,6 +29,28 @@ serve(async (req) => {
   }
 
   try {
+    // Origin/Referer allowlist — blocks browser-based abuse from foreign
+    // sites while still allowing server-side calls (no Referer header).
+    const referer = req.headers.get("referer") || req.headers.get("origin") || "";
+    if (referer) {
+      try {
+        const refHost = new URL(referer).hostname.toLowerCase();
+        const allowed =
+          refHost === "showroom.kilomat.pt" ||
+          refHost === "catalogokilomat.lovable.app" ||
+          refHost === "localhost" ||
+          refHost === "127.0.0.1" ||
+          refHost.endsWith(".lovable.app") ||
+          refHost.endsWith(".lovable.dev") ||
+          refHost.endsWith(".lovableproject.com");
+        if (!allowed) {
+          return new Response("Forbidden origin", { status: 403, headers: corsHeaders });
+        }
+      } catch {
+        return new Response("Invalid referer", { status: 400, headers: corsHeaders });
+      }
+    }
+
     const url = new URL(req.url);
     const target = url.searchParams.get("url");
 
