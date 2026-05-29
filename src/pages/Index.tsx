@@ -643,7 +643,52 @@ const Index = () => {
       )}
 
       <footer className="border-t border-border bg-accent text-accent-foreground py-8">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 space-y-8">
+          {/* Hero info movido do topo */}
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <p className="font-heading text-lg sm:text-xl font-semibold">
+              Mais de 18 anos a equipar profissionais e particulares
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-accent-foreground/80">
+              <a href="tel:+351938283386" className="inline-flex items-center gap-2 hover:text-primary transition-colors">
+                <Phone className="h-4 w-4" /> +351 938 283 386
+              </a>
+              <a href="mailto:info@kilomat.pt" className="inline-flex items-center gap-2 hover:text-primary transition-colors">
+                <Mail className="h-4 w-4" /> info@kilomat.pt
+              </a>
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Kilomat+Lda+Montijo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 hover:text-primary transition-colors"
+              >
+                <MapPin className="h-4 w-4" /> Estrada do Pau Queimado, Montijo
+              </a>
+            </div>
+          </div>
+
+          {/* Como funciona */}
+          <div className="grid grid-cols-3 gap-3 max-w-2xl mx-auto text-center">
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center">
+                <Search className="h-4 w-4 text-primary" />
+              </div>
+              <p className="text-xs font-medium">Pesquise</p>
+            </div>
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center">
+                <ShoppingCart className="h-4 w-4 text-primary" />
+              </div>
+              <p className="text-xs font-medium">Seleccione</p>
+            </div>
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center">
+                <Send className="h-4 w-4 text-primary" />
+              </div>
+              <p className="text-xs font-medium">Receba</p>
+            </div>
+          </div>
+
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
               <img src={kilomatKIcon} alt="Kilomat" className="h-12 w-auto" />
