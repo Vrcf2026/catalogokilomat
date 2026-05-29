@@ -133,6 +133,10 @@ const Index = () => {
             return baseQuery.order("name", { ascending: true });
           case "name_desc":
             return baseQuery.order("name", { ascending: false });
+          case "price_asc":
+            return baseQuery.order("price", { ascending: true, nullsFirst: false });
+          case "price_desc":
+            return baseQuery.order("price", { ascending: false, nullsFirst: false });
           case "newest":
             return baseQuery.order("created_at", { ascending: false });
           case "featured":
