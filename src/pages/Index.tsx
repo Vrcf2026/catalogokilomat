@@ -595,7 +595,7 @@ const Index = () => {
           <ChevronLeft className="h-4 w-4" />
           <span className="hidden sm:inline">Início</span>
         </Button>
-        <span className="font-heading font-semibold text-sm text-foreground truncate hidden md:inline">{catalogTitle}</span>
+        <h2 className="font-heading font-semibold text-sm text-foreground truncate hidden md:inline">{catalogTitle}</h2>
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -690,6 +690,7 @@ const Index = () => {
                 <Button
                   variant="outline"
                   size="sm"
+                  aria-label="Página anterior"
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((p) => p - 1)}
                 >
@@ -711,6 +712,8 @@ const Index = () => {
                         <Button
                           variant={currentPage === page ? "default" : "outline"}
                           size="sm"
+                          aria-label={`Ir para a página ${page}`}
+                          aria-current={currentPage === page ? "page" : undefined}
                           className="min-w-[36px]"
                           onClick={() => setCurrentPage(page)}
                         >
@@ -722,6 +725,7 @@ const Index = () => {
                 <Button
                   variant="outline"
                   size="sm"
+                  aria-label="Página seguinte"
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((p) => p + 1)}
                 >
@@ -736,6 +740,7 @@ const Index = () => {
                   key={size}
                   variant={pageSize === size ? "default" : "outline"}
                   size="sm"
+                  aria-label={`Mostrar ${size} produtos por página`}
                   className="min-w-[36px]"
                   onClick={() => { setPageSize(size); setCurrentPage(1); }}
                 >
