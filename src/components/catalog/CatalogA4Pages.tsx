@@ -247,9 +247,9 @@ export const CatalogContactsPage = forwardRef<HTMLDivElement, {
 
         <div className="absolute bottom-6 left-0 right-0 px-8 flex flex-col items-center gap-1 text-center">
           <p className="text-white/60 text-[10px] font-semibold tracking-wider">kilomat.pt</p>
-          <p className="text-white/40 text-[9px] leading-snug max-w-md">Todos os preços apresentados incluem IVA à taxa legal em vigor.</p>
-          <p className="text-white/40 text-[9px] leading-snug max-w-md">Os preços são meramente indicativos e podem sofrer alterações sem aviso prévio.</p>
-          <p className="text-white/40 text-[9px] leading-snug max-w-md">As imagens apresentadas são meramente ilustrativas.</p>
+          <p className="text-white/80 text-[9px] leading-snug max-w-md">Todos os preços apresentados incluem IVA à taxa legal em vigor.</p>
+          <p className="text-white/80 text-[9px] leading-snug max-w-md">Os preços são meramente indicativos e podem sofrer alterações sem aviso prévio.</p>
+          <p className="text-white/80 text-[9px] leading-snug max-w-md">As imagens apresentadas são meramente ilustrativas.</p>
           <p className="text-white/20 text-[9px] tracking-wider mt-1">© {new Date().getFullYear()} Kilomat — Todos os direitos reservados</p>
         </div>
       </div>
