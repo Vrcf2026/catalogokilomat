@@ -115,10 +115,10 @@ export const ProductFilters = ({
         <SelectContent>
           <SelectItem value="featured">Destaques</SelectItem>
           <SelectItem value="newest">Mais recentes</SelectItem>
-          <SelectItem value="name-asc">Nome (A-Z)</SelectItem>
-          <SelectItem value="name-desc">Nome (Z-A)</SelectItem>
-          <SelectItem value="price-asc">Preço (menor)</SelectItem>
-          <SelectItem value="price-desc">Preço (maior)</SelectItem>
+          <SelectItem value="name_asc">Nome (A-Z)</SelectItem>
+          <SelectItem value="name_desc">Nome (Z-A)</SelectItem>
+          <SelectItem value="price_asc">Preço (menor)</SelectItem>
+          <SelectItem value="price_desc">Preço (maior)</SelectItem>
         </SelectContent>
       </Select>
     </div>
