@@ -24,6 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { useState, useMemo, useEffect } from "react";
 import { Search, ShieldCheck, Package, Loader2, LogOut, Trash2, CheckSquare, Square, XSquare, Settings2, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { Image as ImageIcon, Tag, Layers, Bookmark } from "lucide-react";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
@@ -41,6 +42,10 @@ const Admin = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [selectionMode, setSelectionMode] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkBrand, setBulkBrand] = useState("");
+  const [bulkCategory, setBulkCategory] = useState("");
+  const [bulkFamily, setBulkFamily] = useState("");
   const [toolsOpen, setToolsOpen] = useState(false);
   const [dashboardOpen, setDashboardOpen] = useState(false);
   const [page, setPage] = useState(1);
@@ -212,6 +217,88 @@ const Admin = () => {
       setDeleting(false);
     }
   };
+
+  const handleBulkClearImages = async () => {
+    const count = selectedIds.size;
+    if (!count) return;
+    if (!confirm(`Apagar TODAS as imagens de ${count} produto(s)? Esta ação não pode ser revertida.`)) return;
+    setBulkBusy(true);
+    try {
+      const ids = Array.from(selectedIds);
+      await supabase.from("product_images").delete().in("product_id", ids);
+      const { error } = await supabase.from("products").update({ image_url: null }).in("id", ids);
+      if (error) throw error;
+      toast.success(`Imagens removidas de ${count} produto(s)`);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product_images"] });
+    } catch {
+      toast.error("Erro ao remover imagens");
+    } finally {
+      setBulkBusy(false);
+    }
+  };
+
+  const handleBulkSetBrand = async () => {
+    if (!bulkBrand || !selectedIds.size) return;
+    setBulkBusy(true);
+    try {
+      const ids = Array.from(selectedIds);
+      const value = bulkBrand === "none" ? null : bulkBrand;
+      const { error } = await supabase.from("products").update({ brand_id: value }).in("id", ids);
+      if (error) throw error;
+      toast.success(`Marca aplicada a ${ids.length} produto(s)`);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    } catch {
+      toast.error("Erro ao aplicar marca");
+    } finally {
+      setBulkBusy(false);
+    }
+  };
+
+  const handleBulkSetCategory = async () => {
+    if (!bulkCategory || !selectedIds.size) return;
+    setBulkBusy(true);
+    try {
+      const ids = Array.from(selectedIds);
+      const { error } = await supabase.from("products").update({ category: bulkCategory, family_id: null }).in("id", ids);
+      if (error) throw error;
+      toast.success(`Categoria aplicada a ${ids.length} produto(s)`);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    } catch {
+      toast.error("Erro ao aplicar categoria");
+    } finally {
+      setBulkBusy(false);
+    }
+  };
+
+  const handleBulkSetFamily = async () => {
+    if (!bulkFamily || !selectedIds.size) return;
+    setBulkBusy(true);
+    try {
+      const ids = Array.from(selectedIds);
+      const value = bulkFamily === "none" ? null : bulkFamily;
+      const { error } = await supabase.from("products").update({ family_id: value }).in("id", ids);
+      if (error) throw error;
+      toast.success(`Família aplicada a ${ids.length} produto(s)`);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    } catch {
+      toast.error("Erro ao aplicar família");
+    } finally {
+      setBulkBusy(false);
+    }
+  };
+
+  const navigateProduct = (dir: -1 | 1) => {
+    if (!editingProduct || !filtered) return;
+    const idx = filtered.findIndex((p) => p.id === editingProduct.id);
+    if (idx === -1) return;
+    const next = filtered[idx + dir];
+    if (next) setEditingProduct(next);
+  };
+
+  const editingIdx = editingProduct && filtered ? filtered.findIndex((p) => p.id === editingProduct.id) : -1;
+  const hasPrev = editingIdx > 0;
+  const hasNext = editingIdx >= 0 && filtered ? editingIdx < filtered.length - 1 : false;
 
   const categoryNames = dbCategories.map((c) => c.name);
   const visibleFamilies = categoryFilter === "all" ? families : families.filter((f) => f.category === categoryFilter);
@@ -399,6 +486,59 @@ const Admin = () => {
           )}
         </div>
 
+        {selectionMode && selectedIds.size > 0 && (
+          <div className="flex items-center gap-2 mb-4 flex-wrap p-3 rounded-lg border border-border bg-muted/30">
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mr-1">
+              Ações em massa ({selectedIds.size}):
+            </span>
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={handleBulkClearImages} disabled={bulkBusy}>
+              <ImageIcon className="h-4 w-4" /> Apagar imagens
+            </Button>
+            <div className="flex items-center gap-1">
+              <Select value={bulkBrand} onValueChange={setBulkBrand}>
+                <SelectTrigger className="w-[160px] h-9"><SelectValue placeholder="Marca..." /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Sem marca</SelectItem>
+                  {[...brands].sort((a, b) => a.name.localeCompare(b.name, "pt", { sensitivity: "base" })).map((b) => (
+                    <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button variant="outline" size="sm" onClick={handleBulkSetBrand} disabled={!bulkBrand || bulkBusy}>
+                <Bookmark className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex items-center gap-1">
+              <Select value={bulkCategory} onValueChange={setBulkCategory}>
+                <SelectTrigger className="w-[160px] h-9"><SelectValue placeholder="Categoria..." /></SelectTrigger>
+                <SelectContent>
+                  {[...categoryNames].sort((a, b) => a.localeCompare(b, "pt", { sensitivity: "base" })).map((c) => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button variant="outline" size="sm" onClick={handleBulkSetCategory} disabled={!bulkCategory || bulkBusy}>
+                <Tag className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="flex items-center gap-1">
+              <Select value={bulkFamily} onValueChange={setBulkFamily}>
+                <SelectTrigger className="w-[160px] h-9"><SelectValue placeholder="Família..." /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Sem família</SelectItem>
+                  {[...families].sort((a, b) => a.name.localeCompare(b.name, "pt", { sensitivity: "base" })).map((f) => (
+                    <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button variant="outline" size="sm" onClick={handleBulkSetFamily} disabled={!bulkFamily || bulkBusy}>
+                <Layers className="h-4 w-4" />
+              </Button>
+            </div>
+            {bulkBusy && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
+          </div>
+        )}
+
         {isLoading ? (
           <div className="flex justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -499,12 +639,17 @@ const Admin = () => {
 
       {editingProduct && (
         <EditProductDialog
+          key={editingProduct.id}
           open={!!editingProduct}
           onOpenChange={(open) => !open && setEditingProduct(null)}
           product={editingProduct}
           families={families}
           categories={categoryNames}
           brands={brands}
+          onPrev={() => navigateProduct(-1)}
+          onNext={() => navigateProduct(1)}
+          hasPrev={hasPrev}
+          hasNext={hasNext}
         />
       )}
     </div>

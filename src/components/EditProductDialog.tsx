@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Loader2, Save, Trash2, Wand2 } from "lucide-react";
+import { Loader2, Save, Trash2, Wand2, ChevronLeft, ChevronRight } from "lucide-react";
 import { ImageSlotPicker, type ImageSlot } from "@/components/ImageSlotPicker";
 
 interface EditProductDialogProps {
@@ -28,9 +28,13 @@ interface EditProductDialogProps {
   families: { id: string; name: string; category: string }[];
   categories: string[];
   brands: { id: string; name: string }[];
+  onPrev?: () => void;
+  onNext?: () => void;
+  hasPrev?: boolean;
+  hasNext?: boolean;
 }
 
-export function EditProductDialog({ open, onOpenChange, product, families, categories, brands }: EditProductDialogProps) {
+export function EditProductDialog({ open, onOpenChange, product, families, categories, brands, onPrev, onNext, hasPrev, hasNext }: EditProductDialogProps) {
   const [name, setName] = useState(product.name);
   const [sku, setSku] = useState(product.sku || "");
   const [description, setDescription] = useState(product.description || "");
@@ -132,10 +136,10 @@ export function EditProductDialog({ open, onOpenChange, product, families, categ
     return null;
   };
 
-  const handleSave = async () => {
+  const handleSave = async (afterSave?: () => void) => {
     if (!name.trim()) {
       toast.error("Nome é obrigatório");
-      return;
+      return false;
     }
     setLoading(true);
     try {
@@ -171,9 +175,12 @@ export function EditProductDialog({ open, onOpenChange, product, families, categ
       toast.success("Produto atualizado!");
       queryClient.invalidateQueries({ queryKey: ["products"] });
       queryClient.invalidateQueries({ queryKey: ["product_images"] });
-      onOpenChange(false);
+      if (afterSave) afterSave();
+      else onOpenChange(false);
+      return true;
     } catch (e: any) {
       toast.error(e.message || "Erro ao atualizar");
+      return false;
     } finally {
       setLoading(false);
     }
@@ -200,7 +207,35 @@ export function EditProductDialog({ open, onOpenChange, product, families, categ
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-heading text-xl">Editar Produto</DialogTitle>
+          <div className="flex items-center justify-between gap-2">
+            <DialogTitle className="font-heading text-xl">Editar Produto</DialogTitle>
+            {(onPrev || onNext) && (
+              <div className="flex items-center gap-1 mr-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-2"
+                  disabled={!hasPrev || loading}
+                  onClick={() => handleSave(onPrev)}
+                  title="Guardar e ir para o anterior"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-2"
+                  disabled={!hasNext || loading}
+                  onClick={() => handleSave(onNext)}
+                  title="Guardar e ir para o próximo"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
         </DialogHeader>
         <div className="space-y-4 pt-2">
           <div className="space-y-2">
@@ -315,7 +350,7 @@ export function EditProductDialog({ open, onOpenChange, product, families, categ
           />
 
           <div className="flex gap-2">
-            <Button onClick={handleSave} disabled={loading || generatingDesc} className="flex-1 gap-2">
+            <Button onClick={() => handleSave()} disabled={loading || generatingDesc} className="flex-1 gap-2">
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               Salvar
             </Button>
