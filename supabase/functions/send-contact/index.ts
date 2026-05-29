@@ -21,16 +21,34 @@ serve(async (req) => {
       });
     }
 
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const nameStr = String(name).trim();
+    const emailStr = String(email).trim();
+    const phoneStr = phone ? String(phone).trim() : "";
+    const messageStr = String(message).trim();
+    if (
+      nameStr.length > 200 ||
+      emailStr.length > 255 ||
+      phoneStr.length > 30 ||
+      messageStr.length > 2000 ||
+      !EMAIL_RE.test(emailStr)
+    ) {
+      return new Response(JSON.stringify({ error: "Dados inválidos" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
     const requestId = crypto.randomUUID();
     const data = {
-      name: String(name),
-      email: String(email),
-      phone: phone ? String(phone) : "",
-      message: String(message),
+      name: nameStr,
+      email: emailStr,
+      phone: phoneStr,
+      message: messageStr,
     };
 
     const { error: adminError } = await supabase.functions.invoke("send-transactional-email", {
