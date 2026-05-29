@@ -77,8 +77,13 @@ serve(async (req) => {
         "User-Agent": "Mozilla/5.0 (compatible; LovableCatalogProxy/1.0)",
         Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
       },
-      redirect: "follow",
+      redirect: "manual",
     });
+
+    // Reject redirects to prevent SSRF bypass via Location header
+    if (response.status >= 300 && response.status < 400) {
+      return new Response("Redirects not allowed", { status: 403, headers: corsHeaders });
+    }
 
     if (!response.ok) {
       return new Response("Image fetch failed", { status: response.status, headers: corsHeaders });
