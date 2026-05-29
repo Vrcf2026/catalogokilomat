@@ -509,7 +509,7 @@ const Index = () => {
         <section className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-3 mb-3">
             <div className="h-px flex-1 bg-border" />
-            <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Navegue por categoria</p>
+            <h2 className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Navegue por categoria</h2>
             <div className="h-px flex-1 bg-border" />
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -518,6 +518,8 @@ const Index = () => {
               return (
                 <button
                   key={c.ref_id}
+                  type="button"
+                  aria-label={`Ver produtos da categoria ${c.label}`}
                   onClick={() => openCatalog("category", c.ref_id, c.label)}
                   className="flex flex-col items-center justify-center gap-2 p-3 bg-card border border-border rounded-xl hover:border-primary hover:shadow-sm transition-all text-center min-h-[80px]"
                 >
@@ -529,6 +531,8 @@ const Index = () => {
               );
             })}
             <button
+              type="button"
+              aria-label="Ver todos os produtos"
               onClick={() => openCatalog("all", "all", "Todos os produtos")}
               className="flex flex-col items-center justify-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-xl hover:border-primary hover:bg-primary/10 transition-all text-center min-h-[80px]"
             >
@@ -546,7 +550,7 @@ const Index = () => {
         <section className="container mx-auto px-4 py-4 pb-8">
           <div className="flex items-center gap-3 mb-3">
             <div className="h-px flex-1 bg-border" />
-            <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Produtos em Destaque</p>
+            <h2 className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Produtos em Destaque</h2>
             <div className="h-px flex-1 bg-border" />
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
