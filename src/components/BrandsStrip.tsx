@@ -89,7 +89,7 @@ const BrandsStrip = () => {
 
   return (
     <section
-      className="border-y border-border/50 bg-muted/30 py-6 overflow-hidden"
+      className="border-y border-border/50 bg-muted/30 py-4 overflow-hidden"
       aria-label="Marcas que trabalhamos"
     >
       <div className="container mx-auto px-4">
