@@ -8,7 +8,7 @@ import { getCategoryIcon, getCategoryMeta, allCategoryMeta, LayoutGrid as Layout
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { ProductFilters } from "@/components/ProductFilters";
 import { Input } from "@/components/ui/input";
-import { PRODUCT_COLUMNS } from "@/lib/fetchAllRows";
+import { PRODUCT_COLUMNS, fetchAllRows } from "@/lib/fetchAllRows";
 import kilomatLogo from "@/assets/kilomat-wordmark.png";
 import kilomatShield from "@/assets/kilomat-logo.png";
 import kilomatKIcon from "@/assets/kilomat-k-icon.png";
