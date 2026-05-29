@@ -12,6 +12,7 @@ import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { CartDrawer } from "@/components/CartDrawer";
 import kilomatLogo from "@/assets/kilomat-wordmark.png";
 import { SEO } from "@/components/SEO";
+import { Helmet } from "react-helmet-async";
 
 export default function ProdutoPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -115,9 +116,48 @@ export default function ProdutoPage() {
   const cleanDesc = String(rawDesc).replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
   const seoDesc = (cleanDesc || `${product.name}${familyName ? ` — ${familyName}` : ""}. Disponível no catálogo Kilomat. Peça orçamento online.`).slice(0, 160);
 
+  const productUrl = `https://showroom.kilomat.pt/produto/${slug}`;
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: seoDesc,
+    sku: product.sku || undefined,
+    image: allImages.length > 0 ? allImages : undefined,
+    url: productUrl,
+    ...(brandName ? { brand: { "@type": "Brand", name: brandName } } : {}),
+    ...(familyName ? { category: familyName } : {}),
+    ...(product.price != null
+      ? {
+          offers: {
+            "@type": "Offer",
+            price: Number(product.price).toFixed(2),
+            priceCurrency: "EUR",
+            availability: "https://schema.org/InStock",
+            url: productUrl,
+          },
+        }
+      : {}),
+  };
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Início", item: "https://showroom.kilomat.pt/" },
+      ...(familyName
+        ? [{ "@type": "ListItem", position: 2, name: familyName, item: "https://showroom.kilomat.pt/" }]
+        : []),
+      { "@type": "ListItem", position: familyName ? 3 : 2, name: product.name, item: productUrl },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <SEO title={seoTitle} description={seoDesc} path={`/produto/${slug}`} />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify(productJsonLd)}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>
+      </Helmet>
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto flex items-center justify-between px-3 py-2 sm:px-4 sm:py-4">
           <Link to="/">
