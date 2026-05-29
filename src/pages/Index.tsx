@@ -754,14 +754,14 @@ const Index = () => {
       </>
       )}
 
-      <footer className="border-t border-zinc-700 bg-accent text-accent-foreground py-8">
+      <footer className="border-t border-border bg-accent text-accent-foreground py-8">
         <div className="container mx-auto px-4 space-y-8">
           {/* Hero info movido do topo */}
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <p className="font-heading text-lg sm:text-xl font-semibold">
               Mais de 18 anos a equipar profissionais e particulares
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-accent-foreground/80">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-accent-foreground">
               <a href="tel:+351938283386" className="inline-flex items-center gap-2 hover:text-primary transition-colors">
                 <Phone className="h-4 w-4" /> +351 938 283 386
               </a>
@@ -780,11 +780,11 @@ const Index = () => {
           </div>
 
           {/* Como funciona */}
-          <div className="bg-transparent border-t border-zinc-700 py-4 px-2 sm:px-4">
+          <div className="bg-transparent border-t border-border py-4 px-2 sm:px-4">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-4xl mx-auto">
               <div className="text-center sm:text-left shrink-0">
-                <h3 className="text-sm font-semibold text-white leading-tight">Como funciona?</h3>
-                <p className="text-xs text-zinc-400 leading-tight">Catálogo · Selecção · Orçamento</p>
+                <h2 className="text-sm font-semibold text-accent-foreground leading-tight">Como funciona?</h2>
+                <p className="text-xs text-accent-foreground/85 leading-tight">Catálogo · Selecção · Orçamento</p>
               </div>
               <div className="flex flex-row items-center justify-center gap-2 flex-wrap sm:flex-nowrap">
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-700 bg-zinc-800/50 whitespace-nowrap">
