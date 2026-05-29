@@ -26,6 +26,7 @@ export const DarkModeToggle = ({ size = "sm" }: { size?: "sm" | "icon" }) => {
       size="icon"
       onClick={() => setDark((d) => !d)}
       title={dark ? "Modo claro" : "Modo escuro"}
+      aria-label={dark ? "Mudar para modo claro" : "Mudar para modo escuro"}
       className="h-8 w-8 sm:h-9 sm:w-9"
     >
       {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}

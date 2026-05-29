@@ -192,10 +192,10 @@ export function CatalogViewer({
           <ChevronLeft className="h-4 w-4" /> Voltar
         </button>
         <div className="flex items-center gap-2">
-          <img src={kilomatLogo} alt="Kilomat" className="h-10 w-10 object-contain" />
+          <img src={kilomatLogo} alt="Logótipo Kilomat" className="h-10 w-10 object-contain" />
           <span className="font-heading font-bold text-white/90 text-sm">{category}</span>
         </div>
-        <Button variant="ghost" size="sm" className="text-white/60 hover:text-white hover:bg-white/10 gap-1.5" onClick={toggleFullscreen}>
+        <Button variant="ghost" size="sm" className="text-white/60 hover:text-white hover:bg-white/10 gap-1.5" onClick={toggleFullscreen} aria-label={isFullscreen ? "Sair do ecrã inteiro" : "Ver em ecrã inteiro"}>
           {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
           <span className="hidden sm:inline text-xs">{isFullscreen ? "Sair" : "Ecrã inteiro"}</span>
         </Button>
