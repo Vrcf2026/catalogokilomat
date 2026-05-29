@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ShieldCheck, Loader2, Lock } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -38,6 +39,11 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <SEO
+        title="Login Administrador — Kilomat"
+        description="Área de acesso restrita para a equipa Kilomat. Apenas administradores autorizados."
+        path="/login"
+      />
       <h1 className="sr-only">Login de administrador — Kilomat</h1>
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center space-y-2">

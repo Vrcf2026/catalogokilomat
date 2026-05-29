@@ -3,6 +3,7 @@ import { useSearchParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
@@ -60,6 +61,11 @@ export default function Unsubscribe() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <SEO
+        title="Cancelar Subscrição de Emails — Kilomat"
+        description="Confirma o cancelamento da subscrição de comunicações por email da Kilomat."
+        path="/unsubscribe"
+      />
       <h1 className="sr-only">Cancelar subscrição de emails — Kilomat</h1>
       <Card className="w-full max-w-md">
         <CardHeader>

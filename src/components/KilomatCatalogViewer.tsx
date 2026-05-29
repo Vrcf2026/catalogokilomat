@@ -93,6 +93,7 @@ export function KilomatCatalogViewer({ onBack }: KilomatCatalogViewerProps) {
       onTouchStart={showBars}
     >
       {/* Top bar */}
+      <h1 className="sr-only">Catálogo Kilomat — Materiais de Construção</h1>
       <div
         className={`absolute top-0 left-0 right-0 flex items-center justify-between px-4 py-2 bg-black/50 backdrop-blur-md z-50 transition-all duration-500 ${
           barsVisible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
@@ -191,31 +192,31 @@ export function KilomatCatalogViewer({ onBack }: KilomatCatalogViewerProps) {
         onMouseLeave={() => { hideTimerRef.current = setTimeout(() => setBarsVisible(false), 1500); }}
       >
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10" onClick={() => setShowThumbnails(!showThumbnails)}>
+          <Button aria-label={showThumbnails ? "Ocultar miniaturas das páginas" : "Mostrar miniaturas das páginas"} variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10" onClick={() => setShowThumbnails(!showThumbnails)}>
             <Grid3X3 className="h-4 w-4" />
           </Button>
         </div>
 
         {/* Page navigation */}
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10" onClick={() => bookRef.current?.pageFlip().flipPrev()}>
+          <Button aria-label="Página anterior" variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10" onClick={() => bookRef.current?.pageFlip().flipPrev()}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <span className="text-white/70 text-xs font-medium min-w-[60px] text-center">
             {currentPage + 1} / {TOTAL_PAGES}
           </span>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10" onClick={() => bookRef.current?.pageFlip().flipNext()}>
+          <Button aria-label="Página seguinte" variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10" onClick={() => bookRef.current?.pageFlip().flipNext()}>
             <ChevronLeft className="h-4 w-4 rotate-180" />
           </Button>
         </div>
 
         {/* Zoom */}
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10" onClick={() => setZoom((z) => Math.max(50, z - 10))}>
+          <Button aria-label="Reduzir zoom" variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10" onClick={() => setZoom((z) => Math.max(50, z - 10))}>
             <ZoomOut className="h-4 w-4" />
           </Button>
           <span className="text-white/50 text-[10px] min-w-[32px] text-center">{zoom}%</span>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10" onClick={() => setZoom((z) => Math.min(200, z + 10))}>
+          <Button aria-label="Aumentar zoom" variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10" onClick={() => setZoom((z) => Math.min(200, z + 10))}>
             <ZoomIn className="h-4 w-4" />
           </Button>
         </div>
