@@ -22,6 +22,7 @@ import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import ContactFloatingBubble from "@/components/ContactFloatingBubble";
 import BrandsStrip from "@/components/BrandsStrip";
 import WelcomeBanner from "@/components/WelcomeBanner";
+import { SEO } from "@/components/SEO";
 
 const PAGE_SIZE_OPTIONS = [24, 48, 96];
 
@@ -360,6 +361,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Kilomat — Catálogo de Materiais de Construção | Montijo"
+        description="Catálogo Kilomat: materiais de construção, ferramentas, canalização, tintas e EPI no Montijo. Peça orçamento online."
+        path="/"
+      />
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto flex items-center gap-3 px-3 py-2 sm:px-4 sm:py-3">
           <button onClick={goHome} className="shrink-0">

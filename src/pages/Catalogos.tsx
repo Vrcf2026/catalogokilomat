@@ -8,6 +8,7 @@ import { fetchAllProductImages, fetchAllProducts } from "@/lib/fetchAllRows";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import kilomatLogo from "@/assets/kilomat-wordmark.png";
+import { SEO } from "@/components/SEO";
 
 const CATEGORY_THEMES: Record<string, { icon: string; bgImage: string }> = {
   Laptops: { icon: "💻", bgImage: "/images/bg-laptops.jpg" },
@@ -186,6 +187,11 @@ const Catalogos = () => {
     <div
       className={`h-screen flex flex-col bg-background overflow-hidden ${cursorHidden ? "cursor-none" : ""} ${isKiosk ? "select-none" : ""}`}
     >
+      <SEO
+        title="Catálogos Digitais Kilomat — Folheie Online"
+        description="Explore os catálogos digitais Kilomat: materiais de construção, ferramentas e equipamento. Navegação em formato folheto, pronta a folhear."
+        path="/catalogos"
+      />
       <header className="flex-shrink-0 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="flex items-center justify-between px-4 py-2">
           <div className="flex items-center gap-2">
