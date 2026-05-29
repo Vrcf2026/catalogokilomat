@@ -236,11 +236,11 @@ export default function ProdutoPage() {
             <div className="border-t border-border pt-4 space-y-3">
               <div className="flex items-center gap-3">
                 <div className="flex items-center border border-border rounded-md">
-                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-r-none" onClick={() => setQuantity((q) => Math.max(1, q - 1))}>
+                  <Button aria-label="Diminuir quantidade" variant="ghost" size="icon" className="h-10 w-10 rounded-r-none" onClick={() => setQuantity((q) => Math.max(1, q - 1))}>
                     <Minus className="h-4 w-4" />
                   </Button>
                   <span className="w-12 text-center font-medium">{quantity}</span>
-                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-l-none" onClick={() => setQuantity((q) => q + 1)}>
+                  <Button aria-label="Aumentar quantidade" variant="ghost" size="icon" className="h-10 w-10 rounded-l-none" onClick={() => setQuantity((q) => q + 1)}>
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>

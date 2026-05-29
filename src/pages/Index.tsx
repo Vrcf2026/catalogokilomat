@@ -394,7 +394,7 @@ const Index = () => {
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <DarkModeToggle />
-            <Button variant="outline" size="sm" className="relative gap-1 sm:gap-1.5 text-xs sm:text-sm h-9 px-2.5 sm:px-3" onClick={() => setIsOpen(true)}>
+            <Button aria-label={`Abrir pedido de orçamento${totalItems > 0 ? ` (${totalItems} ${totalItems === 1 ? "item" : "itens"})` : ""}`} variant="outline" size="sm" className="relative gap-1 sm:gap-1.5 text-xs sm:text-sm h-9 px-2.5 sm:px-3" onClick={() => setIsOpen(true)}>
               <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">Orçamento</span>
               {totalItems > 0 && (
