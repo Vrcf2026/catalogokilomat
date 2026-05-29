@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetailDialog } from "@/components/ProductDetailDialog";
 import { useState, useMemo, useEffect } from "react";
-import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin, Search, Send, Paintbrush, Zap, Wrench, FlaskConical, ShieldCheck, ShoppingBag, Layers, Lock, Disc, Anchor, Pipette, Plug, Flame, Gauge, LayoutGrid as LayoutGridIcon } from "lucide-react";
+import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin, Search, Send, LayoutGrid as LayoutGridIcon } from "lucide-react";
+import { getCategoryIcon } from "@/lib/categoryIcons";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { ProductFilters } from "@/components/ProductFilters";
 import { Input } from "@/components/ui/input";
@@ -24,24 +25,6 @@ import BrandsStrip from "@/components/BrandsStrip";
 const PAGE_SIZE_OPTIONS = [24, 48, 96];
 
 type HomeView = "home" | "catalog";
-
-const categoryIconMap: Record<string, React.ElementType> = {
-  "Tintas": Paintbrush,
-  "Ferramenta Eletrica": Zap,
-  "Ferramentas Manuais": Wrench,
-  "Discos": Disc,
-  "Fixacao": Anchor,
-  "Canalizacao": Pipette,
-  "Cimentos e Argamassas": Layers,
-  "Material Electrico": Plug,
-  "Quimicos": FlaskConical,
-  "Higiene e Proteccao": ShieldCheck,
-  "Ferragens": Lock,
-  "Drogaria": ShoppingBag,
-  "Solda": Flame,
-  "Gas": Gauge,
-};
-const getCategoryIcon = (cat: string): React.ElementType => categoryIconMap[cat] || LayoutGridIcon;
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -241,6 +224,20 @@ const Index = () => {
     },
   });
 
+  const { data: visibleCategories = [] } = useQuery({
+    queryKey: ["categories", "visible"],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("categories")
+        .select("id, name, ordem, visivel")
+        .eq("visivel", true)
+        .order("ordem", { ascending: true });
+      if (error) throw error;
+      return (data || []) as { id: string; name: string; ordem: number }[];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   const { data: brandFamilyLinks = [] } = useQuery({
     queryKey: ["brand_families"],
     queryFn: async () => {
@@ -332,110 +329,14 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
-        <div className="container mx-auto flex items-center justify-between px-3 py-2 sm:px-4 sm:py-4">
+        <div className="container mx-auto flex items-center gap-3 px-3 py-2 sm:px-4 sm:py-3">
           <button onClick={goHome} className="shrink-0">
-            <img src={kilomatLogo} alt="Kilomat Logo" className="h-10 sm:h-20 w-auto drop-shadow-md" />
+            <img src={kilomatLogo} alt="Kilomat Logo" className="h-8 sm:h-10 w-auto drop-shadow-md" />
           </button>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <DarkModeToggle />
-            <Button variant="outline" size="sm" className="relative gap-1 sm:gap-1.5 text-xs sm:text-sm h-8 sm:h-9 px-2.5 sm:px-3" onClick={() => setIsOpen(true)}>
-              <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              Orçamento
-              {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                  {totalItems}
-                </span>
-              )}
-            </Button>
-            <Link to="/login" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-              Admin
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {activeView === "home" ? (
-      <>
-      <section className="container mx-auto px-4 py-10 text-center">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-4">
-          <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-          Desde 2007 · Montijo
-        </span>
-        <h2 className="font-heading text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-          Tudo para a sua obra
-        </h2>
-        <p className="mt-3 text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
-          Mais de 18 anos a equipar profissionais e particulares — Construção, Ferramentas e Agrícola
-        </p>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
-          <a
-            href="tel:+351938283386"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-            aria-label="Telefonar para Kilomat"
-          >
-            <Phone className="h-4 w-4" />
-            <span>+351 938 283 386</span>
-          </a>
-          <a
-            href="mailto:info@kilomat.pt"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-            aria-label="Enviar email para Kilomat"
-          >
-            <Mail className="h-4 w-4" />
-            <span>info@kilomat.pt</span>
-          </a>
-          <a
-            href="https://www.google.com/maps/search/?api=1&query=Kilomat+Lda+Montijo"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-            aria-label="Ver Kilomat Lda no Google Maps"
-          >
-            <MapPin className="h-4 w-4" />
-            <span>Estrada do Pau Queimado, Montijo</span>
-          </a>
-        </div>
-      </section>
-
-      {/* Como funciona */}
-      <section className="bg-muted/40 border-y border-border py-6 px-4">
-        <div className="container mx-auto max-w-2xl">
-          <p className="text-center text-sm font-medium text-foreground mb-5">
-            Consulte o nosso catálogo, seleccione os produtos e solicite o seu orçamento
-          </p>
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Search className="h-5 w-5 text-primary" />
-              </div>
-              <p className="text-xs font-medium text-foreground">Pesquise</p>
-              <p className="text-[11px] text-muted-foreground">por produto, marca ou categoria</p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <ShoppingCart className="h-5 w-5 text-primary" />
-              </div>
-              <p className="text-xs font-medium text-foreground">Seleccione</p>
-              <p className="text-[11px] text-muted-foreground">adicione ao orçamento</p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Send className="h-5 w-5 text-primary" />
-              </div>
-              <p className="text-xs font-medium text-foreground">Receba</p>
-              <p className="text-[11px] text-muted-foreground">resposta em 24 horas</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pesquisa destacada */}
-      <section className="container mx-auto px-4 py-5">
-        <div className="max-w-lg mx-auto flex items-center gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <div className="relative flex-1 max-w-2xl mx-auto">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Pesquise por produto, referência ou marca..."
+              placeholder="Pesquisar produtos..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
@@ -445,19 +346,68 @@ const Index = () => {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }
               }}
-              className="pl-11 h-12 text-base bg-card border-border shadow-sm"
+              className="pl-9 h-9 text-sm bg-card border-border"
             />
           </div>
-          <Button
-            variant="outline"
-            onClick={() => openCatalog("all", "all", "Todos os produtos")}
-            className="h-12 px-4 shrink-0 gap-1.5"
-          >
-            <LayoutGridIcon className="h-4 w-4" />
-            <span className="hidden sm:inline">Ver tudo</span>
-          </Button>
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <DarkModeToggle />
+            <Button variant="outline" size="sm" className="relative gap-1 sm:gap-1.5 text-xs sm:text-sm h-9 px-2.5 sm:px-3" onClick={() => setIsOpen(true)}>
+              <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Orçamento</span>
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </Button>
+            <Link to="/login" className="hidden sm:inline text-xs text-muted-foreground hover:text-foreground transition-colors">
+              Admin
+            </Link>
+          </div>
         </div>
-      </section>
+      </header>
+
+      {activeView === "home" ? (
+      <>
+      {/* Barra de categorias */}
+      {visibleCategories.length > 0 && (
+        <section className="border-b border-border bg-card/40">
+          <div className="container mx-auto px-2 sm:px-4">
+            <div className="flex overflow-x-auto gap-3 py-4 px-2 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: "none" }}>
+              <button
+                onClick={() => openCatalog("all", "all", "Todos os produtos")}
+                className={`shrink-0 flex flex-col items-center justify-center gap-1.5 min-w-[80px] w-[80px] h-[80px] sm:min-w-[100px] sm:w-[100px] sm:h-[100px] rounded-xl border transition-all ${
+                  categoryFilter === "all"
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "bg-card border-border hover:border-primary hover:bg-primary/5"
+                }`}
+              >
+                <LayoutGridIcon className={`h-7 w-7 ${categoryFilter === "all" ? "text-primary" : "text-muted-foreground"}`} />
+                <span className="text-[10px] sm:text-xs font-medium text-center leading-tight line-clamp-2 px-1">Todos</span>
+              </button>
+              {visibleCategories.map((c) => {
+                const Icon = getCategoryIcon(c.name);
+                const active = categoryFilter === c.name;
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => openCatalog("category", c.name, c.name)}
+                    className={`shrink-0 flex flex-col items-center justify-center gap-1.5 min-w-[80px] w-[80px] h-[80px] sm:min-w-[100px] sm:w-[100px] sm:h-[100px] rounded-xl border transition-all ${
+                      active
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "bg-card border-border hover:border-primary hover:bg-primary/5"
+                    }`}
+                    title={c.name}
+                  >
+                    <Icon className={`h-7 w-7 ${active ? "text-primary" : "text-muted-foreground"}`} />
+                    <span className="text-[10px] sm:text-xs font-medium text-center leading-tight line-clamp-2 px-1">{c.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       <BrandsStrip />
 
@@ -693,7 +643,52 @@ const Index = () => {
       )}
 
       <footer className="border-t border-border bg-accent text-accent-foreground py-8">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 space-y-8">
+          {/* Hero info movido do topo */}
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <p className="font-heading text-lg sm:text-xl font-semibold">
+              Mais de 18 anos a equipar profissionais e particulares
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-accent-foreground/80">
+              <a href="tel:+351938283386" className="inline-flex items-center gap-2 hover:text-primary transition-colors">
+                <Phone className="h-4 w-4" /> +351 938 283 386
+              </a>
+              <a href="mailto:info@kilomat.pt" className="inline-flex items-center gap-2 hover:text-primary transition-colors">
+                <Mail className="h-4 w-4" /> info@kilomat.pt
+              </a>
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Kilomat+Lda+Montijo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 hover:text-primary transition-colors"
+              >
+                <MapPin className="h-4 w-4" /> Estrada do Pau Queimado, Montijo
+              </a>
+            </div>
+          </div>
+
+          {/* Como funciona */}
+          <div className="grid grid-cols-3 gap-3 max-w-2xl mx-auto text-center">
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center">
+                <Search className="h-4 w-4 text-primary" />
+              </div>
+              <p className="text-xs font-medium">Pesquise</p>
+            </div>
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center">
+                <ShoppingCart className="h-4 w-4 text-primary" />
+              </div>
+              <p className="text-xs font-medium">Seleccione</p>
+            </div>
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center">
+                <Send className="h-4 w-4 text-primary" />
+              </div>
+              <p className="text-xs font-medium">Receba</p>
+            </div>
+          </div>
+
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
               <img src={kilomatKIcon} alt="Kilomat" className="h-12 w-auto" />
