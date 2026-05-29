@@ -108,7 +108,7 @@ const Index = () => {
   };
 
   const { data: productsResult, isLoading } = useQuery({
-    queryKey: ["products", "public-paginated", { debouncedSearch, categoryFilter, familyFilter, brandFilter, currentPage, pageSize }],
+    queryKey: ["products", "public-paginated", { debouncedSearch, categoryFilter, familyFilter, brandFilter, currentPage, pageSize, sortBy }],
     queryFn: async () => {
       const client = supabase as any;
       const buildFilters = (q: any) => {
@@ -126,10 +126,23 @@ const Index = () => {
       const total = count ?? 0;
       const from = (currentPage - 1) * pageSize;
       const to = from + pageSize - 1;
-      const { data, error } = await buildFilters(client.from("products").select(PRODUCT_COLUMNS))
-        .order("featured", { ascending: false })
-        .order("created_at", { ascending: false })
-        .range(from, to);
+      const baseQuery = buildFilters(client.from("products").select(PRODUCT_COLUMNS));
+      const sortedQuery = (() => {
+        switch (sortBy) {
+          case "name_asc":
+            return baseQuery.order("name", { ascending: true });
+          case "name_desc":
+            return baseQuery.order("name", { ascending: false });
+          case "newest":
+            return baseQuery.order("created_at", { ascending: false });
+          case "featured":
+          default:
+            return baseQuery
+              .order("featured", { ascending: false })
+              .order("created_at", { ascending: false });
+        }
+      })();
+      const { data, error } = await sortedQuery.range(from, to);
       if (error) throw error;
       return { items: (data || []) as any[], total };
     },
