@@ -373,11 +373,7 @@ const Index = () => {
       {activeView === "home" ? (
       <>
       {/* Título da loja */}
-      <div className="container mx-auto px-4 pt-4 pb-1">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-2 rounded-full border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/30 text-xs font-medium text-red-700 dark:text-red-400">
-          <Star className="h-3 w-3 fill-current" />
-          Desde 2007 · Montijo
-        </div>
+      <div className="container mx-auto px-4 pt-4 pb-1 text-center">
         <h1 className="text-lg sm:text-xl font-bold text-foreground">
           Materiais de Construção, Ferramentas e Agrícola
         </h1>
@@ -670,7 +666,7 @@ const Index = () => {
       </>
       )}
 
-      <footer className="border-t border-border bg-accent text-accent-foreground py-8">
+      <footer className="border-t border-zinc-700 bg-accent text-accent-foreground py-8">
         <div className="container mx-auto px-4 space-y-8">
           {/* Hero info movido do topo */}
           <div className="text-center max-w-3xl mx-auto space-y-3">
@@ -696,10 +692,10 @@ const Index = () => {
           </div>
 
           {/* Como funciona */}
-          <div className="-mx-4 sm:mx-0 bg-white dark:bg-zinc-900 border-t border-b sm:border sm:rounded-2xl border-border py-8 px-4 sm:px-6">
+          <div className="bg-transparent border-t border-zinc-700 py-8 px-4 sm:px-6">
             <div className="max-w-3xl mx-auto text-center space-y-1 mb-6">
-              <h3 className="text-base font-semibold text-foreground">Como funciona?</h3>
-              <p className="text-sm text-muted-foreground">
+              <h3 className="text-base font-semibold text-white">Como funciona?</h3>
+              <p className="text-sm text-zinc-400">
                 Consulte o nosso catálogo, seleccione os produtos e solicite o seu orçamento
               </p>
             </div>
@@ -712,17 +708,17 @@ const Index = () => {
                 const Icon = step.icon;
                 return (
                   <div key={step.title} className="flex items-center gap-2 flex-1">
-                    <div className="flex items-center gap-3 flex-1 px-3 py-3 rounded-xl bg-red-50/60 dark:bg-red-950/20 border border-red-100 dark:border-red-900/40">
-                      <div className="shrink-0 h-8 w-8 rounded-full bg-red-100 dark:bg-red-950/50 flex items-center justify-center">
-                        <Icon className="h-4 w-4 text-red-600 dark:text-red-400" />
+                    <div className="flex items-center gap-3 flex-1 px-3 py-3 rounded-xl border border-zinc-700 bg-zinc-800/50">
+                      <div className="shrink-0 h-7 w-7 rounded-full bg-red-600/90 flex items-center justify-center">
+                        <Icon className="h-3.5 w-3.5 text-white" />
                       </div>
                       <div className="text-left">
-                        <p className="text-sm font-semibold text-foreground leading-tight">{step.title}</p>
-                        <p className="text-xs text-muted-foreground leading-tight">{step.desc}</p>
+                        <p className="text-sm font-semibold text-white leading-tight">{step.title}</p>
+                        <p className="text-xs text-zinc-400 leading-tight">{step.desc}</p>
                       </div>
                     </div>
                     {idx < arr.length - 1 && (
-                      <ChevronRight className="hidden sm:block h-5 w-5 text-muted-foreground/60 shrink-0" />
+                      <ChevronRight className="hidden sm:block h-5 w-5 text-zinc-500 shrink-0" />
                     )}
                   </div>
                 );
@@ -734,7 +730,7 @@ const Index = () => {
             <div className="flex items-center gap-3">
               <img src={kilomatKIcon} alt="Kilomat" className="h-12 w-auto" />
               <div>
-                <p className="font-heading font-bold text-sm">Kilomat — Materiais de Construção</p>
+                <p className="font-heading font-bold text-sm">Kilomat — Materiais de Construção · Desde 2007 · Montijo</p>
                 <p className="text-xs text-accent-foreground/70">Materiais de construção, ferramentas, canalização e tintas</p>
                 <p className="text-xs text-accent-foreground/70 mt-1">
                   <a href="tel:+351938283386" className="hover:text-primary transition-colors">+351 938 283 386</a>
