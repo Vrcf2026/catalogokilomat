@@ -11,6 +11,7 @@ import { PRODUCT_COLUMNS } from "@/lib/fetchAllRows";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { CartDrawer } from "@/components/CartDrawer";
 import kilomatLogo from "@/assets/kilomat-wordmark.png";
+import { SEO } from "@/components/SEO";
 
 export default function ProdutoPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -109,8 +110,14 @@ export default function ProdutoPage() {
   const familyName = product.product_families?.name as string | undefined;
   const waText = encodeURIComponent(`Olá Kilomat, quero informação sobre: ${product.name} (Ref: ${product.sku || slug})`);
 
+  const seoTitle = `${product.name}${brandName ? ` — ${brandName}` : ""} | Kilomat`.slice(0, 60);
+  const rawDesc = (product as any).description || (product as any).short_description || "";
+  const cleanDesc = String(rawDesc).replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+  const seoDesc = (cleanDesc || `${product.name}${familyName ? ` — ${familyName}` : ""}. Disponível no catálogo Kilomat. Peça orçamento online.`).slice(0, 160);
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO title={seoTitle} description={seoDesc} path={`/produto/${slug}`} />
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto flex items-center justify-between px-3 py-2 sm:px-4 sm:py-4">
           <Link to="/">
