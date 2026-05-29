@@ -368,7 +368,7 @@ const Index = () => {
       />
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto flex items-center gap-3 px-3 py-2 sm:px-4 sm:py-3">
-          <button onClick={goHome} className="shrink-0">
+          <button onClick={goHome} aria-label="Ir para o início — Kilomat" className="shrink-0">
             <img src={kilomatLogo} alt="Kilomat Logo" className="h-8 sm:h-10 w-auto drop-shadow-md" />
           </button>
           <div className="relative flex-1 max-w-2xl mx-auto">

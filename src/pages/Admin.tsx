@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { PRODUCT_COLUMNS } from "@/lib/fetchAllRows";
+import { SEO } from "@/components/SEO";
 
 const Admin = () => {
   const [search, setSearch] = useState("");
@@ -217,6 +218,11 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Painel de Administração — Kilomat"
+        description="Gestão interna de produtos, catálogos e marcas Kilomat. Acesso restrito a administradores."
+        path="/admin"
+      />
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <div className="flex items-center gap-3">
