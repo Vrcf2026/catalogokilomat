@@ -273,6 +273,20 @@ const Index = () => {
     },
   });
 
+  // Full association index derived from real products — used to keep
+  // Category / Family / Brand filters fully interdependent.
+  const { data: productAssoc = [] } = useQuery({
+    queryKey: ["products", "filter_assoc_index"],
+    queryFn: async () =>
+      fetchAllRows<{ category: string | null; family_id: string | null; brand_id: string | null }>({
+        table: "products",
+        select: "category,family_id,brand_id",
+        orderBy: "id",
+        ascending: true,
+      }),
+    staleTime: 5 * 60 * 1000,
+  });
+
   const { data: hasPricesGlobal = false } = useQuery({
     queryKey: ["products", "has_prices"],
     queryFn: async () => {
