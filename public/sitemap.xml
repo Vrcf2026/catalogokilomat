@@ -1,8 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Este sitemap é gerado dinamicamente -->
-<!-- Aceder a: https://cyuvtugxjfblpgabhfvb.supabase.co/functions/v1/sitemap -->
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <sitemap>
-    <loc>https://cyuvtugxjfblpgabhfvb.supabase.co/functions/v1/sitemap</loc>
-  </sitemap>
-</sitemapindex>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://showroom.kilomat.pt/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://showroom.kilomat.pt/catalogos</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://showroom.kilomat.pt/termos-condicoes</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://showroom.kilomat.pt/politica-privacidade</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://showroom.kilomat.pt/politica-cookies</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>
