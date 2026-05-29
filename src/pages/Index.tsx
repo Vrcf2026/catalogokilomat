@@ -336,12 +336,17 @@ const Index = () => {
           <div className="relative flex-1 max-w-2xl mx-auto">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Pesquisar produtos..."
+              placeholder="Pesquisar em todo o catálogo..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && search.trim().length > 0) {
-                  setCatalogTitle("Resultados");
+                  // Pesquisa global: limpa filtros activos
+                  setCategoryFilter("all");
+                  setFamilyFilter("all");
+                  updateBrandFilter("all");
+                  setCurrentPage(1);
+                  setCatalogTitle(`Resultados para "${search.trim()}"`);
                   setActiveView("catalog");
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }
@@ -360,9 +365,6 @@ const Index = () => {
                 </span>
               )}
             </Button>
-            <Link to="/login" className="hidden sm:inline text-xs text-muted-foreground hover:text-foreground transition-colors">
-              Admin
-            </Link>
           </div>
         </div>
       </header>
