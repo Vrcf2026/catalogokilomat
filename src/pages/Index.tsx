@@ -266,6 +266,19 @@ const Index = () => {
     },
   });
 
+  const { data: hasPricesGlobal = false } = useQuery({
+    queryKey: ["products", "has_prices"],
+    queryFn: async () => {
+      const { count, error } = await (supabase as any)
+        .from("products")
+        .select("id", { count: "exact", head: true })
+        .gt("price", 0);
+      if (error) throw error;
+      return (count ?? 0) > 0;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   const visibleIds = useMemo(() => products.map((p) => p.id), [products]);
   const { data: productImages = [] } = useQuery({
     queryKey: ["product_images", "page", visibleIds],
