@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetailDialog } from "@/components/ProductDetailDialog";
 import { useState, useMemo, useEffect } from "react";
-import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin, Search, Send, Paintbrush, Zap, Wrench, FlaskConical, ShieldCheck, ShoppingBag, Layers, Lock, Disc, Anchor, Pipette, Plug, Flame, Gauge, LayoutGrid as LayoutGridIcon } from "lucide-react";
+import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin, Search, Send, LayoutGrid as LayoutGridIcon } from "lucide-react";
+import { getCategoryIcon } from "@/lib/categoryIcons";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { ProductFilters } from "@/components/ProductFilters";
 import { Input } from "@/components/ui/input";
@@ -24,24 +25,6 @@ import BrandsStrip from "@/components/BrandsStrip";
 const PAGE_SIZE_OPTIONS = [24, 48, 96];
 
 type HomeView = "home" | "catalog";
-
-const categoryIconMap: Record<string, React.ElementType> = {
-  "Tintas": Paintbrush,
-  "Ferramenta Eletrica": Zap,
-  "Ferramentas Manuais": Wrench,
-  "Discos": Disc,
-  "Fixacao": Anchor,
-  "Canalizacao": Pipette,
-  "Cimentos e Argamassas": Layers,
-  "Material Electrico": Plug,
-  "Quimicos": FlaskConical,
-  "Higiene e Proteccao": ShieldCheck,
-  "Ferragens": Lock,
-  "Drogaria": ShoppingBag,
-  "Solda": Flame,
-  "Gas": Gauge,
-};
-const getCategoryIcon = (cat: string): React.ElementType => categoryIconMap[cat] || LayoutGridIcon;
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
