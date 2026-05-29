@@ -29,6 +29,7 @@ interface ProductFiltersProps {
   categories: string[];
   visibleFamilies: Family[];
   visibleBrands: Brand[];
+  hasPrices?: boolean;
 }
 
 export const ProductFilters = ({
@@ -45,6 +46,7 @@ export const ProductFilters = ({
   categories,
   visibleFamilies,
   visibleBrands,
+  hasPrices = true,
 }: ProductFiltersProps) => {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -117,8 +119,8 @@ export const ProductFilters = ({
           <SelectItem value="newest">Mais recentes</SelectItem>
           <SelectItem value="name_asc">Nome (A-Z)</SelectItem>
           <SelectItem value="name_desc">Nome (Z-A)</SelectItem>
-          <SelectItem value="price_asc">Preço (menor)</SelectItem>
-          <SelectItem value="price_desc">Preço (maior)</SelectItem>
+          {hasPrices && <SelectItem value="price_asc">Preço (menor)</SelectItem>}
+          {hasPrices && <SelectItem value="price_desc">Preço (maior)</SelectItem>}
         </SelectContent>
       </Select>
     </div>
