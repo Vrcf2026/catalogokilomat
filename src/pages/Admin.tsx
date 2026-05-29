@@ -75,7 +75,8 @@ const Admin = () => {
         if (debouncedSearch.trim()) q = q.ilike("name", `%${debouncedSearch.trim()}%`);
         if (categoryFilter !== "all") q = q.eq("category", categoryFilter);
         if (familyFilter !== "all") q = q.eq("family_id", familyFilter);
-        if (brandFilter !== "all") q = q.eq("brand_id", brandFilter);
+        if (brandFilter === "none") q = q.is("brand_id", null);
+        else if (brandFilter !== "all") q = q.eq("brand_id", brandFilter);
         return q;
       };
       const countQuery = buildFilters(client.from("products").select("id", { count: "exact", head: true }));
@@ -355,6 +356,7 @@ const Admin = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Marcas</SelectItem>
+                <SelectItem value="none">Sem marca</SelectItem>
                 {[...visibleBrands].sort((a, b) => a.name.localeCompare(b.name, "pt", { sensitivity: "base" })).map((b) => (
                   <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
                 ))}
@@ -461,7 +463,21 @@ const Admin = () => {
             <Button variant="outline" size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
               <ChevronLeft className="h-4 w-4" /> Anterior
             </Button>
-            <span className="text-sm px-2">Página {page} de {totalPages}</span>
+            <div className="flex items-center gap-1.5 text-sm px-2">
+              <span>Página</span>
+              <Input
+                type="number"
+                min={1}
+                max={totalPages}
+                value={page}
+                onChange={(e) => {
+                  const v = Number(e.target.value);
+                  if (!Number.isNaN(v)) setPage(Math.min(totalPages, Math.max(1, v)));
+                }}
+                className="h-8 w-16 text-center"
+              />
+              <span>de {totalPages}</span>
+            </div>
             <Button variant="outline" size="sm" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages}>
               Próximo <ChevronRight className="h-4 w-4" />
             </Button>
