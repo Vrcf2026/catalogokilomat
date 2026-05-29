@@ -2,10 +2,16 @@ import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import kilomatLogo from "@/assets/kilomat-wordmark.png";
+import { SEO } from "@/components/SEO";
 
 const PoliticaCookies = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Política de Cookies — Kilomat"
+        description="Saiba que cookies utiliza o site Kilomat, com que finalidade e como pode gerir ou recusar o seu consentimento a qualquer momento."
+        path="/politica-de-cookies"
+      />
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <div className="flex items-center gap-3">

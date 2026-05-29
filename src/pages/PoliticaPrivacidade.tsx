@@ -2,10 +2,16 @@ import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import kilomatLogo from "@/assets/kilomat-wordmark.png";
+import { SEO } from "@/components/SEO";
 
 const PoliticaPrivacidade = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Política de Privacidade — Kilomat"
+        description="Política de privacidade da Kilomat: que dados recolhemos no pedido de orçamento, como os tratamos e quais os seus direitos enquanto titular."
+        path="/politica-de-privacidade"
+      />
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <div className="flex items-center gap-3">

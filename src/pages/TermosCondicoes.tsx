@@ -2,10 +2,16 @@ import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import kilomatLogo from "@/assets/kilomat-wordmark.png";
+import { SEO } from "@/components/SEO";
 
 const TermosCondicoes = () => {
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Termos e Condições — Kilomat"
+        description="Termos e condições de utilização do catálogo digital Kilomat: regras de uso, pedidos de orçamento e responsabilidades das partes."
+        path="/termos-e-condicoes"
+      />
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto flex items-center justify-between px-4 py-4">
           <div className="flex items-center gap-3">
