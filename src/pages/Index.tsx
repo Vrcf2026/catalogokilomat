@@ -354,38 +354,37 @@ const Index = () => {
     resetDependents?.();
   };
 
-  const categories = [...new Set(families.map((f) => f.category).filter(Boolean))];
-  // Family ↔ Brand explicit associations (union with derived-from-products for backwards compat)
-  const explicitFamiliesByBrand = brandFamilyLinks.reduce<Record<string, Set<string>>>((acc, l: any) => {
-    if (!acc[l.brand_id]) acc[l.brand_id] = new Set();
-    acc[l.brand_id].add(l.family_id);
-    return acc;
-  }, {});
-  const explicitBrandsByFamily = brandFamilyLinks.reduce<Record<string, Set<string>>>((acc, l: any) => {
-    if (!acc[l.family_id]) acc[l.family_id] = new Set();
-    acc[l.family_id].add(l.brand_id);
-    return acc;
-  }, {});
-
-  const visibleFamilies = families.filter((f) => {
-    if (categoryFilter !== "all" && f.category !== categoryFilter) return false;
-    if (brandFilter === "all") return true;
-    return explicitFamiliesByBrand[brandFilter]?.has(f.id) ?? false;
-  });
-  const visibleBrands = brands.filter((b) => {
-    if (familyFilter !== "all") {
-      return explicitBrandsByFamily[familyFilter]?.has(b.id) ?? false;
-    }
-    if (categoryFilter !== "all") {
-      const linkedFamilyIds = explicitFamiliesByBrand[b.id];
-      if (!linkedFamilyIds || linkedFamilyIds.size === 0) return false;
-      return [...linkedFamilyIds].some((fid) => {
-        const fam = families.find((f) => f.id === fid);
-        return fam?.category === categoryFilter;
-      });
-    }
+  // Fully interdependent filters derived from real product associations.
+  // A value is "visible" in a filter if at least one product matches the
+  // currently selected values of the OTHER filters.
+  const matchesAssoc = (row: any, opts: { skipCategory?: boolean; skipFamily?: boolean; skipBrand?: boolean }) => {
+    if (!opts.skipCategory && categoryFilter !== "all" && row.category !== categoryFilter) return false;
+    if (!opts.skipFamily && familyFilter !== "all" && row.family_id !== familyFilter) return false;
+    if (!opts.skipBrand && brandFilter !== "all" && row.brand_id !== brandFilter) return false;
     return true;
-  });
+  };
+
+  const allCategoriesFromFamilies = [...new Set(families.map((f) => f.category).filter(Boolean))];
+  const visibleCategorySet = new Set(
+    productAssoc.filter((r) => matchesAssoc(r, { skipCategory: true })).map((r) => r.category).filter(Boolean) as string[]
+  );
+  const categories = allCategoriesFromFamilies.filter((c) =>
+    categoryFilter !== "all" && c === categoryFilter ? true : visibleCategorySet.has(c as string)
+  );
+
+  const visibleFamilyIdSet = new Set(
+    productAssoc.filter((r) => matchesAssoc(r, { skipFamily: true })).map((r) => r.family_id).filter(Boolean) as string[]
+  );
+  const visibleFamilies = families.filter((f) =>
+    familyFilter !== "all" && f.id === familyFilter ? true : visibleFamilyIdSet.has(f.id)
+  );
+
+  const visibleBrandIdSet = new Set(
+    productAssoc.filter((r) => matchesAssoc(r, { skipBrand: true })).map((r) => r.brand_id).filter(Boolean) as string[]
+  );
+  const visibleBrands = brands.filter((b) =>
+    brandFilter !== "all" && b.id === brandFilter ? true : visibleBrandIdSet.has(b.id)
+  );
 
   return (
     <div className="min-h-screen bg-background">
