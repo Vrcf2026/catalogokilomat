@@ -730,8 +730,14 @@ const Index = () => {
             <div className="flex items-center gap-3">
               <img src={kilomatKIcon} alt="Kilomat" className="h-12 w-auto" />
               <div>
-                <p className="font-heading font-bold text-sm">Kilomat — Materiais de Construção · Desde 2007 · Montijo</p>
-                <p className="text-xs text-accent-foreground/70">Materiais de construção, ferramentas, canalização e tintas</p>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <p className="font-heading font-bold text-sm">Kilomat — Materiais de Construção</p>
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-red-400/40 bg-red-500/10 text-[11px] font-medium text-red-300">
+                    <Star className="h-3 w-3 fill-current" />
+                    Desde 2007 · Montijo
+                  </span>
+                </div>
+                <p className="text-xs text-accent-foreground/70 mt-1">Materiais de construção, ferramentas, canalização e tintas</p>
                 <p className="text-xs text-accent-foreground/70 mt-1">
                   <a href="tel:+351938283386" className="hover:text-primary transition-colors">+351 938 283 386</a>
                   {" · "}
