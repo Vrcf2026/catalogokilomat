@@ -787,32 +787,32 @@ const Index = () => {
                 <p className="text-xs text-accent-foreground/85 leading-tight">Catálogo · Selecção · Orçamento</p>
               </div>
               <div className="flex flex-row items-center justify-center gap-2 flex-wrap sm:flex-nowrap">
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-700 bg-zinc-800/50 whitespace-nowrap">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background/20 whitespace-nowrap">
                   <div className="h-7 w-7 rounded-full bg-red-600/20 flex items-center justify-center shrink-0">
                     <Search className="h-3.5 w-3.5 text-red-500" />
                   </div>
-                  <span className="text-sm text-white font-medium">Pesquise</span>
-                  <span className="text-xs text-zinc-400 hidden sm:inline">— por produto, marca ou categoria</span>
+                  <span className="text-sm text-accent-foreground font-medium">Pesquise</span>
+                  <span className="text-xs text-accent-foreground/85 hidden sm:inline">— por produto, marca ou categoria</span>
                 </div>
 
-                <ChevronRight className="h-4 w-4 text-zinc-500 shrink-0 hidden sm:block" />
+                <ChevronRight className="h-4 w-4 text-accent-foreground/70 shrink-0 hidden sm:block" />
 
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-700 bg-zinc-800/50 whitespace-nowrap">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background/20 whitespace-nowrap">
                   <div className="h-7 w-7 rounded-full bg-red-600/20 flex items-center justify-center shrink-0">
                     <ShoppingCart className="h-3.5 w-3.5 text-red-500" />
                   </div>
-                  <span className="text-sm text-white font-medium">Seleccione</span>
-                  <span className="text-xs text-zinc-400 hidden sm:inline">— adicione ao orçamento</span>
+                  <span className="text-sm text-accent-foreground font-medium">Seleccione</span>
+                  <span className="text-xs text-accent-foreground/85 hidden sm:inline">— adicione ao orçamento</span>
                 </div>
 
-                <ChevronRight className="h-4 w-4 text-zinc-500 shrink-0 hidden sm:block" />
+                <ChevronRight className="h-4 w-4 text-accent-foreground/70 shrink-0 hidden sm:block" />
 
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-700 bg-zinc-800/50 whitespace-nowrap">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background/20 whitespace-nowrap">
                   <div className="h-7 w-7 rounded-full bg-red-600/20 flex items-center justify-center shrink-0">
                     <Send className="h-3.5 w-3.5 text-red-500" />
                   </div>
-                  <span className="text-sm text-white font-medium">Receba</span>
-                  <span className="text-xs text-zinc-400 hidden sm:inline">— resposta em 24 horas</span>
+                  <span className="text-sm text-accent-foreground font-medium">Receba</span>
+                  <span className="text-xs text-accent-foreground/85 hidden sm:inline">— resposta em 24 horas</span>
                 </div>
               </div>
             </div>
