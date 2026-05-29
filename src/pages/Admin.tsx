@@ -356,6 +356,7 @@ const Admin = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Marcas</SelectItem>
+                <SelectItem value="none">Sem marca</SelectItem>
                 {[...visibleBrands].sort((a, b) => a.name.localeCompare(b.name, "pt", { sensitivity: "base" })).map((b) => (
                   <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
                 ))}
