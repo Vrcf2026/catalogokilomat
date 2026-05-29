@@ -7,10 +7,16 @@ const corsHeaders = {
 
 const SUPER_ADMIN_EMAIL = "vrcf.loja@gmail.com";
 
-const ADMINS_TO_CREATE = [
-  { email: "vrcf.infseg@outlook.pt", password: "vrcf2025" },
-  { email: "vrcf@outlook.pt", password: "vrcf2025" },
-];
+const ADMIN_EMAILS = ["vrcf.infseg@outlook.pt", "vrcf@outlook.pt"];
+
+function generateSecurePassword(length = 24): string {
+  const charset = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*";
+  const bytes = new Uint8Array(length);
+  crypto.getRandomValues(bytes);
+  let out = "";
+  for (let i = 0; i < length; i++) out += charset[bytes[i] % charset.length];
+  return out;
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -46,7 +52,22 @@ Deno.serve(async (req) => {
     const admin = createClient(supabaseUrl, serviceKey);
     const results: Array<Record<string, unknown>> = [];
 
-    for (const a of ADMINS_TO_CREATE) {
+    // Optional caller-provided password mapping: { passwords: { "email@x": "..." } }
+    let providedPasswords: Record<string, string> = {};
+    try {
+      if (req.method === "POST") {
+        const body = await req.json().catch(() => ({}));
+        if (body && typeof body.passwords === "object" && body.passwords) {
+          providedPasswords = body.passwords;
+        }
+      }
+    } catch { /* ignore */ }
+
+    for (const email of ADMIN_EMAILS) {
+      const password = providedPasswords[email] && String(providedPasswords[email]).length >= 12
+        ? String(providedPasswords[email])
+        : generateSecurePassword();
+      const a = { email, password };
       try {
         const { data: created, error: createErr } = await admin.auth.admin.createUser({
           email: a.email,
@@ -67,7 +88,9 @@ Deno.serve(async (req) => {
           userId = existing.id;
           results.push({ email: a.email, status: "already_existed", userId });
         } else {
-          results.push({ email: a.email, status: "created", userId });
+          // Return generated password ONLY to the calling super-admin, on initial creation,
+          // so they can communicate it securely to the new admin who must change it on first login.
+          results.push({ email: a.email, status: "created", userId, temporaryPassword: a.password });
         }
 
         if (userId) {
