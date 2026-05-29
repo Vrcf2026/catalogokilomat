@@ -130,9 +130,9 @@ const Index = () => {
       const sortedQuery = (() => {
         switch (sortBy) {
           case "name_asc":
-            return baseQuery.order("name", { ascending: true });
+            return baseQuery.order("name", { ascending: true }).order("id", { ascending: true });
           case "name_desc":
-            return baseQuery.order("name", { ascending: false });
+            return baseQuery.order("name", { ascending: false }).order("id", { ascending: true });
           case "price_asc":
             return baseQuery.order("price", { ascending: true, nullsFirst: false });
           case "price_desc":
