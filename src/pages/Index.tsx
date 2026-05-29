@@ -692,14 +692,13 @@ const Index = () => {
           </div>
 
           {/* Como funciona */}
-          <div className="bg-transparent border-t border-zinc-700 py-8 px-4 sm:px-6">
-            <div className="max-w-3xl mx-auto text-center space-y-1 mb-6">
-              <h3 className="text-base font-semibold text-white">Como funciona?</h3>
-              <p className="text-sm text-zinc-400">
-                Consulte o nosso catálogo, seleccione os produtos e solicite o seu orçamento
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-2 max-w-3xl mx-auto">
+          <div className="bg-transparent border-t border-zinc-700 py-4 px-2 sm:px-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-4xl mx-auto">
+              <div className="text-center sm:text-left shrink-0">
+                <h3 className="text-sm font-semibold text-white leading-tight">Como funciona?</h3>
+                <p className="text-xs text-zinc-400 leading-tight">Catálogo · Selecção · Orçamento</p>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-1.5">
               {[
                 { icon: Search, title: "Pesquise", desc: "por produto, marca ou categoria" },
                 { icon: ShoppingCart, title: "Seleccione", desc: "adicione ao orçamento" },
@@ -707,22 +706,23 @@ const Index = () => {
               ].map((step, idx, arr) => {
                 const Icon = step.icon;
                 return (
-                  <div key={step.title} className="flex items-center gap-2 flex-1">
-                    <div className="flex items-center gap-3 flex-1 px-3 py-3 rounded-xl border border-zinc-700 bg-zinc-800/50">
-                      <div className="shrink-0 h-7 w-7 rounded-full bg-red-600/90 flex items-center justify-center">
-                        <Icon className="h-3.5 w-3.5 text-white" />
+                  <div key={step.title} className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/50">
+                      <div className="shrink-0 h-5 w-5 rounded-full bg-red-600/90 flex items-center justify-center">
+                        <Icon className="h-3 w-3 text-white" />
                       </div>
-                      <div className="text-left">
-                        <p className="text-sm font-semibold text-white leading-tight">{step.title}</p>
-                        <p className="text-xs text-zinc-400 leading-tight">{step.desc}</p>
-                      </div>
+                      <p className="text-xs font-medium text-white leading-none">
+                        <span className="font-semibold">{step.title}</span>
+                        <span className="text-zinc-400 font-normal"> — {step.desc}</span>
+                      </p>
                     </div>
                     {idx < arr.length - 1 && (
-                      <ChevronRight className="hidden sm:block h-5 w-5 text-zinc-500 shrink-0" />
+                      <ChevronRight className="h-4 w-4 text-zinc-500 shrink-0" />
                     )}
                   </div>
                 );
               })}
+              </div>
             </div>
           </div>
 
