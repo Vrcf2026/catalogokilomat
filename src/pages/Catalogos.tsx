@@ -195,9 +195,9 @@ const Catalogos = () => {
       <header className="flex-shrink-0 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="flex items-center justify-between px-4 py-2">
           <div className="flex items-center gap-2">
-            <img src={kilomatLogo} alt="Kilomat" className="h-20 w-auto object-contain drop-shadow-md" />
+            <img src={kilomatLogo} alt="Logo Kilomat — Materiais de Construção" className="h-20 w-auto object-contain drop-shadow-md" />
             <div>
-              <h1 className="font-heading text-xl font-bold text-foreground leading-tight">Kilomat</h1>
+              <h1 className="font-heading text-xl font-bold text-foreground leading-tight">Kilomat — Catálogos de Produtos</h1>
               <p className="text-[10px] font-medium text-muted-foreground tracking-wider uppercase">Materiais de Construção</p>
             </div>
           </div>
@@ -242,7 +242,7 @@ const Catalogos = () => {
                   onClick={() => setSelectedCategory(category)}
                   className="group relative rounded-xl overflow-hidden border border-border hover:ring-2 hover:ring-primary/40 transition-all"
                 >
-                  <img src={bgImage} alt={category} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                  <img src={bgImage} alt={`Catálogo de ${category}`} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10 group-hover:from-black/80 transition-all" />
                   <div className="relative z-10 h-full flex flex-col items-center justify-center p-4">
                     <span className="text-3xl md:text-4xl mb-2 drop-shadow-lg">{icon}</span>
@@ -275,7 +275,7 @@ const Catalogos = () => {
                   <div className="relative z-10 h-full flex flex-col items-center justify-center p-4">
                     {brand.logo_url ? (
                       <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center p-2 mb-2 shadow-lg">
-                        <img src={brand.logo_url} alt={brand.name} className="max-w-full max-h-full object-contain" />
+                        <img src={brand.logo_url} alt={`Logo da marca ${brand.name}`} className="max-w-full max-h-full object-contain" />
                       </div>
                     ) : (
                       <span className="text-3xl md:text-4xl mb-2">🏷️</span>
