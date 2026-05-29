@@ -57,6 +57,12 @@ const Index = () => {
         document.querySelector("[data-results-anchor]")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
     }
+    if (urlBrand !== "all") {
+      setCategoryFilter("all");
+      setFamilyFilter("all");
+      setActiveView("catalog");
+      setCatalogTitle("Marca");
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
