@@ -362,6 +362,14 @@ const Index = () => {
     if (familyFilter !== "all") {
       return explicitBrandsByFamily[familyFilter]?.has(b.id) ?? false;
     }
+    if (categoryFilter !== "all") {
+      const linkedFamilyIds = explicitFamiliesByBrand[b.id];
+      if (!linkedFamilyIds || linkedFamilyIds.size === 0) return false;
+      return [...linkedFamilyIds].some((fid) => {
+        const fam = families.find((f) => f.id === fid);
+        return fam?.category === categoryFilter;
+      });
+    }
     return true;
   });
 
