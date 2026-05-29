@@ -30,6 +30,7 @@ type HomeView = "home" | "catalog";
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState("");
+  const categoriesScrollRef = useRef<HTMLDivElement>(null);
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [familyFilter, setFamilyFilter] = useState("all");
