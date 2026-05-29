@@ -224,6 +224,20 @@ const Index = () => {
     },
   });
 
+  const { data: visibleCategories = [] } = useQuery({
+    queryKey: ["categories", "visible"],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("categories")
+        .select("id, name, ordem, visivel")
+        .eq("visivel", true)
+        .order("ordem", { ascending: true });
+      if (error) throw error;
+      return (data || []) as { id: string; name: string; ordem: number }[];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   const { data: brandFamilyLinks = [] } = useQuery({
     queryKey: ["brand_families"],
     queryFn: async () => {
