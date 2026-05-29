@@ -207,7 +207,7 @@ const Catalogos = () => {
             </h2>
           </div>
           {isKiosk ? (
-            <span className="text-[10px] text-muted-foreground/60 uppercase tracking-wider">Modo Recepção</span>
+            <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Modo Recepção</span>
           ) : (
             <Link to="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
               ← Voltar
