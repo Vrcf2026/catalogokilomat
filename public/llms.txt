@@ -1,0 +1,22 @@
+# Kilomat — Materiais de Construção
+
+> Catálogo digital da Kilomat (Montijo, Portugal): materiais de construção, ferramentas, canalização, tintas e equipamento de proteção individual, com pedidos de orçamento online.
+
+A Kilomat - Materiais para Construção, Lda. comercializa materiais de construção e equipamento profissional no Montijo. O site funciona como showroom digital: os visitantes pesquisam produtos por categoria, família ou marca, folheiam catálogos em formato A4 e enviam pedidos de orçamento. Os preços apresentados são indicativos, em Euros e com IVA incluído à taxa legal em vigor.
+
+## Pages
+
+- [Início](/): Catálogo principal com pesquisa, filtros por categoria, família e marca, e produtos em destaque.
+- [Catálogos digitais](/catalogos): Lista de catálogos folheáveis por categoria e por marca.
+- [Catálogo Kilomat](/catalogos/kilomat): Catálogo completo da Kilomat em formato folheto A4.
+- [Destaques](/catalogos/destaques): Catálogo dos produtos em destaque e novidades.
+
+## Legal
+
+- [Termos e Condições](/termos-e-condicoes): Regras de utilização do site e dos pedidos de orçamento.
+- [Política de Privacidade](/politica-de-privacidade): Tratamento de dados pessoais nos pedidos de orçamento.
+- [Política de Cookies](/politica-de-cookies): Cookies utilizados e gestão do consentimento.
+
+## Optional
+
+- [Sitemap](/sitemap.xml): Lista completa de URLs públicos.
