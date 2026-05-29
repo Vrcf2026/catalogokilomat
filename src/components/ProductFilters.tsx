@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Search, SlidersHorizontal, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { SlidersHorizontal, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -128,17 +127,8 @@ export const ProductFilters = ({
   return (
     <section className="container mx-auto px-4 pb-6">
       <div className="max-w-5xl mx-auto space-y-3">
-        {/* Search bar + filter toggle */}
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Pesquisar produtos..."
-              value={search}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10 bg-card border-border"
-            />
-          </div>
+        {/* Filter toggle (mobile) */}
+        <div className="flex gap-2 justify-end">
           {isMobile && (
             <Button
               variant={filtersOpen ? "default" : "outline"}

@@ -507,14 +507,23 @@ const Index = () => {
       ) : (
       <>
       {/* Catalog header */}
-      <div className="bg-card border-b border-border px-4 py-3 flex items-center gap-3 sticky top-[57px] sm:top-[97px] z-40">
+      <div className="bg-card border-b border-border px-4 py-3 flex items-center gap-3 sticky top-[53px] sm:top-[61px] z-40">
         <Button variant="outline" size="sm" onClick={goHome} className="gap-1.5 shrink-0">
           <ChevronLeft className="h-4 w-4" />
-          Início
+          <span className="hidden sm:inline">Início</span>
         </Button>
-        <span className="font-heading font-semibold text-sm text-foreground truncate">{catalogTitle}</span>
+        <span className="font-heading font-semibold text-sm text-foreground truncate hidden md:inline">{catalogTitle}</span>
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Pesquisar nesta selecção..."
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+            className="pl-9 h-9 text-sm bg-background border-border"
+          />
+        </div>
         {total > 0 && (
-          <span className="text-xs text-muted-foreground ml-auto shrink-0">{total} produtos</span>
+          <span className="text-xs text-muted-foreground shrink-0 hidden sm:inline">{total} produtos</span>
         )}
       </div>
 
