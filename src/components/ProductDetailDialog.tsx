@@ -197,7 +197,7 @@ export function ProductDetailDialog({ open, onOpenChange, product }: ProductDeta
                   </span>
                 </p>
 
-                <p className="text-xs text-muted-foreground/70 italic">
+                <p className="text-xs text-muted-foreground italic">
                   As imagens apresentadas são meramente ilustrativas.
                 </p>
 
