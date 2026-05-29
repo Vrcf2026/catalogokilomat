@@ -17,6 +17,8 @@ import { GenerateDescriptionsDialog } from "@/components/GenerateDescriptionsDia
 import HomepageHighlightsDialog from "@/components/HomepageHighlightsDialog";
 import { KioskAccessButton } from "@/components/KioskAccessButton";
 import { AdminDashboard } from "@/components/AdminDashboard";
+import { CategoriesManager } from "@/components/CategoriesManager";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
@@ -304,7 +306,13 @@ const Admin = () => {
         )}
       </section>
 
-      <section className="container mx-auto px-4 py-8">
+      <Tabs defaultValue="produtos" className="container mx-auto px-4">
+        <TabsList>
+          <TabsTrigger value="produtos">Produtos</TabsTrigger>
+          <TabsTrigger value="categorias">Categorias</TabsTrigger>
+        </TabsList>
+        <TabsContent value="produtos">
+      <section className="py-8">
         <div className="flex flex-col sm:flex-row gap-3 max-w-3xl mx-auto flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -350,7 +358,7 @@ const Admin = () => {
         </div>
       </section>
 
-      <section className="container mx-auto px-4 pb-16">
+      <section className="pb-16">
         {/* Selection toolbar */}
         <div className="flex items-center gap-2 mb-4 flex-wrap">
           <Button
@@ -461,6 +469,11 @@ const Admin = () => {
           </div>
         )}
       </section>
+        </TabsContent>
+        <TabsContent value="categorias" className="py-8">
+          <CategoriesManager />
+        </TabsContent>
+      </Tabs>
 
       {editingProduct && (
         <EditProductDialog
