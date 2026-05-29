@@ -60,6 +60,7 @@ export default function Unsubscribe() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <h1 className="sr-only">Cancelar subscrição de emails — Kilomat</h1>
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center">Cancelar subscrição de emails</CardTitle>
