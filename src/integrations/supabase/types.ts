@@ -104,18 +104,27 @@ export type Database = {
       categories: {
         Row: {
           created_at: string
+          icone: string | null
           id: string
           name: string
+          ordem: number
+          visivel: boolean
         }
         Insert: {
           created_at?: string
+          icone?: string | null
           id?: string
           name: string
+          ordem?: number
+          visivel?: boolean
         }
         Update: {
           created_at?: string
+          icone?: string | null
           id?: string
           name?: string
+          ordem?: number
+          visivel?: boolean
         }
         Relationships: []
       }
