@@ -130,9 +130,9 @@ const Index = () => {
       const sortedQuery = (() => {
         switch (sortBy) {
           case "name_asc":
-            return baseQuery.order("name", { ascending: true });
+            return baseQuery.order("name", { ascending: true }).order("id", { ascending: true });
           case "name_desc":
-            return baseQuery.order("name", { ascending: false });
+            return baseQuery.order("name", { ascending: false }).order("id", { ascending: true });
           case "price_asc":
             return baseQuery.order("price", { ascending: true, nullsFirst: false });
           case "price_desc":
@@ -264,6 +264,19 @@ const Index = () => {
       if (error) throw error;
       return data;
     },
+  });
+
+  const { data: hasPricesGlobal = false } = useQuery({
+    queryKey: ["products", "has_prices"],
+    queryFn: async () => {
+      const { count, error } = await (supabase as any)
+        .from("products")
+        .select("id", { count: "exact", head: true })
+        .gt("price", 0);
+      if (error) throw error;
+      return (count ?? 0) > 0;
+    },
+    staleTime: 5 * 60 * 1000,
   });
 
   const visibleIds = useMemo(() => products.map((p) => p.id), [products]);
@@ -595,6 +608,7 @@ const Index = () => {
         categories={categories}
         visibleFamilies={visibleFamilies}
         visibleBrands={visibleBrands}
+        hasPrices={hasPricesGlobal}
       />
 
       <section className="container mx-auto px-4 pb-2" data-results-anchor>
