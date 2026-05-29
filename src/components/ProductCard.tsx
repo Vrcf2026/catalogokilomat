@@ -31,6 +31,8 @@ function ProductImage({ src, alt }: { src: string; alt: string }) {
       <img
         src={src}
         alt={alt}
+        width={320}
+        height={320}
         className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${loaded ? 'opacity-100' : 'opacity-0'}`}
         loading="lazy"
         decoding="async"
@@ -120,12 +122,14 @@ export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onCli
           {allImages.map((img, idx) => (
             <button
               key={idx}
+              type="button"
+              aria-label={`Ver imagem ${idx + 1} de ${name}`}
               onClick={(e) => { e.stopPropagation(); setSelectedIndex(idx); }}
               className={`w-10 h-10 rounded-md overflow-hidden border-2 transition-all flex-shrink-0 ${
                 idx === selectedIndex ? 'border-primary ring-1 ring-primary' : 'border-transparent opacity-60 hover:opacity-100'
               }`}
             >
-              <img src={img} alt={`${name} ${idx + 1}`} className="w-full h-full object-cover" loading="lazy" decoding="async" />
+              <img src={img} alt={`${name} ${idx + 1}`} width={40} height={40} className="w-full h-full object-cover" loading="lazy" decoding="async" />
             </button>
           ))}
         </div>
@@ -208,11 +212,11 @@ export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps & { onCli
         {!isAdmin && (
           <div className="flex items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center border border-border rounded-md">
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-r-none" onClick={() => setQuantity((q) => Math.max(1, q - 1))}>
+              <Button aria-label="Diminuir quantidade" variant="ghost" size="icon" className="h-8 w-8 rounded-r-none" onClick={() => setQuantity((q) => Math.max(1, q - 1))}>
                 <Minus className="h-3 w-3" />
               </Button>
               <span className="w-8 text-center text-sm font-medium">{quantity}</span>
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-l-none" onClick={() => setQuantity((q) => q + 1)}>
+              <Button aria-label="Aumentar quantidade" variant="ghost" size="icon" className="h-8 w-8 rounded-l-none" onClick={() => setQuantity((q) => q + 1)}>
                 <Plus className="h-3 w-3" />
               </Button>
             </div>

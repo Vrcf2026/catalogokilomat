@@ -12,9 +12,11 @@ const SUPABASE_ANON =
 const STATIC_PATHS = [
   { path: "/", priority: "1.0", changefreq: "weekly" },
   { path: "/catalogos", priority: "0.7", changefreq: "weekly" },
-  { path: "/termos-condicoes", priority: "0.3", changefreq: "yearly" },
-  { path: "/politica-privacidade", priority: "0.3", changefreq: "yearly" },
-  { path: "/politica-cookies", priority: "0.3", changefreq: "yearly" },
+  { path: "/catalogos/destaques", priority: "0.6", changefreq: "weekly" },
+  { path: "/catalogos/kilomat", priority: "0.6", changefreq: "weekly" },
+  { path: "/termos-e-condicoes", priority: "0.3", changefreq: "yearly" },
+  { path: "/politica-de-privacidade", priority: "0.3", changefreq: "yearly" },
+  { path: "/politica-de-cookies", priority: "0.3", changefreq: "yearly" },
 ];
 
 interface Product { slug: string; updated_at: string | null }

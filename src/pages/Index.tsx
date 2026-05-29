@@ -369,7 +369,7 @@ const Index = () => {
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto flex items-center gap-3 px-3 py-2 sm:px-4 sm:py-3">
           <button onClick={goHome} aria-label="Ir para o início — Kilomat" className="shrink-0">
-            <img src={kilomatLogo} alt="Kilomat Logo" className="h-8 sm:h-10 w-auto drop-shadow-md" />
+            <img src={kilomatLogo} alt="Kilomat Logo" width={510} height={126} className="h-8 sm:h-10 w-auto drop-shadow-md" loading="eager" fetchPriority="high" decoding="async" />
           </button>
           <div className="relative flex-1 max-w-2xl mx-auto">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -424,9 +424,9 @@ const Index = () => {
         <section className="border-b border-border bg-card/40">
           <div className="container mx-auto px-2 sm:px-4">
             <div className="flex items-center justify-between px-4 pt-3 pb-1">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Explorar por categoria
-              </p>
+              </h2>
               <div className="flex items-center gap-1">
                 <button
                   type="button"
@@ -459,6 +459,8 @@ const Index = () => {
                   const allActive = categoryFilter === "all";
                   return (
                     <button
+                      type="button"
+                      aria-label="Ver todos os produtos"
                       onClick={() => openCatalog("all", "all", "Todos os produtos")}
                       className={`shrink-0 flex flex-col items-center justify-center gap-1.5 p-2 min-w-[80px] w-[80px] h-[80px] sm:min-w-[96px] sm:w-[96px] sm:h-[96px] rounded-xl border transition-all ${allCategoryMeta.bg} ${allActive ? "border-primary ring-2 ring-primary/20" : "border-border hover:border-primary/50"}`}
                     >
@@ -474,6 +476,8 @@ const Index = () => {
                   return (
                     <button
                       key={c.id}
+                      type="button"
+                      aria-label={`Ver categoria ${c.name}`}
                       onClick={() => openCatalog("category", c.name, c.name)}
                       title={c.name}
                       className={`shrink-0 flex flex-col items-center justify-center gap-1.5 p-2 min-w-[80px] w-[80px] h-[80px] sm:min-w-[96px] sm:w-[96px] sm:h-[96px] rounded-xl border transition-all ${meta.bg} ${active ? "border-primary ring-2 ring-primary/20" : "border-border hover:border-primary/50"}`}
@@ -484,6 +488,8 @@ const Index = () => {
                   );
                 })}
                 <button
+                  type="button"
+                  aria-label="Ver todas as categorias"
                   onClick={() => openCatalog("all", "all", "Todos os produtos")}
                   className="flex flex-col items-center justify-center gap-1.5 p-2 min-w-[80px] w-[80px] h-[80px] sm:min-w-[96px] sm:w-[96px] sm:h-[96px] rounded-xl border border-dashed border-border hover:border-primary/50 transition-all shrink-0 text-muted-foreground hover:text-primary"
                 >
@@ -503,7 +509,7 @@ const Index = () => {
         <section className="container mx-auto px-4 py-4">
           <div className="flex items-center gap-3 mb-3">
             <div className="h-px flex-1 bg-border" />
-            <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Navegue por categoria</p>
+            <h2 className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Navegue por categoria</h2>
             <div className="h-px flex-1 bg-border" />
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -512,6 +518,8 @@ const Index = () => {
               return (
                 <button
                   key={c.ref_id}
+                  type="button"
+                  aria-label={`Ver produtos da categoria ${c.label}`}
                   onClick={() => openCatalog("category", c.ref_id, c.label)}
                   className="flex flex-col items-center justify-center gap-2 p-3 bg-card border border-border rounded-xl hover:border-primary hover:shadow-sm transition-all text-center min-h-[80px]"
                 >
@@ -523,6 +531,8 @@ const Index = () => {
               );
             })}
             <button
+              type="button"
+              aria-label="Ver todos os produtos"
               onClick={() => openCatalog("all", "all", "Todos os produtos")}
               className="flex flex-col items-center justify-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-xl hover:border-primary hover:bg-primary/10 transition-all text-center min-h-[80px]"
             >
@@ -540,7 +550,7 @@ const Index = () => {
         <section className="container mx-auto px-4 py-4 pb-8">
           <div className="flex items-center gap-3 mb-3">
             <div className="h-px flex-1 bg-border" />
-            <p className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Produtos em Destaque</p>
+            <h2 className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Produtos em Destaque</h2>
             <div className="h-px flex-1 bg-border" />
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
@@ -585,7 +595,7 @@ const Index = () => {
           <ChevronLeft className="h-4 w-4" />
           <span className="hidden sm:inline">Início</span>
         </Button>
-        <span className="font-heading font-semibold text-sm text-foreground truncate hidden md:inline">{catalogTitle}</span>
+        <h2 className="font-heading font-semibold text-sm text-foreground truncate hidden md:inline">{catalogTitle}</h2>
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -680,6 +690,7 @@ const Index = () => {
                 <Button
                   variant="outline"
                   size="sm"
+                  aria-label="Página anterior"
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage((p) => p - 1)}
                 >
@@ -701,6 +712,8 @@ const Index = () => {
                         <Button
                           variant={currentPage === page ? "default" : "outline"}
                           size="sm"
+                          aria-label={`Ir para a página ${page}`}
+                          aria-current={currentPage === page ? "page" : undefined}
                           className="min-w-[36px]"
                           onClick={() => setCurrentPage(page)}
                         >
@@ -712,6 +725,7 @@ const Index = () => {
                 <Button
                   variant="outline"
                   size="sm"
+                  aria-label="Página seguinte"
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage((p) => p + 1)}
                 >
@@ -726,6 +740,7 @@ const Index = () => {
                   key={size}
                   variant={pageSize === size ? "default" : "outline"}
                   size="sm"
+                  aria-label={`Mostrar ${size} produtos por página`}
                   className="min-w-[36px]"
                   onClick={() => { setPageSize(size); setCurrentPage(1); }}
                 >
@@ -739,14 +754,14 @@ const Index = () => {
       </>
       )}
 
-      <footer className="border-t border-zinc-700 bg-accent text-accent-foreground py-8">
+      <footer className="border-t border-border bg-accent text-accent-foreground py-8">
         <div className="container mx-auto px-4 space-y-8">
           {/* Hero info movido do topo */}
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <p className="font-heading text-lg sm:text-xl font-semibold">
               Mais de 18 anos a equipar profissionais e particulares
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-accent-foreground/80">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-accent-foreground">
               <a href="tel:+351938283386" className="inline-flex items-center gap-2 hover:text-primary transition-colors">
                 <Phone className="h-4 w-4" /> +351 938 283 386
               </a>
@@ -765,39 +780,39 @@ const Index = () => {
           </div>
 
           {/* Como funciona */}
-          <div className="bg-transparent border-t border-zinc-700 py-4 px-2 sm:px-4">
+          <div className="bg-transparent border-t border-border py-4 px-2 sm:px-4">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-4xl mx-auto">
               <div className="text-center sm:text-left shrink-0">
-                <h3 className="text-sm font-semibold text-white leading-tight">Como funciona?</h3>
-                <p className="text-xs text-zinc-400 leading-tight">Catálogo · Selecção · Orçamento</p>
+                <h2 className="text-sm font-semibold text-accent-foreground leading-tight">Como funciona?</h2>
+                <p className="text-xs text-accent-foreground/85 leading-tight">Catálogo · Selecção · Orçamento</p>
               </div>
               <div className="flex flex-row items-center justify-center gap-2 flex-wrap sm:flex-nowrap">
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-700 bg-zinc-800/50 whitespace-nowrap">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background/20 whitespace-nowrap">
                   <div className="h-7 w-7 rounded-full bg-red-600/20 flex items-center justify-center shrink-0">
                     <Search className="h-3.5 w-3.5 text-red-500" />
                   </div>
-                  <span className="text-sm text-white font-medium">Pesquise</span>
-                  <span className="text-xs text-zinc-400 hidden sm:inline">— por produto, marca ou categoria</span>
+                  <span className="text-sm text-accent-foreground font-medium">Pesquise</span>
+                  <span className="text-xs text-accent-foreground/85 hidden sm:inline">— por produto, marca ou categoria</span>
                 </div>
 
-                <ChevronRight className="h-4 w-4 text-zinc-500 shrink-0 hidden sm:block" />
+                <ChevronRight className="h-4 w-4 text-accent-foreground/70 shrink-0 hidden sm:block" />
 
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-700 bg-zinc-800/50 whitespace-nowrap">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background/20 whitespace-nowrap">
                   <div className="h-7 w-7 rounded-full bg-red-600/20 flex items-center justify-center shrink-0">
                     <ShoppingCart className="h-3.5 w-3.5 text-red-500" />
                   </div>
-                  <span className="text-sm text-white font-medium">Seleccione</span>
-                  <span className="text-xs text-zinc-400 hidden sm:inline">— adicione ao orçamento</span>
+                  <span className="text-sm text-accent-foreground font-medium">Seleccione</span>
+                  <span className="text-xs text-accent-foreground/85 hidden sm:inline">— adicione ao orçamento</span>
                 </div>
 
-                <ChevronRight className="h-4 w-4 text-zinc-500 shrink-0 hidden sm:block" />
+                <ChevronRight className="h-4 w-4 text-accent-foreground/70 shrink-0 hidden sm:block" />
 
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-700 bg-zinc-800/50 whitespace-nowrap">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background/20 whitespace-nowrap">
                   <div className="h-7 w-7 rounded-full bg-red-600/20 flex items-center justify-center shrink-0">
                     <Send className="h-3.5 w-3.5 text-red-500" />
                   </div>
-                  <span className="text-sm text-white font-medium">Receba</span>
-                  <span className="text-xs text-zinc-400 hidden sm:inline">— resposta em 24 horas</span>
+                  <span className="text-sm text-accent-foreground font-medium">Receba</span>
+                  <span className="text-xs text-accent-foreground/85 hidden sm:inline">— resposta em 24 horas</span>
                 </div>
               </div>
             </div>
@@ -805,7 +820,7 @@ const Index = () => {
 
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <img src={kilomatKIcon} alt="Kilomat" className="h-12 w-auto" />
+              <img src={kilomatKIcon} alt="Kilomat" width={90} height={86} className="h-12 w-auto" loading="lazy" decoding="async" />
               <div>
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <p className="font-heading font-bold text-sm">Kilomat — Materiais de Construção</p>
@@ -814,8 +829,8 @@ const Index = () => {
                     Desde 2007 · Montijo
                   </span>
                 </div>
-                <p className="text-xs text-accent-foreground/70 mt-1">Materiais de construção, ferramentas, canalização e tintas</p>
-                <p className="text-xs text-accent-foreground/70 mt-1">
+                <p className="text-xs text-accent-foreground/85 mt-1">Materiais de construção, ferramentas, canalização e tintas</p>
+                <p className="text-xs text-accent-foreground/85 mt-1">
                   <a href="tel:+351938283386" className="hover:text-primary transition-colors">+351 938 283 386</a>
                   {" · "}
                   <a href="mailto:info@kilomat.pt" className="hover:text-primary transition-colors">info@kilomat.pt</a>
@@ -823,22 +838,22 @@ const Index = () => {
               </div>
             </div>
             <div className="text-center md:text-right space-y-1">
-              <p className="text-xs text-accent-foreground/70">
+              <p className="text-xs text-accent-foreground/85">
                 <a href="https://kilomat.pt" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                   kilomat.pt
                 </a>
               </p>
               {hasAnyPrice && (
                 <>
-                  <p className="text-xs text-accent-foreground/70">
+                  <p className="text-xs text-accent-foreground/85">
                     Todos os preços apresentados incluem IVA à taxa legal em vigor.
                   </p>
-                  <p className="text-xs text-accent-foreground/70">
+                  <p className="text-xs text-accent-foreground/85">
                     Os preços são meramente indicativos e podem sofrer alterações sem aviso prévio.
                   </p>
                 </>
               )}
-              <p className="text-xs text-accent-foreground/70">
+              <p className="text-xs text-accent-foreground/85">
                 As imagens apresentadas são meramente ilustrativas.
               </p>
               <p className="text-xs mt-2 space-x-3">
