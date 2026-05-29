@@ -734,30 +734,34 @@ const Index = () => {
                 <h3 className="text-sm font-semibold text-white leading-tight">Como funciona?</h3>
                 <p className="text-xs text-zinc-400 leading-tight">Catálogo · Selecção · Orçamento</p>
               </div>
-              <div className="flex flex-wrap items-center justify-center gap-1.5">
-              {[
-                { icon: Search, title: "Pesquise", desc: "por produto, marca ou categoria" },
-                { icon: ShoppingCart, title: "Seleccione", desc: "adicione ao orçamento" },
-                { icon: Send, title: "Receba", desc: "resposta em 24 horas" },
-              ].map((step, idx, arr) => {
-                const Icon = step.icon;
-                return (
-                  <div key={step.title} className="flex items-center gap-1.5">
-                    <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/50">
-                      <div className="shrink-0 h-5 w-5 rounded-full bg-red-600/90 flex items-center justify-center">
-                        <Icon className="h-3 w-3 text-white" />
-                      </div>
-                      <p className="text-xs font-medium text-white leading-none">
-                        <span className="font-semibold">{step.title}</span>
-                        <span className="text-zinc-400 font-normal"> — {step.desc}</span>
-                      </p>
-                    </div>
-                    {idx < arr.length - 1 && (
-                      <ChevronRight className="h-4 w-4 text-zinc-500 shrink-0" />
-                    )}
+              <div className="flex flex-row items-center justify-center gap-2 flex-wrap sm:flex-nowrap">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-700 bg-zinc-800/50 whitespace-nowrap">
+                  <div className="h-7 w-7 rounded-full bg-red-600/20 flex items-center justify-center shrink-0">
+                    <Search className="h-3.5 w-3.5 text-red-500" />
                   </div>
-                );
-              })}
+                  <span className="text-sm text-white font-medium">Pesquise</span>
+                  <span className="text-xs text-zinc-400 hidden sm:inline">— por produto, marca ou categoria</span>
+                </div>
+
+                <ChevronRight className="h-4 w-4 text-zinc-500 shrink-0 hidden sm:block" />
+
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-700 bg-zinc-800/50 whitespace-nowrap">
+                  <div className="h-7 w-7 rounded-full bg-red-600/20 flex items-center justify-center shrink-0">
+                    <ShoppingCart className="h-3.5 w-3.5 text-red-500" />
+                  </div>
+                  <span className="text-sm text-white font-medium">Seleccione</span>
+                  <span className="text-xs text-zinc-400 hidden sm:inline">— adicione ao orçamento</span>
+                </div>
+
+                <ChevronRight className="h-4 w-4 text-zinc-500 shrink-0 hidden sm:block" />
+
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-700 bg-zinc-800/50 whitespace-nowrap">
+                  <div className="h-7 w-7 rounded-full bg-red-600/20 flex items-center justify-center shrink-0">
+                    <Send className="h-3.5 w-3.5 text-red-500" />
+                  </div>
+                  <span className="text-sm text-white font-medium">Receba</span>
+                  <span className="text-xs text-zinc-400 hidden sm:inline">— resposta em 24 horas</span>
+                </div>
               </div>
             </div>
           </div>
