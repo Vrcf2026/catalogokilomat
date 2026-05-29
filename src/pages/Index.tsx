@@ -608,6 +608,7 @@ const Index = () => {
         categories={categories}
         visibleFamilies={visibleFamilies}
         visibleBrands={visibleBrands}
+        hasPrices={hasPricesGlobal}
       />
 
       <section className="container mx-auto px-4 pb-2" data-results-anchor>
