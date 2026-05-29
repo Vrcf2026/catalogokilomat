@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetailDialog } from "@/components/ProductDetailDialog";
 import { useState, useMemo, useEffect } from "react";
-import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin, Search, Send } from "lucide-react";
+import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin, Search, Send, Star } from "lucide-react";
 import { getCategoryIcon, getCategoryMeta, allCategoryMeta, LayoutGrid as LayoutGridIcon } from "@/lib/categoryIcons";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { ProductFilters } from "@/components/ProductFilters";
@@ -21,6 +21,7 @@ import ContactButton from "@/components/ContactButton";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import ContactFloatingBubble from "@/components/ContactFloatingBubble";
 import BrandsStrip from "@/components/BrandsStrip";
+import WelcomeBanner from "@/components/WelcomeBanner";
 
 const PAGE_SIZE_OPTIONS = [24, 48, 96];
 
@@ -373,6 +374,10 @@ const Index = () => {
       <>
       {/* Título da loja */}
       <div className="container mx-auto px-4 pt-4 pb-1">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-2 rounded-full border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/30 text-xs font-medium text-red-700 dark:text-red-400">
+          <Star className="h-3 w-3 fill-current" />
+          Desde 2007 · Montijo
+        </div>
         <h1 className="text-lg sm:text-xl font-bold text-foreground">
           Materiais de Construção, Ferramentas e Agrícola
         </h1>
