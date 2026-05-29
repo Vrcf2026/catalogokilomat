@@ -1,5 +1,6 @@
 import { useState, useCallback, forwardRef } from "react";
-import { Package, ImageOff, Pencil, ShoppingCart, Minus, Plus, Star, BookOpen, Paintbrush, ArrowUpFromLine, FlaskConical, Zap, Wind, Layers, Pipette, Square, ShoppingBag, Anchor, Home, Network, Circle, Wrench, Plug, Flame, Waves, Lock, ShieldCheck, Disc, Gauge, PanelTop, House } from "lucide-react";
+import { ImageOff, Pencil, ShoppingCart, Minus, Plus, Star, BookOpen, House } from "lucide-react";
+import { CategoryPlaceholder } from "@/lib/categoryIcons";
 import { Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
@@ -39,43 +40,6 @@ function ProductImage({ src, alt }: { src: string; alt: string }) {
     </>
   );
 }
-
-const categoryIconMap: Record<string, React.ElementType> = {
-  "Tintas": Paintbrush,
-  "Elevacao e Traccao": ArrowUpFromLine,
-  "Quimicos": FlaskConical,
-  "Ferramenta Eletrica": Zap,
-  "Exaustão e Ventilação": Wind,
-  "Cimentos e Argamassas": Layers,
-  "Canalizacao": Pipette,
-  "Barramentos, Tubos e Perfis": Minus,
-  "Chapas": Square,
-  "Drogaria": ShoppingBag,
-  "Fixacao": Anchor,
-  "Coberturas e Terraços": Home,
-  "Arames Redes e Vedacoes": Network,
-  "Rodas, Rodizios e Rolamentos": Circle,
-  "Ferramentas Manuais": Wrench,
-  "Material Electrico": Plug,
-  "Perfuração, Demolição e Corte": Zap,
-  "Solo e Drenagem": Waves,
-  "Ferragens": Lock,
-  "Higiene e Proteccao": ShieldCheck,
-  "Solda": Flame,
-  "Pladur, Perfis e Acessorios": PanelTop,
-  "Discos": Disc,
-  "Gas": Gauge,
-};
-
-const CategoryPlaceholder = ({ category }: { category: string | null }) => {
-  const Icon: React.ElementType = (category && categoryIconMap[category]) || Package;
-  return (
-    <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground w-full h-full bg-secondary/60">
-      <Icon className="h-12 w-12 opacity-40" />
-      {category && <span className="text-xs opacity-60">{category}</span>}
-    </div>
-  );
-};
 
 interface ProductCardProps {
   id: string;
