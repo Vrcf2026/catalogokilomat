@@ -75,7 +75,8 @@ const Admin = () => {
         if (debouncedSearch.trim()) q = q.ilike("name", `%${debouncedSearch.trim()}%`);
         if (categoryFilter !== "all") q = q.eq("category", categoryFilter);
         if (familyFilter !== "all") q = q.eq("family_id", familyFilter);
-        if (brandFilter !== "all") q = q.eq("brand_id", brandFilter);
+        if (brandFilter === "none") q = q.is("brand_id", null);
+        else if (brandFilter !== "all") q = q.eq("brand_id", brandFilter);
         return q;
       };
       const countQuery = buildFilters(client.from("products").select("id", { count: "exact", head: true }));
