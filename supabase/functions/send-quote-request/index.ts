@@ -42,6 +42,25 @@ serve(async (req) => {
       });
     }
 
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const nameStr = String(customerName).trim();
+    const emailStr = String(customerEmail).trim();
+    const phoneStr = String(customerPhone ?? "").trim();
+    const notesStr = notes ? String(notes).trim() : "";
+    if (
+      nameStr.length > 200 ||
+      emailStr.length > 255 ||
+      phoneStr.length > 30 ||
+      notesStr.length > 2000 ||
+      items.length > 200 ||
+      !EMAIL_RE.test(emailStr)
+    ) {
+      return new Response(JSON.stringify({ error: "Dados inválidos" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const requestId = crypto.randomUUID();
     const safeItems = (items as any[]).map((i) => ({
       name: String(i.name ?? ""),
