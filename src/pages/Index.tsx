@@ -692,7 +692,7 @@ const Index = () => {
           </div>
 
           {/* Como funciona */}
-          <div className="bg-transparent py-8 px-4 sm:px-6">
+          <div className="bg-transparent border-t border-zinc-700 py-8 px-4 sm:px-6">
             <div className="max-w-3xl mx-auto text-center space-y-1 mb-6">
               <h3 className="text-base font-semibold text-white">Como funciona?</h3>
               <p className="text-sm text-zinc-400">
