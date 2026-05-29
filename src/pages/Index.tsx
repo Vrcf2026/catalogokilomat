@@ -373,11 +373,7 @@ const Index = () => {
       {activeView === "home" ? (
       <>
       {/* Título da loja */}
-      <div className="container mx-auto px-4 pt-4 pb-1">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 mb-2 rounded-full border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/30 text-xs font-medium text-red-700 dark:text-red-400">
-          <Star className="h-3 w-3 fill-current" />
-          Desde 2007 · Montijo
-        </div>
+      <div className="container mx-auto px-4 pt-4 pb-1 text-center">
         <h1 className="text-lg sm:text-xl font-bold text-foreground">
           Materiais de Construção, Ferramentas e Agrícola
         </h1>
