@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetailDialog } from "@/components/ProductDetailDialog";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin, Search, Send, Star } from "lucide-react";
 import { getCategoryIcon, getCategoryMeta, allCategoryMeta, LayoutGrid as LayoutGridIcon } from "@/lib/categoryIcons";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
@@ -386,39 +386,74 @@ const Index = () => {
       {visibleCategories.length > 0 && (
         <section className="border-b border-border bg-card/40">
           <div className="container mx-auto px-2 sm:px-4">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-4 pt-3 pb-1">
-              Explore por categoria
-            </p>
-            <div className="flex overflow-x-auto gap-3 py-4 px-2 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: "none" }}>
-              {(() => {
-                const AllIcon = allCategoryMeta.icon;
-                const allActive = categoryFilter === "all";
-                return (
-                  <button
-                    onClick={() => openCatalog("all", "all", "Todos os produtos")}
-                    className={`shrink-0 flex flex-col items-center justify-center gap-1.5 p-2 min-w-[80px] w-[80px] h-[80px] sm:min-w-[96px] sm:w-[96px] sm:h-[96px] rounded-xl border transition-all ${allCategoryMeta.bg} ${allActive ? "border-primary ring-2 ring-primary/20" : "border-border hover:border-primary/50"}`}
-                  >
-                    <AllIcon className={`h-6 w-6 sm:h-7 sm:w-7 ${allCategoryMeta.color}`} />
-                    <span className="text-[10px] sm:text-[11px] font-medium text-center leading-tight line-clamp-2 text-foreground">Todos</span>
-                  </button>
-                );
-              })()}
-              {visibleCategories.map((c) => {
-                const meta = getCategoryMeta(c.name);
-                const Icon = meta.icon;
-                const active = categoryFilter === c.name;
-                return (
-                  <button
-                    key={c.id}
-                    onClick={() => openCatalog("category", c.name, c.name)}
-                    title={c.name}
-                    className={`shrink-0 flex flex-col items-center justify-center gap-1.5 p-2 min-w-[80px] w-[80px] h-[80px] sm:min-w-[96px] sm:w-[96px] sm:h-[96px] rounded-xl border transition-all ${meta.bg} ${active ? "border-primary ring-2 ring-primary/20" : "border-border hover:border-primary/50"}`}
-                  >
-                    <Icon className={`h-6 w-6 sm:h-7 sm:w-7 ${meta.color}`} />
-                    <span className="text-[10px] sm:text-[11px] font-medium text-center leading-tight line-clamp-2 text-foreground">{c.name}</span>
-                  </button>
-                );
-              })}
+            <div className="flex items-center justify-between px-4 pt-3 pb-1">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Explorar por categoria
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  aria-label="Scroll esquerda"
+                  onClick={() => categoriesScrollRef.current?.scrollBy({ left: -200, behavior: "smooth" })}
+                  className="p-1 rounded-full hover:bg-muted transition-colors"
+                >
+                  <ChevronLeft className="h-4 w-4 text-muted-foreground" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Scroll direita"
+                  onClick={() => categoriesScrollRef.current?.scrollBy({ left: 200, behavior: "smooth" })}
+                  className="p-1 rounded-full hover:bg-muted transition-colors"
+                >
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </button>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+              <div
+                ref={categoriesScrollRef}
+                className="flex overflow-x-auto gap-2 px-4 pb-3 pt-1 [&::-webkit-scrollbar]:hidden"
+                style={{ scrollbarWidth: "none" }}
+              >
+                {(() => {
+                  const AllIcon = allCategoryMeta.icon;
+                  const allActive = categoryFilter === "all";
+                  return (
+                    <button
+                      onClick={() => openCatalog("all", "all", "Todos os produtos")}
+                      className={`shrink-0 flex flex-col items-center justify-center gap-1.5 p-2 min-w-[80px] w-[80px] h-[80px] sm:min-w-[96px] sm:w-[96px] sm:h-[96px] rounded-xl border transition-all ${allCategoryMeta.bg} ${allActive ? "border-primary ring-2 ring-primary/20" : "border-border hover:border-primary/50"}`}
+                    >
+                      <AllIcon className={`h-6 w-6 sm:h-7 sm:w-7 ${allCategoryMeta.color}`} />
+                      <span className="text-[10px] sm:text-[11px] font-medium text-center leading-tight line-clamp-2 text-foreground">Todos</span>
+                    </button>
+                  );
+                })()}
+                {visibleCategories.map((c) => {
+                  const meta = getCategoryMeta(c.name);
+                  const Icon = meta.icon;
+                  const active = categoryFilter === c.name;
+                  return (
+                    <button
+                      key={c.id}
+                      onClick={() => openCatalog("category", c.name, c.name)}
+                      title={c.name}
+                      className={`shrink-0 flex flex-col items-center justify-center gap-1.5 p-2 min-w-[80px] w-[80px] h-[80px] sm:min-w-[96px] sm:w-[96px] sm:h-[96px] rounded-xl border transition-all ${meta.bg} ${active ? "border-primary ring-2 ring-primary/20" : "border-border hover:border-primary/50"}`}
+                    >
+                      <Icon className={`h-6 w-6 sm:h-7 sm:w-7 ${meta.color}`} />
+                      <span className="text-[10px] sm:text-[11px] font-medium text-center leading-tight line-clamp-2 text-foreground">{c.name}</span>
+                    </button>
+                  );
+                })}
+                <button
+                  onClick={() => openCatalog("all", "all", "Todos os produtos")}
+                  className="flex flex-col items-center justify-center gap-1.5 p-2 min-w-[80px] w-[80px] h-[80px] sm:min-w-[96px] sm:w-[96px] sm:h-[96px] rounded-xl border border-dashed border-border hover:border-primary/50 transition-all shrink-0 text-muted-foreground hover:text-primary"
+                >
+                  <LayoutGridIcon className="h-6 w-6" />
+                  <span className="text-[10px] sm:text-[11px] font-medium text-center">Ver todas</span>
+                </button>
+              </div>
             </div>
           </div>
         </section>
