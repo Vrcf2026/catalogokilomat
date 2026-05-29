@@ -161,7 +161,7 @@ export default function ProdutoPage() {
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg">
         <div className="container mx-auto flex items-center justify-between px-3 py-2 sm:px-4 sm:py-4">
           <Link to="/">
-            <img src={kilomatLogo} alt="Kilomat" className="h-10 sm:h-16 w-auto drop-shadow-md" />
+            <img src={kilomatLogo} alt="Logótipo Kilomat" className="h-10 sm:h-16 w-auto drop-shadow-md" />
           </Link>
           <div className="flex items-center gap-2">
             <DarkModeToggle />
