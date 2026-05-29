@@ -3,8 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetailDialog } from "@/components/ProductDetailDialog";
 import { useState, useMemo, useEffect } from "react";
-import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin, Search, Send, LayoutGrid as LayoutGridIcon } from "lucide-react";
-import { getCategoryIcon } from "@/lib/categoryIcons";
+import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin, Search, Send } from "lucide-react";
+import { getCategoryIcon, getCategoryMeta, allCategoryMeta } from "@/lib/categoryIcons";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { ProductFilters } from "@/components/ProductFilters";
 import { Input } from "@/components/ui/input";
@@ -369,38 +369,50 @@ const Index = () => {
 
       {activeView === "home" ? (
       <>
+      {/* Título da loja */}
+      <div className="container mx-auto px-4 pt-4 pb-1">
+        <h1 className="text-lg sm:text-xl font-bold text-foreground">
+          Materiais de Construção, Ferramentas e Agrícola
+        </h1>
+        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+          Mais de 18 anos a servir profissionais e particulares em Montijo
+        </p>
+      </div>
+
       {/* Barra de categorias */}
       {visibleCategories.length > 0 && (
         <section className="border-b border-border bg-card/40">
           <div className="container mx-auto px-2 sm:px-4">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide px-4 pt-3 pb-1">
+              Explore por categoria
+            </p>
             <div className="flex overflow-x-auto gap-3 py-4 px-2 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: "none" }}>
-              <button
-                onClick={() => openCatalog("all", "all", "Todos os produtos")}
-                className={`shrink-0 flex flex-col items-center justify-center gap-1.5 min-w-[80px] w-[80px] h-[80px] sm:min-w-[100px] sm:w-[100px] sm:h-[100px] rounded-xl border transition-all ${
-                  categoryFilter === "all"
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "bg-card border-border hover:border-primary hover:bg-primary/5"
-                }`}
-              >
-                <LayoutGridIcon className={`h-7 w-7 ${categoryFilter === "all" ? "text-primary" : "text-muted-foreground"}`} />
-                <span className="text-[10px] sm:text-xs font-medium text-center leading-tight line-clamp-2 px-1">Todos</span>
-              </button>
+              {(() => {
+                const AllIcon = allCategoryMeta.icon;
+                const allActive = categoryFilter === "all";
+                return (
+                  <button
+                    onClick={() => openCatalog("all", "all", "Todos os produtos")}
+                    className={`shrink-0 flex flex-col items-center justify-center gap-1.5 p-2 min-w-[80px] w-[80px] h-[80px] sm:min-w-[96px] sm:w-[96px] sm:h-[96px] rounded-xl border transition-all ${allCategoryMeta.bg} ${allActive ? "border-primary ring-2 ring-primary/20" : "border-border hover:border-primary/50"}`}
+                  >
+                    <AllIcon className={`h-6 w-6 sm:h-7 sm:w-7 ${allCategoryMeta.color}`} />
+                    <span className="text-[10px] sm:text-[11px] font-medium text-center leading-tight line-clamp-2 text-foreground">Todos</span>
+                  </button>
+                );
+              })()}
               {visibleCategories.map((c) => {
-                const Icon = getCategoryIcon(c.name);
+                const meta = getCategoryMeta(c.name);
+                const Icon = meta.icon;
                 const active = categoryFilter === c.name;
                 return (
                   <button
                     key={c.id}
                     onClick={() => openCatalog("category", c.name, c.name)}
-                    className={`shrink-0 flex flex-col items-center justify-center gap-1.5 min-w-[80px] w-[80px] h-[80px] sm:min-w-[100px] sm:w-[100px] sm:h-[100px] rounded-xl border transition-all ${
-                      active
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "bg-card border-border hover:border-primary hover:bg-primary/5"
-                    }`}
                     title={c.name}
+                    className={`shrink-0 flex flex-col items-center justify-center gap-1.5 p-2 min-w-[80px] w-[80px] h-[80px] sm:min-w-[96px] sm:w-[96px] sm:h-[96px] rounded-xl border transition-all ${meta.bg} ${active ? "border-primary ring-2 ring-primary/20" : "border-border hover:border-primary/50"}`}
                   >
-                    <Icon className={`h-7 w-7 ${active ? "text-primary" : "text-muted-foreground"}`} />
-                    <span className="text-[10px] sm:text-xs font-medium text-center leading-tight line-clamp-2 px-1">{c.name}</span>
+                    <Icon className={`h-6 w-6 sm:h-7 sm:w-7 ${meta.color}`} />
+                    <span className="text-[10px] sm:text-[11px] font-medium text-center leading-tight line-clamp-2 text-foreground">{c.name}</span>
                   </button>
                 );
               })}
