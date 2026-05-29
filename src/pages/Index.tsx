@@ -4,7 +4,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { ProductDetailDialog } from "@/components/ProductDetailDialog";
 import { useState, useMemo, useEffect } from "react";
 import { Package, Loader2, ShoppingCart, ChevronLeft, ChevronRight, Phone, Mail, MapPin, Search, Send } from "lucide-react";
-import { getCategoryIcon, getCategoryMeta, allCategoryMeta } from "@/lib/categoryIcons";
+import { getCategoryIcon, getCategoryMeta, allCategoryMeta, LayoutGrid as LayoutGridIcon } from "@/lib/categoryIcons";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { ProductFilters } from "@/components/ProductFilters";
 import { Input } from "@/components/ui/input";
@@ -452,7 +452,7 @@ const Index = () => {
               className="flex flex-col items-center justify-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-xl hover:border-primary hover:bg-primary/10 transition-all text-center min-h-[80px]"
             >
               <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center">
-                <allCategoryMeta.icon className="h-5 w-5 text-primary" />
+                <LayoutGridIcon className="h-5 w-5 text-primary" />
               </div>
               <span className="text-[11px] font-semibold text-primary leading-tight">Ver tudo</span>
             </button>
