@@ -337,6 +337,7 @@ export function CatalogViewer({
         {/* Navigation arrows */}
         <button
           onClick={() => bookRef.current?.pageFlip().flipPrev()}
+          aria-label="Página anterior"
           className={`absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center z-30 transition-opacity duration-500 ${barsVisible ? "opacity-100" : "opacity-0"}`}
           style={{ backgroundColor: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)" }}
           disabled={currentPage === 0}
@@ -345,6 +346,7 @@ export function CatalogViewer({
         </button>
         <button
           onClick={() => bookRef.current?.pageFlip().flipNext()}
+          aria-label="Página seguinte"
           className={`absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center z-30 transition-opacity duration-500 ${barsVisible ? "opacity-100" : "opacity-0"}`}
           style={{ backgroundColor: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)" }}
           disabled={currentPage === totalPages - 1}
@@ -393,6 +395,7 @@ export function CatalogViewer({
                 value={searchQuery}
                 onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(0); if (bookRef.current) bookRef.current.pageFlip().flip(0); }}
                 placeholder="Pesquisar..."
+                aria-label="Pesquisar no catálogo"
                 className="h-7 w-28 sm:w-36 text-xs bg-white/10 border-white/20 text-white placeholder:text-white/40"
                 autoFocus
               />
