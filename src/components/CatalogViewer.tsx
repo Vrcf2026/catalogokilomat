@@ -381,7 +381,7 @@ export function CatalogViewer({
           <Button aria-label="Reduzir zoom" variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10" onClick={() => setZoom(Math.max(50, zoom - 10))}>
             <ZoomOut className="h-4 w-4" />
           </Button>
-          <span className="text-white/50 text-[10px] w-8 text-center">{zoom}%</span>
+          <span className="text-white/80 text-[10px] w-8 text-center">{zoom}%</span>
           <Button aria-label="Aumentar zoom" variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10" onClick={() => setZoom(Math.min(150, zoom + 10))}>
             <ZoomIn className="h-4 w-4" />
           </Button>
