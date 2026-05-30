@@ -215,7 +215,7 @@ export function KilomatCatalogViewer({ onBack }: KilomatCatalogViewerProps) {
           <Button aria-label="Reduzir zoom" variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10" onClick={() => setZoom((z) => Math.max(50, z - 10))}>
             <ZoomOut className="h-4 w-4" />
           </Button>
-          <span className="text-white/50 text-[10px] min-w-[32px] text-center">{zoom}%</span>
+          <span className="text-white/80 text-[10px] min-w-[32px] text-center">{zoom}%</span>
           <Button aria-label="Aumentar zoom" variant="ghost" size="icon" className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10" onClick={() => setZoom((z) => Math.min(200, z + 10))}>
             <ZoomIn className="h-4 w-4" />
           </Button>
