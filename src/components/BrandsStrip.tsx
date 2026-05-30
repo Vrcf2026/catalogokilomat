@@ -133,8 +133,11 @@ const BrandsStrip = () => {
                   <img
                     src={b.logo_url}
                     alt={b.name}
+                    width={120}
+                    height={48}
                     className="h-full w-auto object-contain opacity-90 hover:opacity-100 transition-opacity"
                     loading="lazy"
+                    decoding="async"
                   />
                 ) : (
                   <span className="font-heading text-sm sm:text-base font-semibold text-foreground hover:text-primary transition-colors whitespace-nowrap">
