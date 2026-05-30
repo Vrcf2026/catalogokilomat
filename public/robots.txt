@@ -2,6 +2,7 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /login
+Disallow: /unsubscribe
 Disallow: /catalogos/destaques
 Disallow: /catalogos/kilomat
 
