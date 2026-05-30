@@ -50,6 +50,10 @@ export const WelcomeBanner = () => {
           <img
             src="https://images.unsplash.com/photo-1504148455328-c376907d081c?w=800"
             alt="Ferramentas Kilomat"
+            width={800}
+            height={533}
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/80" />
