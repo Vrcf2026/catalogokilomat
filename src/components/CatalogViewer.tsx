@@ -396,7 +396,7 @@ export function CatalogViewer({
                 onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(0); if (bookRef.current) bookRef.current.pageFlip().flip(0); }}
                 placeholder="Pesquisar..."
                 aria-label="Pesquisar no catálogo"
-                className="h-7 w-28 sm:w-36 text-xs bg-white/10 border-white/20 text-white placeholder:text-white/40"
+                className="h-7 w-28 sm:w-36 text-xs bg-white/10 border-white/20 text-white placeholder:text-white/75"
                 autoFocus
               />
               <Button aria-label="Fechar pesquisa" variant="ghost" size="icon" className="h-7 w-7 text-white/60 hover:text-white" onClick={() => { setShowSearch(false); setSearchQuery(""); }}>
