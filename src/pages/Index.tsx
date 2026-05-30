@@ -402,6 +402,7 @@ const Index = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Pesquisar em todo o catálogo..."
+              aria-label="Pesquisar em todo o catálogo"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
@@ -627,6 +628,7 @@ const Index = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Pesquisar nesta selecção..."
+            aria-label="Pesquisar nesta selecção"
             value={search}
             onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
             className="pl-9 h-9 text-sm bg-background border-border"
@@ -655,6 +657,7 @@ const Index = () => {
       />
 
       <section className="container mx-auto px-4 pb-2" data-results-anchor>
+        <h2 className="sr-only">Resultados da pesquisa</h2>
         {!isLoading && total > 0 && (
           <p className="text-sm text-muted-foreground text-center">
             {total} produto{total !== 1 ? "s" : ""} encontrado{total !== 1 ? "s" : ""}
@@ -665,6 +668,7 @@ const Index = () => {
       </section>
 
       <section className="container mx-auto px-4 pb-8">
+        <h2 className="sr-only">Lista de produtos</h2>
         {isLoading ? (
           <div className="flex justify-center py-20">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -711,6 +715,7 @@ const Index = () => {
 
       {(totalPages > 1 || total > 24) && (
         <section className="container mx-auto px-4 pb-16">
+          <h2 className="sr-only">Paginação e número de produtos por página</h2>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             {totalPages > 1 && (
               <div className="flex items-center gap-2">
@@ -847,7 +852,7 @@ const Index = () => {
 
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <img src={kilomatKIcon} alt="Kilomat" width={90} height={86} className="h-12 w-auto" loading="lazy" decoding="async" />
+              <img src={kilomatKIcon} alt="Ícone Kilomat" width={90} height={86} className="h-12 w-auto" loading="lazy" decoding="async" />
               <div>
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                   <p className="font-heading font-bold text-sm">Kilomat — Materiais de Construção</p>
