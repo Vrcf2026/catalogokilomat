@@ -1,0 +1,32 @@
+{
+  "name": "Kilomat — Catálogo de Materiais de Construção",
+  "short_name": "Kilomat",
+  "description": "Catálogo Kilomat: materiais de construção, ferramentas, canalização, tintas e EPI no Montijo.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#ef1c26",
+  "lang": "pt-PT",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
