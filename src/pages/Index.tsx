@@ -18,6 +18,7 @@ import { CartDrawer } from "@/components/CartDrawer";
 import { Button } from "@/components/ui/button";
 import SuggestionButton from "@/components/SuggestionButton";
 import ContactButton from "@/components/ContactButton";
+import { openCookiePreferences } from "@/components/CookieConsentBanner";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import ContactFloatingBubble from "@/components/ContactFloatingBubble";
 import BrandsStrip from "@/components/BrandsStrip";
@@ -898,6 +899,21 @@ const Index = () => {
                 <Link to="/politica-de-cookies" className="text-primary hover:underline transition-colors">
                   Cookies
                 </Link>
+                <button
+                  type="button"
+                  onClick={openCookiePreferences}
+                  className="text-primary hover:underline transition-colors"
+                >
+                  Gerir Cookies
+                </button>
+                <a
+                  href="https://www.livroreclamacoes.pt"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline transition-colors"
+                >
+                  Livro de Reclamações
+                </a>
                 <SuggestionButton />
                 <ContactButton />
               </p>

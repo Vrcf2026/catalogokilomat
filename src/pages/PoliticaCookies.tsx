@@ -165,10 +165,9 @@ const PoliticaCookies = () => {
               Pode gerir as suas preferências de cookies de duas formas:
             </p>
 
-            <h3 className="font-heading text-lg font-semibold text-foreground mt-4">5.1 Através do nosso banner de cookies</h3>
+            <h3 className="font-heading text-lg font-semibold text-foreground mt-4">5.1 Através do nosso painel de preferências</h3>
             <p className="text-muted-foreground leading-relaxed mt-2">
-              Na sua primeira visita ao website, será apresentado um banner onde pode aceitar ou rejeitar os cookies 
-              não essenciais. Pode alterar as suas preferências a qualquer momento limpando os dados do seu navegador.
+              Na sua primeira visita ao website, é apresentado um banner onde pode aceitar ou rejeitar os cookies não essenciais. Pode alterar a sua escolha a qualquer momento clicando no link <strong className="text-foreground">Gerir Cookies</strong> no rodapé da página. Ao clicar, o banner de consentimento reabre e pode alterar a sua preferência imediatamente, sem necessidade de limpar manualmente os dados do browser.
             </p>
 
             <h3 className="font-heading text-lg font-semibold text-foreground mt-4">5.2 Através do seu navegador</h3>
