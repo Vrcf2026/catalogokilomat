@@ -53,7 +53,7 @@ const PoliticaPrivacidade = () => {
               dos dados pessoais nos termos do Regulamento (UE) 2016/679 (RGPD) e da Lei n.º 58/2019, de 8 de agosto.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-3">
-              <strong className="text-foreground">Contacto do Encarregado da Proteção de Dados (DPO):</strong>{" "}
+              <strong className="text-foreground">Contacto para assuntos de proteção de dados:</strong>{" "}
               <a href="mailto:info@kilomat.pt" className="text-primary hover:underline">info@kilomat.pt</a>{" "}
               · <a href="tel:+351938283386" className="text-primary hover:underline">+351 938 283 386</a>
             </p>
@@ -125,10 +125,6 @@ const PoliticaPrivacidade = () => {
                     <td className="p-3">Obrigação legal (art. 6.º, n.º 1, al. c) RGPD)</td>
                   </tr>
                   <tr className="border-t border-border">
-                    <td className="p-3">Envio de newsletters ou comunicações de marketing (com consentimento prévio)</td>
-                    <td className="p-3">Consentimento (art. 6.º, n.º 1, al. a) RGPD)</td>
-                  </tr>
-                  <tr className="border-t border-border">
                     <td className="p-3">Melhorar a experiência do utilizador e segurança do website</td>
                     <td className="p-3">Interesse legítimo (art. 6.º, n.º 1, al. f) RGPD)</td>
                   </tr>
@@ -178,7 +174,7 @@ const PoliticaPrivacidade = () => {
             <ul className="list-disc pl-6 text-muted-foreground space-y-1 mt-2">
               <li>O país destino é reconhecido pela Comissão Europeia como oferecendo nível adequado de proteção; ou</li>
               <li>São implementadas salvaguardas contratuais aprovadas (Cláusulas Contratuais Tipo da Comissão Europeia); ou</li>
-              <li>O subcontratado está certificado no âmbito do Privacy Shield (quando aplicável).</li>
+              <li>O subcontratado está certificado ao abrigo do Data Privacy Framework UE-EUA (Decisão de Adequação da Comissão Europeia de julho de 2023), quando aplicável.</li>
             </ul>
           </section>
 
@@ -202,10 +198,6 @@ const PoliticaPrivacidade = () => {
               <li>
                 <strong className="text-foreground">Dados de faturação:</strong>{" "}
                 10 anos (obrigação legal fiscal);
-              </li>
-              <li>
-                <strong className="text-foreground">Consentimentos de marketing:</strong>{" "}
-                Até revogação do consentimento ou 5 anos após inatividade;
               </li>
               <li>
                 <strong className="text-foreground">Dados de navegação (cookies):</strong>{" "}

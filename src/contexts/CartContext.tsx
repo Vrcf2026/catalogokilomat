@@ -1,5 +1,15 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 
+const COOKIE_CONSENT_KEY = "kilomat_cookie_consent";
+
+function hasFunctionalConsent(): boolean {
+  try {
+    return localStorage.getItem(COOKIE_CONSENT_KEY) === "accepted";
+  } catch {
+    return false;
+  }
+}
+
 export interface CartItem {
   id: string;
   name: string;
@@ -26,6 +36,7 @@ const CartContext = createContext<CartContextType | null>(null);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(() => {
     try {
+      if (!hasFunctionalConsent()) return [];
       const saved = localStorage.getItem("kilomat_cart");
       return saved ? JSON.parse(saved) : [];
     } catch {
@@ -36,6 +47,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
+      if (!hasFunctionalConsent()) {
+        localStorage.removeItem("kilomat_cart");
+        return;
+      }
       localStorage.setItem("kilomat_cart", JSON.stringify(items));
     } catch {}
   }, [items]);
