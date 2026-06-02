@@ -488,6 +488,18 @@ const Admin = () => {
               </SelectContent>
             </Select>
           )}
+          <Button
+            type="button"
+            variant={noImageFilter ? "default" : "outline"}
+            size="sm"
+            className="gap-1.5"
+            onClick={() => setNoImageFilter((v) => !v)}
+            title="Mostrar apenas produtos sem imagem"
+          >
+            <ImageOff className="h-4 w-4" />
+            Sem imagem
+            {noImageFilter && <X className="h-3.5 w-3.5" />}
+          </Button>
         </div>
       </section>
 
