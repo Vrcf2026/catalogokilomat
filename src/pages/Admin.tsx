@@ -18,13 +18,14 @@ import HomepageHighlightsDialog from "@/components/HomepageHighlightsDialog";
 import { KioskAccessButton } from "@/components/KioskAccessButton";
 import { AdminDashboard } from "@/components/AdminDashboard";
 import { CategoriesManager } from "@/components/CategoriesManager";
+import { BarcodeScannerDialog } from "@/components/BarcodeScannerDialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useState, useMemo, useEffect } from "react";
-import { Search, ShieldCheck, Package, Loader2, LogOut, Trash2, CheckSquare, Square, XSquare, Settings2, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
-import { Image as ImageIcon, Tag, Layers, Bookmark } from "lucide-react";
+import { Search, ShieldCheck, Package, Loader2, LogOut, Trash2, CheckSquare, Square, XSquare, Settings2, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Image as ImageIcon, ImageOff, Tag, Layers, Bookmark } from "lucide-react";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
@@ -38,6 +39,7 @@ const Admin = () => {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [familyFilter, setFamilyFilter] = useState("all");
   const [brandFilter, setBrandFilter] = useState("all");
+  const [noImageFilter, setNoImageFilter] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [selectionMode, setSelectionMode] = useState(false);
@@ -64,14 +66,14 @@ const Admin = () => {
   // Reset page when filters change
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, categoryFilter, familyFilter, brandFilter, pageSize]);
+  }, [debouncedSearch, categoryFilter, familyFilter, brandFilter, noImageFilter, pageSize]);
 
   const handleLogout = async () => {
     await signOut();
     navigate("/");
   };
 
-  const productsQueryKey = ["products", "paginated", { debouncedSearch, categoryFilter, familyFilter, brandFilter, page, pageSize }];
+  const productsQueryKey = ["products", "paginated", { debouncedSearch, categoryFilter, familyFilter, brandFilter, noImageFilter, page, pageSize }];
   const { data: productsResult, isLoading } = useQuery({
     queryKey: productsQueryKey,
     queryFn: async () => {
@@ -82,6 +84,7 @@ const Admin = () => {
         if (familyFilter !== "all") q = q.eq("family_id", familyFilter);
         if (brandFilter === "none") q = q.is("brand_id", null);
         else if (brandFilter !== "all") q = q.eq("brand_id", brandFilter);
+        if (noImageFilter) q = q.is("image_url", null);
         return q;
       };
       const countQuery = buildFilters(client.from("products").select("id", { count: "exact", head: true }));
@@ -304,6 +307,35 @@ const Admin = () => {
   const visibleFamilies = categoryFilter === "all" ? families : families.filter((f) => f.category === categoryFilter);
   const visibleBrands = brands;
 
+  const handleBarcodeDetected = async (code: string) => {
+    const cleaned = code.trim();
+    if (!cleaned) return;
+    toast.info(`Código lido: ${cleaned}`);
+    try {
+      // Try exact SKU first, then fuzzy
+      let { data } = await (supabase as any)
+        .from("products")
+        .select(PRODUCT_COLUMNS)
+        .eq("sku", cleaned)
+        .limit(1);
+      if (!data || data.length === 0) {
+        const res = await (supabase as any)
+          .from("products")
+          .select(PRODUCT_COLUMNS)
+          .ilike("sku", `%${cleaned}%`)
+          .limit(2);
+        data = res.data;
+      }
+      if (!data || data.length === 0) {
+        toast.error(`Nenhum produto com código "${cleaned}"`);
+        return;
+      }
+      setEditingProduct(data[0]);
+    } catch (e: any) {
+      toast.error("Erro ao procurar produto: " + e.message);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <SEO
@@ -323,6 +355,7 @@ const Admin = () => {
           </div>
           <div className="flex items-center gap-2 flex-wrap justify-end">
             <AddProductDialog families={families} categories={categoryNames} brands={brands} />
+            <BarcodeScannerDialog onDetected={handleBarcodeDetected} />
             <Button
               variant={toolsOpen ? "default" : "outline"}
               size="sm"
@@ -396,6 +429,11 @@ const Admin = () => {
             productImages={productImages}
             families={families}
             brands={brands}
+            onFilterNoImage={() => {
+              setNoImageFilter(true);
+              setDashboardOpen(false);
+              toast.info("A mostrar apenas produtos sem imagem");
+            }}
           />
         )}
       </section>
@@ -450,6 +488,18 @@ const Admin = () => {
               </SelectContent>
             </Select>
           )}
+          <Button
+            type="button"
+            variant={noImageFilter ? "default" : "outline"}
+            size="sm"
+            className="gap-1.5"
+            onClick={() => setNoImageFilter((v) => !v)}
+            title="Mostrar apenas produtos sem imagem"
+          >
+            <ImageOff className="h-4 w-4" />
+            Sem imagem
+            {noImageFilter && <X className="h-3.5 w-3.5" />}
+          </Button>
         </div>
       </section>
 

@@ -13,9 +13,10 @@ interface AdminDashboardProps {
   productImages: any[];
   families: { id: string; name: string; category: string }[];
   brands: { id: string; name: string }[];
+  onFilterNoImage?: () => void;
 }
 
-export function AdminDashboard({ products, productImages, families, brands }: AdminDashboardProps) {
+export function AdminDashboard({ products, productImages, families, brands, onFilterNoImage }: AdminDashboardProps) {
   const [dateRange, setDateRange] = useState("all");
   const [clearing, setClearing] = useState(false);
   const [generatingSlugs, setGeneratingSlugs] = useState(false);
@@ -206,7 +207,7 @@ export function AdminDashboard({ products, productImages, families, brands }: Ad
         <StatCard icon={Package} label="Total Produtos" value={totalProducts} />
         <StatCard icon={Star} label="Destaques" value={featuredProducts} />
         <StatCard icon={BarChart3} label="No Catálogo" value={catalogProducts} />
-        <StatCard icon={ImageOff} label="Sem Imagem" value={productsWithoutImage} color="text-orange-500" />
+        <StatCard icon={ImageOff} label="Sem Imagem" value={productsWithoutImage} color="text-orange-500" onClick={onFilterNoImage} />
         <StatCard icon={MousePointerClick} label="Total Cliques" value={totalClicks} color="text-blue-500" />
         <StatCard icon={ShoppingCart} label="Total Orçamentos" value={totalQuotes} color="text-green-500" />
       </div>
@@ -300,9 +301,12 @@ export function AdminDashboard({ products, productImages, families, brands }: Ad
   );
 }
 
-function StatCard({ icon: Icon, label, value, color }: { icon: any; label: string; value: number; color?: string }) {
+function StatCard({ icon: Icon, label, value, color, onClick }: { icon: any; label: string; value: number; color?: string; onClick?: () => void }) {
   return (
-    <Card>
+    <Card
+      onClick={onClick}
+      className={onClick ? "cursor-pointer hover:bg-accent/40 transition-colors" : ""}
+    >
       <CardContent className="flex items-center gap-3 p-4">
         <Icon className={`h-5 w-5 ${color || "text-primary"}`} />
         <div>

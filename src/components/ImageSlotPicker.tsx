@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Lock, Unlock, X, Search, Sparkles, Upload, Loader2, RefreshCw } from "lucide-react";
+import { Lock, Unlock, X, Search, Sparkles, Upload, Loader2, RefreshCw, Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface ImageSlot {
@@ -30,6 +30,7 @@ export function ImageSlotPicker({ slots, onSlotsChange, productName, brandName, 
   const [searchResults, setSearchResults] = useState<string[]>([]);
   const [showResults, setShowResults] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const lockedCount = slots.filter((s) => s.locked).length;
   const unlockedSlotCount = slots.filter((s) => !s.locked).length + (3 - slots.length);
@@ -259,7 +260,7 @@ export function ImageSlotPicker({ slots, onSlotsChange, productName, brandName, 
       </div>
 
       <div className="flex flex-col gap-2">
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-4 gap-2">
           <Button
             type="button"
             variant="outline"
@@ -270,6 +271,18 @@ export function ImageSlotPicker({ slots, onSlotsChange, productName, brandName, 
           >
             {searching ? <Loader2 className="h-3 w-3 animate-spin" /> : <Search className="h-3 w-3" />}
             Web
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => cameraInputRef.current?.click()}
+            disabled={disabled || generating || unlockedSlotCount === 0}
+            className="gap-1 text-xs"
+            title="Tirar foto com a câmara"
+          >
+            <Camera className="h-3 w-3" />
+            Câmara
           </Button>
           <Button
             type="button"
@@ -345,6 +358,14 @@ export function ImageSlotPicker({ slots, onSlotsChange, productName, brandName, 
         type="file"
         accept="image/*"
         multiple
+        onChange={handleFileSelect}
+        className="hidden"
+      />
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
         onChange={handleFileSelect}
         className="hidden"
       />
