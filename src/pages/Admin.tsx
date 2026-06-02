@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useState, useMemo, useEffect } from "react";
-import { Search, ShieldCheck, Package, Loader2, LogOut, Trash2, CheckSquare, Square, XSquare, Settings2, ChevronDown, ChevronUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ShieldCheck, Package, Loader2, LogOut, Trash2, CheckSquare, Square, XSquare, Settings2, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Image as ImageIcon, ImageOff, Tag, Layers, Bookmark } from "lucide-react";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
 import { Checkbox } from "@/components/ui/checkbox";
