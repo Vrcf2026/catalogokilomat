@@ -22,6 +22,14 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
   const videoRef = useRef<HTMLVideoElement>(null);
   const controlsRef = useRef<{ stop: () => void } | null>(null);
   const trackRef = useRef<MediaStreamTrack | null>(null);
+  const nativeScanTimerRef = useRef<number | null>(null);
+
+  const stopNativeScan = () => {
+    if (nativeScanTimerRef.current !== null) {
+      window.clearTimeout(nativeScanTimerRef.current);
+      nativeScanTimerRef.current = null;
+    }
+  };
 
   useEffect(() => {
     if (!open) {
@@ -31,6 +39,7 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
     }
 
     let cancelled = false;
+    let detected = false;
     let activeStream: MediaStream | null = null;
     setError(null);
     setStarting(true);
@@ -53,6 +62,51 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
     ]);
     hints.set(DecodeHintType.TRY_HARDER, true);
     const reader = new BrowserMultiFormatReader(hints, { delayBetweenScanAttempts: 120 });
+
+    const finishWithCode = (text: string, ctrl?: { stop: () => void }) => {
+      if (cancelled || detected) return;
+      detected = true;
+      stopNativeScan();
+      ctrl?.stop();
+      controlsRef.current?.stop();
+      activeStream?.getTracks().forEach((t) => t.stop());
+      activeStream = null;
+      controlsRef.current = null;
+      setOpen(false);
+      onDetected(text);
+    };
+
+    const startNativeScanner = async () => {
+      const BarcodeDetector = (window as any).BarcodeDetector;
+      if (!BarcodeDetector || !videoRef.current) return;
+      try {
+        const wantedFormats = ["ean_13", "ean_8", "upc_a", "upc_e", "code_128", "code_39", "itf", "qr_code", "data_matrix"];
+        const supported = typeof BarcodeDetector.getSupportedFormats === "function" ? await BarcodeDetector.getSupportedFormats() : wantedFormats;
+        const formats = wantedFormats.filter((f) => supported.includes(f));
+        if (!formats.length) return;
+        const detector = new BarcodeDetector({ formats });
+        const scan = async () => {
+          if (cancelled || detected) return;
+          try {
+            const video = videoRef.current;
+            if (video && video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+              const codes = await detector.detect(video);
+              const value = codes?.find((c: any) => c?.rawValue)?.rawValue?.trim();
+              if (value) {
+                finishWithCode(value);
+                return;
+              }
+            }
+          } catch {
+            // Keep ZXing fallback running if native detection fails on a frame.
+          }
+          nativeScanTimerRef.current = window.setTimeout(scan, 160);
+        };
+        scan();
+      } catch {
+        // Native BarcodeDetector is optional; ZXing continues as fallback.
+      }
+    };
 
     (async () => {
       try {
@@ -110,15 +164,9 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
           stream,
           videoRef.current,
           (result, _err, ctrl) => {
-            if (cancelled) return;
+            if (cancelled || detected) return;
             if (result) {
-              const text = result.getText();
-              ctrl.stop();
-              activeStream?.getTracks().forEach((t) => t.stop());
-              activeStream = null;
-              controlsRef.current = null;
-              setOpen(false);
-              onDetected(text);
+              finishWithCode(result.getText(), ctrl);
             }
           },
         );
@@ -129,10 +177,12 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
         } else {
           controlsRef.current = {
             stop: () => {
+              stopNativeScan();
               controls.stop();
               stream.getTracks().forEach((t) => t.stop());
             },
           };
+          startNativeScanner();
           setStarting(false);
         }
       } catch (e: any) {
@@ -157,6 +207,7 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
 
     return () => {
       cancelled = true;
+      stopNativeScan();
       controlsRef.current?.stop();
       controlsRef.current = null;
       activeStream?.getTracks().forEach((t) => t.stop());
