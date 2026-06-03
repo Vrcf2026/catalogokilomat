@@ -318,8 +318,12 @@ const Admin = () => {
         [
           cleaned,
           compact,
+          digitsOnly.length >= 6 ? digitsOnly.slice(-6) : "",
+          digitsOnly.length >= 6 ? digitsOnly.slice(-6).replace(/^0+/, "") : "",
           digitsOnly.length === 13 ? digitsOnly.slice(6, 12) : "",
           digitsOnly.length === 13 ? digitsOnly.slice(6, 12).replace(/^0+/, "") : "",
+          digitsOnly.length === 13 ? digitsOnly.slice(7, 12) : "",
+          digitsOnly.length === 13 ? digitsOnly.slice(7, 12).replace(/^0+/, "") : "",
           digitsOnly.length === 13 ? digitsOnly.slice(0, 12) : "",
         ].filter(Boolean),
       ),
