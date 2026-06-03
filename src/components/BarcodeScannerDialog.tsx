@@ -3,7 +3,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { ScanLine, Loader2, X } from "lucide-react";
 import { BrowserMultiFormatReader } from "@zxing/browser";
-import { toast } from "sonner";
 
 interface BarcodeScannerDialogProps {
   onDetected: (code: string) => void;
@@ -24,6 +23,7 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
     }
 
     let cancelled = false;
+    let activeStream: MediaStream | null = null;
     setError(null);
     setStarting(true);
 
@@ -31,42 +31,77 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
 
     (async () => {
       try {
-        const devices = await BrowserMultiFormatReader.listVideoInputDevices();
-        // Prefer back camera
-        const back = devices.find((d) => /back|rear|environment|traseira/i.test(d.label));
-        const deviceId = back?.deviceId ?? devices[0]?.deviceId;
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw new Error("Câmara não suportada neste browser.");
+        }
+        if (!window.isSecureContext) {
+          throw new Error("É necessário HTTPS para aceder à câmara.");
+        }
 
-        if (!videoRef.current) return;
+        // Request camera FIRST (with rear preference) to trigger the permission prompt.
+        // This also ensures device labels are populated on subsequent enumeration.
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" } },
+          audio: false,
+        });
 
-        const controls = await reader.decodeFromVideoDevice(
-          deviceId ?? undefined,
+        if (cancelled) {
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        activeStream = stream;
+
+        if (!videoRef.current) {
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+
+        // Attach the stream directly so we keep the rear-camera selection.
+        const controls = await reader.decodeFromStream(
+          stream,
           videoRef.current,
           (result, _err, ctrl) => {
             if (cancelled) return;
             if (result) {
               const text = result.getText();
               ctrl.stop();
+              activeStream?.getTracks().forEach((t) => t.stop());
+              activeStream = null;
               controlsRef.current = null;
               setOpen(false);
               onDetected(text);
             }
           },
         );
+
         if (cancelled) {
           controls.stop();
+          stream.getTracks().forEach((t) => t.stop());
         } else {
-          controlsRef.current = controls;
+          controlsRef.current = {
+            stop: () => {
+              controls.stop();
+              stream.getTracks().forEach((t) => t.stop());
+            },
+          };
           setStarting(false);
         }
       } catch (e: any) {
         console.error("Scanner error:", e);
         if (!cancelled) {
+          const name = e?.name;
           setError(
-            e?.name === "NotAllowedError"
-              ? "Permissão da câmara negada. Autorize o acesso e tente novamente."
-              : "Não foi possível aceder à câmara.",
+            name === "NotAllowedError" || name === "SecurityError"
+              ? "Permissão da câmara negada. Autorize o acesso nas definições do browser e tente novamente."
+              : name === "NotFoundError" || name === "OverconstrainedError"
+                ? "Nenhuma câmara disponível neste dispositivo."
+                : name === "NotReadableError"
+                  ? "A câmara está a ser usada por outra aplicação."
+                  : e?.message || "Não foi possível aceder à câmara.",
           );
           setStarting(false);
+          activeStream?.getTracks().forEach((t) => t.stop());
+          activeStream = null;
         }
       }
     })();
@@ -75,6 +110,8 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
       cancelled = true;
       controlsRef.current?.stop();
       controlsRef.current = null;
+      activeStream?.getTracks().forEach((t) => t.stop());
+      activeStream = null;
     };
   }, [open, onDetected]);
 
