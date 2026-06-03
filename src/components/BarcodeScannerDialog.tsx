@@ -94,7 +94,7 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
       const BarcodeDetector = (window as Window & typeof globalThis & { BarcodeDetector?: BarcodeDetectorConstructor }).BarcodeDetector;
       if (!BarcodeDetector || !videoRef.current) return;
       try {
-        const wantedFormats = ["ean_13", "ean_8", "upc_a", "upc_e", "code_128", "code_39", "itf", "qr_code", "data_matrix"];
+        const wantedFormats: BarcodeDetectorFormat[] = ["ean_13", "ean_8", "upc_a", "upc_e", "code_128", "code_39", "itf", "qr_code", "data_matrix"];
         const supported = typeof BarcodeDetector.getSupportedFormats === "function" ? await BarcodeDetector.getSupportedFormats() : wantedFormats;
         const formats = wantedFormats.filter((f) => supported.includes(f));
         if (!formats.length) return;
