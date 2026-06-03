@@ -10,6 +10,20 @@ interface BarcodeScannerDialogProps {
   onDetected: (code: string) => void;
 }
 
+type BarcodeDetectorFormat = "ean_13" | "ean_8" | "upc_a" | "upc_e" | "code_128" | "code_39" | "itf" | "qr_code" | "data_matrix";
+type DetectedBarcode = { rawValue?: string };
+type BarcodeDetectorConstructor = {
+  new (options: { formats: BarcodeDetectorFormat[] }): { detect: (source: CanvasImageSource) => Promise<DetectedBarcode[]> };
+  getSupportedFormats?: () => Promise<BarcodeDetectorFormat[]>;
+};
+type CameraCapabilities = MediaTrackCapabilities & {
+  focusMode?: string[];
+  torch?: boolean;
+  zoom?: { min?: number; max?: number; step?: number };
+};
+type CameraSettings = MediaTrackSettings & { zoom?: number };
+type AdvancedCameraConstraint = MediaTrackConstraintSet & { focusMode?: string; torch?: boolean; zoom?: number };
+
 export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) {
   const [open, setOpen] = useState(false);
   const [starting, setStarting] = useState(false);
@@ -77,7 +91,7 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
     };
 
     const startNativeScanner = async () => {
-      const BarcodeDetector = (window as any).BarcodeDetector;
+      const BarcodeDetector = (window as Window & typeof globalThis & { BarcodeDetector?: BarcodeDetectorConstructor }).BarcodeDetector;
       if (!BarcodeDetector || !videoRef.current) return;
       try {
         const wantedFormats = ["ean_13", "ean_8", "upc_a", "upc_e", "code_128", "code_39", "itf", "qr_code", "data_matrix"];
@@ -91,7 +105,7 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
             const video = videoRef.current;
             if (video && video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
               const codes = await detector.detect(video);
-              const value = codes?.find((c: any) => c?.rawValue)?.rawValue?.trim();
+              const value = codes?.find((c) => c?.rawValue)?.rawValue?.trim();
               if (value) {
                 finishWithCode(value);
                 return;
@@ -124,7 +138,7 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
             facingMode: { ideal: "environment" },
             width: { ideal: 2560 },
             height: { ideal: 1440 },
-            // @ts-ignore - non-standard but widely supported
+            // @ts-expect-error - non-standard but widely supported
             focusMode: "continuous",
           },
           audio: false,
@@ -134,14 +148,14 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
         try {
           const track = stream.getVideoTracks()[0];
           trackRef.current = track;
-          const caps: any = track.getCapabilities?.() ?? {};
-          const advanced: any[] = [];
+          const caps = (track.getCapabilities?.() ?? {}) as CameraCapabilities;
+          const advanced: AdvancedCameraConstraint[] = [];
           if (caps.focusMode?.includes?.("continuous")) advanced.push({ focusMode: "continuous" });
-          if (advanced.length) await track.applyConstraints({ advanced } as any);
+          if (advanced.length) await track.applyConstraints({ advanced } as MediaTrackConstraints);
           if (caps.torch) setTorchAvailable(true);
           if (typeof caps.zoom === "object" && caps.zoom) {
             setZoomCaps({ min: caps.zoom.min ?? 1, max: caps.zoom.max ?? 1, step: caps.zoom.step ?? 0.1 });
-            const settings: any = track.getSettings?.() ?? {};
+            const settings = (track.getSettings?.() ?? {}) as CameraSettings;
             if (settings.zoom) setZoom(settings.zoom);
           }
         } catch {
@@ -185,10 +199,11 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
           startNativeScanner();
           setStarting(false);
         }
-      } catch (e: any) {
+      } catch (e: unknown) {
         console.error("Scanner error:", e);
         if (!cancelled) {
-          const name = e?.name;
+          const name = e instanceof DOMException || e instanceof Error ? e.name : undefined;
+          const message = e instanceof Error ? e.message : undefined;
           setError(
             name === "NotAllowedError" || name === "SecurityError"
               ? "Permissão da câmara negada. Autorize o acesso nas definições do browser e tente novamente."
@@ -196,7 +211,7 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
                 ? "Nenhuma câmara disponível neste dispositivo."
                 : name === "NotReadableError"
                   ? "A câmara está a ser usada por outra aplicação."
-                  : e?.message || "Não foi possível aceder à câmara.",
+                  : message || "Não foi possível aceder à câmara.",
           );
           setStarting(false);
           activeStream?.getTracks().forEach((t) => t.stop());
