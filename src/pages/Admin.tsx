@@ -330,7 +330,7 @@ const Admin = () => {
     );
     try {
       // Try exact SKU first, including common EAN-13 labels where the internal article code is embedded before the check digit.
-      let data: any[] | null = null;
+      let data: NonNullable<typeof products> | null = null;
       for (const candidate of candidates) {
         const res = await (supabase as any)
           .from("products")
