@@ -236,7 +236,7 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
     if (!track) return;
     try {
       const next = !torchOn;
-      await track.applyConstraints({ advanced: [{ torch: next } as any] });
+      await track.applyConstraints({ advanced: [{ torch: next } as AdvancedCameraConstraint] } as MediaTrackConstraints);
       setTorchOn(next);
     } catch (e) {
       console.warn("Torch toggle failed", e);
@@ -248,7 +248,7 @@ export function BarcodeScannerDialog({ onDetected }: BarcodeScannerDialogProps) 
     if (!track || !zoomCaps) return;
     const clamped = Math.min(zoomCaps.max, Math.max(zoomCaps.min, next));
     try {
-      await track.applyConstraints({ advanced: [{ zoom: clamped } as any] });
+      await track.applyConstraints({ advanced: [{ zoom: clamped } as AdvancedCameraConstraint] } as MediaTrackConstraints);
       setZoom(clamped);
     } catch (e) {
       console.warn("Zoom apply failed", e);
