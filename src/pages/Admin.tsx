@@ -311,20 +311,49 @@ const Admin = () => {
     const cleaned = code.trim();
     if (!cleaned) return;
     toast.info(`Código lido: ${cleaned}`);
+    const compact = cleaned.replace(/[\s-]/g, "");
+    const digitsOnly = compact.replace(/\D/g, "");
+    const candidates = Array.from(
+      new Set(
+        [
+          cleaned,
+          compact,
+          digitsOnly.length >= 6 ? digitsOnly.slice(-6) : "",
+          digitsOnly.length >= 6 ? digitsOnly.slice(-6).replace(/^0+/, "") : "",
+          digitsOnly.length === 13 ? digitsOnly.slice(6, 12) : "",
+          digitsOnly.length === 13 ? digitsOnly.slice(6, 12).replace(/^0+/, "") : "",
+          digitsOnly.length === 13 ? digitsOnly.slice(7, 12) : "",
+          digitsOnly.length === 13 ? digitsOnly.slice(7, 12).replace(/^0+/, "") : "",
+          digitsOnly.length === 13 ? digitsOnly.slice(0, 12) : "",
+        ].filter(Boolean),
+      ),
+    );
     try {
-      // Try exact SKU first, then fuzzy
-      let { data } = await (supabase as any)
-        .from("products")
-        .select(PRODUCT_COLUMNS)
-        .eq("sku", cleaned)
-        .limit(1);
-      if (!data || data.length === 0) {
+      // Try exact SKU first, including common EAN-13 labels where the internal article code is embedded before the check digit.
+      let data: NonNullable<typeof products> | null = null;
+      for (const candidate of candidates) {
         const res = await (supabase as any)
           .from("products")
           .select(PRODUCT_COLUMNS)
-          .ilike("sku", `%${cleaned}%`)
-          .limit(2);
-        data = res.data;
+          .eq("sku", candidate)
+          .limit(1);
+        if (res.data?.length) {
+          data = res.data;
+          break;
+        }
+      }
+      if (!data || data.length === 0) {
+        for (const candidate of candidates) {
+          const res = await (supabase as any)
+            .from("products")
+            .select(PRODUCT_COLUMNS)
+            .ilike("sku", `%${candidate}%`)
+            .limit(2);
+          if (res.data?.length) {
+            data = res.data;
+            break;
+          }
+        }
       }
       if (!data || data.length === 0) {
         toast.error(`Nenhum produto com código "${cleaned}"`);
