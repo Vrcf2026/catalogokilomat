@@ -365,6 +365,67 @@ const Admin = () => {
     }
   };
 
+  // Global HID barcode scanner capture (PDAs / USB / Bluetooth scanners that emit keystrokes + Enter).
+  // Detects fast keystroke sequences (avg gap < 35ms) ending with Enter and routes them to handleBarcodeDetected.
+  useEffect(() => {
+    let buffer = "";
+    let lastTime = 0;
+    let firstTime = 0;
+    const FAST_GAP_MS = 35;
+    const MIN_LEN = 4;
+
+    const isTypingTarget = (el: EventTarget | null) => {
+      if (!(el instanceof HTMLElement)) return false;
+      const tag = el.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+      if (el.isContentEditable) return true;
+      return false;
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      // Skip when an edit dialog is open or the user is typing in a field — manual input shouldn't trigger this.
+      if (isTypingTarget(e.target)) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      const now = performance.now();
+      const gap = now - lastTime;
+
+      if (e.key === "Enter") {
+        const totalTime = now - firstTime;
+        const avgGap = buffer.length > 1 ? totalTime / buffer.length : 999;
+        const candidate = buffer;
+        buffer = "";
+        lastTime = 0;
+        firstTime = 0;
+        if (candidate.length >= MIN_LEN && avgGap < FAST_GAP_MS) {
+          e.preventDefault();
+          handleBarcodeDetected(candidate);
+        }
+        return;
+      }
+
+      // Reset buffer if too slow between keys (human typing)
+      if (gap > 80) {
+        buffer = "";
+        firstTime = now;
+      }
+
+      // Accept only printable single chars typical of barcodes
+      if (e.key.length === 1 && /[\w\-\.\/]/.test(e.key)) {
+        if (buffer.length === 0) firstTime = now;
+        buffer += e.key;
+        lastTime = now;
+      } else {
+        buffer = "";
+        lastTime = 0;
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <SEO
