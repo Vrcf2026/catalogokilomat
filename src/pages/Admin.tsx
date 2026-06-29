@@ -19,6 +19,7 @@ import { KioskAccessButton } from "@/components/KioskAccessButton";
 import { AdminDashboard } from "@/components/AdminDashboard";
 import { CategoriesManager } from "@/components/CategoriesManager";
 import { BarcodeScannerDialog } from "@/components/BarcodeScannerDialog";
+import { EmailHealthPanel } from "@/components/EmailHealthPanel";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -532,6 +533,7 @@ const Admin = () => {
         <TabsList>
           <TabsTrigger value="produtos">Produtos</TabsTrigger>
           <TabsTrigger value="categorias">Categorias</TabsTrigger>
+          <TabsTrigger value="emails">Emails</TabsTrigger>
         </TabsList>
         <TabsContent value="produtos">
       <section className="py-8">
@@ -774,6 +776,9 @@ const Admin = () => {
         </TabsContent>
         <TabsContent value="categorias" className="py-8">
           <CategoriesManager />
+        </TabsContent>
+        <TabsContent value="emails">
+          <EmailHealthPanel />
         </TabsContent>
       </Tabs>
 
