@@ -15,6 +15,7 @@ import { template as suggestionAdmin } from './suggestion-admin.tsx'
 import { template as suggestionCustomer } from './suggestion-customer.tsx'
 import { template as contactAdmin } from './contact-admin.tsx'
 import { template as contactCustomer } from './contact-customer.tsx'
+import { template as emailHealthAlert } from './email-health-alert.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'quote-request-admin': quoteRequestAdmin,
@@ -23,4 +24,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'suggestion-customer': suggestionCustomer,
   'contact-admin': contactAdmin,
   'contact-customer': contactCustomer,
+  'email-health-alert': emailHealthAlert,
 }
